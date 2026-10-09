@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>MONTÈ Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mute:#777;--line:#e6e6e6;--bg:#fafafa}
+*{box-sizing:border-box;margin:0}
+body{font-family:Inter,sans-serif;font-weight:300;color:var(--ink);background:var(--bg);font-size:13px}
+button,input,select{font:inherit;color:inherit}
+.logo{font-family:'Playfair Display',serif;letter-spacing:.4em;font-size:20px}
+.eb{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--mute)}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#fff;border:1px solid var(--line);padding:40px;width:100%;max-width:380px}
+input,select{width:100%;border:1px solid var(--line);padding:12px;background:#fff;margin-top:6px;outline:none;border-radius:0}
+input:focus,select:focus{border-color:#000}
+label{display:block;margin-top:16px}
+.btn{background:#000;color:#fff;border:0;padding:12px 20px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.btn.l{background:#fff;color:#000;border:1px solid var(--line)}
+.btn:hover{opacity:.85}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;gap:12px;flex-wrap:wrap}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 14px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;color:var(--mute);border-bottom:1px solid transparent}
+nav button.on{color:#000;border-color:#000}
+main{padding:24px;max-width:1200px;margin:auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.st{background:#fff;border:1px solid var(--line);padding:18px}
+.st b{display:block;font-weight:400;font-size:24px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--line);padding:24px;margin-bottom:16px}
+.tw{overflow-x:auto;background:#fff;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{text-align:left;font-weight:400;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding:14px;border-bottom:1px solid var(--line)}
+td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+td select{margin:0;padding:8px;width:auto}
+.tag{font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--line)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.sz{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sz button{width:56px;height:40px;border:1px solid #000;background:#fff;cursor:pointer}
+.sz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
+.hide{display:none!important}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:12px 22px;font-size:11px;letter-spacing:.1em;opacity:0;pointer-events:none;transition:.3s;z-index:99}
+#toast.show{opacity:1}
+textarea{width:100%;border:1px solid var(--line);padding:12px;background:#fff;margin-top:6px;outline:none;border-radius:0;min-height:84px;resize:vertical;font:inherit}
+textarea:focus{border-color:#000}
+.th{width:44px;height:55px;object-fit:cover;background:#f2f2f2;display:block}
+.sub{margin:30px 0 4px;padding-top:22px;border-top:1px solid var(--line)}
+.chipz{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chipz button{min-width:52px;height:38px;border:1px solid #000;background:#fff;cursor:pointer}
+.chipz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
+.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="box">
+    <div class="logo" style="text-align:center">MONTÈ</div>
+    <p class="eb" style="text-align:center;margin:10px 0 24px">Admin Console</p>
+    <label class="eb">Email<input id="em" type="email" autocomplete="username"></label>
+    <label class="eb">Password<input id="pw" type="password" autocomplete="current-password"></label>
+    <button class="btn" style="width:100%;margin-top:24px" onclick="doLogin()">Sign in</button>
+    <p id="lerr" style="color:#b00020;margin-top:14px;font-size:12px"></p>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <header>
+    <div class="logo">MONTÈ <span class="eb" style="letter-spacing:.2em">Admin</span></div>
+    <nav id="tabs">
+      <button class="on" data-t="orders">Orders</button>
+      <button data-t="product">Products</button>
+      <button data-t="coupons">Coupons</button>
+      <button data-t="settings">Settings</button>
+    </nav>
+    <button class="btn l" onclick="doOut()">Sign out</button>
+  </header>
+  <main>
+    <div class="stats">
+      <div class="st"><span class="eb">Total orders</span><b id="sT">0</b></div>
+      <div class="st"><span class="eb">To ship</span><b id="sP">0</b></div>
+      <div class="st"><span class="eb">Shipped</span><b id="sS">0</b></div>
+      <div class="st"><span class="eb">Revenue (excl. cancelled)</span><b id="sR">₹0</b></div>
+    </div>
+
+    <section id="t-orders">
+      <div class="row" style="margin-bottom:12px">
+        <input id="q" placeholder="Search order ID, name, email…" oninput="renderOrders()">
+        <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
+      </div>
+      <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="ob"></tbody></table></div>
+    </section>
+
+    <section id="t-product" class="hide">
+      <div id="plist">
+        <div class="row" style="margin-bottom:14px;align-items:flex-end">
+          <button class="btn" style="flex:0 0 auto" onclick="newProd()">+ New product</button>
+          <label class="eb" style="margin:0">Bulk discount % on all products<input id="bulkPct" type="number" min="1" max="90" placeholder="e.g. 20"></label>
+          <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount()">Apply</button>
+          <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount(true)">Remove all discounts</button>
+          <button id="impBtn" class="btn l hide" style="flex:0 0 auto" onclick="importDefault()">Import Signature Tee</button>
+        </div>
+        <div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
+      </div>
+      <div id="pedit" class="card hide">
+        <p class="eb" id="pTitle">New product</p>
+        <p class="eb sub">Section &amp; identity</p>
+        <div class="row"><label class="eb">Section *<select id="fGen" onchange="catOpts();autoSku()"><option value="WOMEN">Women</option><option value="MEN">Men</option><option value="KIDS">Kids</option><option value="UNISEX">Unisex</option></select></label><label class="eb">Category *<input id="fCat" list="cats" oninput="autoSku()" placeholder="Shirts, Dresses, Knitwear…"><datalist id="cats"></datalist></label><label class="eb">Product name *<input id="fName"></label></div>
+        <div class="row"><label class="eb">SKU (auto)<input id="fSku" readonly></label><label class="eb">Collection<input id="fColl" placeholder="Autumn Winter 2026"></label><label class="eb">Fit<input id="fFit" placeholder="Relaxed, Slim, Oversized"></label></div>
+        <p class="eb" id="skuPrev" style="margin-top:8px"></p>
+        <p class="eb sub">Story &amp; craft</p>
+        <label class="eb">Description *<textarea id="fDesc" placeholder="Design story, silhouette, feel"></textarea></label>
+        <div class="row"><label class="eb">Composition / material *<input id="fComp" placeholder="100% organic cotton, 280 gsm"></label><label class="eb">Made in *<input id="fOrigin" placeholder="India"></label><label class="eb">Model wears<input id="fModel" placeholder="Model is 6'1&quot;, wears size M"></label></div>
+        <div class="row"><label class="eb">Details (one per line)<textarea id="fDet" placeholder="Mother-of-pearl buttons&#10;Chest 42 in, length 28 in"></textarea></label>
+        <label class="eb">Care instructions *<textarea id="fCare" placeholder="Machine wash cold. Do not bleach."></textarea></label></div>
+        <p class="eb sub">Price &amp; offer</p>
+        <div class="row"><label class="eb">Selling price ₹ *<input id="fPrice" type="number" min="1" oninput="calcOff()"></label><label class="eb">MRP ₹ *<input id="fMrp" type="number" min="1" oninput="calcOff()"></label><label class="eb">Discount<input id="fOff" disabled></label></div>
+        <div class="row"><label class="eb">Offer line on product page<input id="fOffer" placeholder="Buy now and get free delivery"></label><label class="eb">Tag (shown on photo)<input id="fBadge" placeholder="NEW, BESTSELLER"></label></div>
+        <p class="eb sub">Availability</p>
+        <select id="fStatus" style="max-width:300px"><option value="ACTIVE">Available</option><option value="OUT_OF_STOCK">Sold out</option><option value="COMING_SOON">Scheduled launch (countdown)</option><option value="DRAFT">Hidden (draft)</option></select>
+        <label class="eb" id="launchRow" style="max-width:300px">Launch date &amp; time (shown as countdown; orders open exactly then)<input id="fLaunch" type="datetime-local"></label>
+        <p class="eb sub">Photos &amp; variants</p>
+        <label class="eb">Shared photos (optional, used when a colour has none)<textarea id="fImgs" placeholder="https://…/front.jpg&#10;https://…/back.jpg"></textarea></label>
+        <p class="eb" style="margin-top:16px">Colours: each colour gets its own photos, the website switches photos when the customer picks a colour *</p><div id="colRows"></div><button class="btn l" style="margin-top:8px" onclick="addCol()">+ Add colour</button>
+        <label class="eb">Sizes (comma separated)<input id="fSizes" oninput="buildChips()" placeholder="S, M, L, XL"></label>
+        <p class="eb" style="margin-top:16px">Tap a size or colour to mark it out of stock</p><div class="chipz" id="chipBox"></div>
+        <div style="margin-top:28px;display:flex;gap:10px"><button class="btn" onclick="saveProd()">Save product</button><button class="btn l" onclick="closeEdit()">Cancel</button></div>
+      </div>
+    </section>
+
+    <section id="t-coupons" class="hide">
+      <div class="card">
+        <p class="eb">New coupon</p>
+        <div class="row">
+          <label class="eb">Code<input id="cCode" placeholder="DIWALI100" style="text-transform:uppercase"></label>
+          <label class="eb">Discount (₹ off)<input id="cDisc" type="number" min="1"></label>
+          <div style="display:flex;align-items:flex-end"><button class="btn" onclick="addCoupon()" style="width:100%">Add coupon</button></div>
+        </div>
+      </div>
+      <div class="tw"><table style="min-width:520px"><thead><tr><th>Code</th><th>Discount</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
+    </section>
+  <section id="t-settings" class="hide">
+      <div class="card">
+        <p class="eb">Website offer banner (top strip)</p>
+        <div class="row"><label class="eb">Banner text<input id="sBanner" placeholder="Festive sale: extra ₹100 off with code DIWALI"></label><label class="eb">Show banner<select id="sBannerOn"><option value="1">On</option><option value="0">Off</option></select></label></div>
+        <p class="eb sub">Business details (used in Terms, Privacy, Returns, Contact pages)</p>
+        <div class="row"><label class="eb">Legal / business name<input id="sName"></label><label class="eb">GSTIN (optional)<input id="sGst"></label></div>
+        <div class="row"><label class="eb">Support email<input id="sMail" type="email"></label><label class="eb">Support phone<input id="sPhone"></label></div>
+        <label class="eb">Registered address<textarea id="sAddr"></textarea></label>
+        <div class="row"><label class="eb">Grievance officer name<input id="sGrv"></label><label class="eb">Grievance officer email<input id="sGrvMail" type="email"></label><label class="eb">Return window (days, 0 = no returns)<input id="sRet" type="number" min="0" max="60"></label></div>
+        <button class="btn" style="margin-top:24px" onclick="saveSettings()">Save settings</button>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getDatabase, ref, get, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+/* ====== ONLY these emails can use the panel. Edit this list. ====== */
+const ADMIN_EMAILS = ["sgursharn076@gmail.com"];
+
+const app = initializeApp({
+  apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",authDomain:"pulse2-92372.firebaseapp.com",
+  databaseURL:"https://pulse2-92372-default-rtdb.firebaseio.com",projectId:"pulse2-92372",
+  storageBucket:"pulse2-92372.firebasestorage.app",messagingSenderId:"276235725177",appId:"1:276235725177:web:0f4e0789fae80a435927a8"});
+const auth = getAuth(app), db = getDatabase(app);
+const $ = id => document.getElementById(id);
+const SIZES = ["S","M","L","XL","2XL","3XL","4XL"];
+let orders = {}, oos = [], started = false;
+const inr = n => '₹' + Number(n||0).toLocaleString('en-IN');
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+window.doLogin = async () => {
+  $('lerr').textContent = '';
+  try { await signInWithEmailAndPassword(auth, $('em').value.trim(), $('pw').value); }
+  catch(e){ $('lerr').textContent = 'Login failed: ' + e.message; }
+};
+window.doOut = () => signOut(auth);
+
+onAuthStateChanged(auth, u => {
+  const ok = u && ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((u.email||'').toLowerCase());
+  if (u && !ok) { $('lerr').textContent = 'This account is not an admin.'; signOut(auth); return; }
+  $('login').classList.toggle('hide', !!ok);
+  $('app').classList.toggle('hide', !ok);
+  if (ok && !started) { started = true; start(); }
+});
+
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  ['orders','product','coupons','settings'].forEach(t => $('t-'+t).classList.toggle('hide', t !== b.dataset.t));
+});
+
+function start(){
+  onValue(ref(db,'orders'), s => { orders = s.val() || {}; renderOrders(); });
+  onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
+  onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
+  onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
+}
+
+/* ---------- Orders ---------- */
+window.renderOrders = () => {
+  const q = $('q').value.toLowerCase(), f = $('fs').value;
+  const list = Object.entries(orders).map(([k,o]) => ({k,...o})).sort((a,b) => (b.chronologicalCreationTimestamp||0) - (a.chronologicalCreationTimestamp||0));
+  let rev = 0, pend = 0, ship = 0;
+  list.forEach(o => { const st = (o.orderPipelineTrackingState||'').toUpperCase();
+    if (st !== 'CANCELLED') rev += Number(o.transactionSettlementAmount||0);
+    if (st === 'PLACED' || st === 'VERIFIED') pend++; if (st === 'SHIPPED') ship++; });
+  $('sT').textContent = list.length; $('sP').textContent = pend; $('sS').textContent = ship; $('sR').textContent = inr(rev);
+  const rows = list.filter(o => (!f || (o.orderPipelineTrackingState||'').toUpperCase() === f) &&
+    (!q || [o.orderId,o.clientIdentityName,o.email].join(' ').toLowerCase().includes(q)));
+  $('ob').innerHTML = rows.map(o => {
+    const st = (o.orderPipelineTrackingState||'').toUpperCase();
+    return `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN')}</span></td>
+    <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
+    <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span></td>
+    <td>${inr(o.transactionSettlementAmount)}</td>
+    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select></td></tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
+};
+window.setStatus = async (k, v) => {
+  try { await update(ref(db, 'orders/' + k), { orderPipelineTrackingState: v }); toast('Order marked ' + v); }
+  catch(e){ toast('Failed: ' + e.message); }
+};
+
+/* ---------- Products ---------- */
+const DEFAULT_PRODUCTS = {monte_signature_tee:{name:'MONTÈ Signature Tee',category:'T-Shirts',sku:'MNT-TEE-001',description:'Effortless, refined and timeless. A relaxed, oversized silhouette cut from premium cotton for all-day comfort and a clean, elevated line.',details:['Premium cotton fabric','Oversized contemporary fit','Soft-touch organic finish','Breathable and ultra-light'],care:'Machine wash cold with similar colours. Do not bleach. Dry in shade. Iron on low heat.',price:999,mrp:1499,status:'ACTIVE',badge:'',offerText:'',launchTimestamp:0,createdAt:1,images:['https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png','https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png','https://aryasongs.github.io/Pulse/9BF12F78-C4CF-4BEF-86AE-A489D8B36021.png','https://aryasongs.github.io/Pulse/B0ED3981-14B8-4A5D-83BF-D23C1DB14F2E.png'],colors:[{name:'Midnight Navy',hex:'#1A2332',image:'https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png'},{name:'Arctic Blanc',hex:'#F5F5F5',image:'https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png'}],sizes:['S','M','L','XL','2XL','3XL','4XL'],oosVariants:[]}};
+let CAT = {}, editId = null, oosSet = new Set();
+const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'product';
+const offPct = p => (+p.mrp > +p.price) ? Math.round((1 - p.price/p.mrp)*100) : 0;
+function renderProducts(){
+  const rows = Object.entries(CAT).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+  $('impBtn').classList.toggle('hide', rows.length > 0);
+  $('cats').innerHTML = [...new Set(rows.map(r=>r[1].category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
+  const lab = {ACTIVE:'Available',OUT_OF_STOCK:'Sold out',DRAFT:'Hidden'};
+  $('pb').innerHTML = rows.map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
+    <td><b style="font-weight:500">${esc(p.name)}</b><br><span class="eb">${esc(p.category)} ${p.sku?'· '+esc(p.sku):''}</span></td>
+    <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
+    <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
+    || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
+}
+const F = id => $(id);
+window.newProd = () => { editId = null; fillForm({status:'ACTIVE',price:'',mrp:''}); F('fSku').value=genSku(); $('pTitle').textContent = 'New product'; showEdit(); };
+window.editProd = id => { editId = id; fillForm(CAT[id]); $('pTitle').textContent = 'Edit product'; showEdit(); };
+function showEdit(){ $('plist').classList.add('hide'); $('pedit').classList.remove('hide'); window.scrollTo(0,0); }
+window.closeEdit = () => { $('pedit').classList.add('hide'); $('plist').classList.remove('hide'); };
+function fillForm(p){
+  F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
+  F('fDet').value = (p.details||[]).join('\n'); F('fCare').value = p.care||''; F('fPrice').value = p.price||''; F('fMrp').value = p.mrp||'';
+  F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE'; F('fLaunch').value = p.launchTimestamp ? new Date(+p.launchTimestamp - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
+  F('fImgs').value = (p.images||[]).join('\n'); F('fGen').value=p.gender||'WOMEN'; F('fColl').value=p.collection||''; F('fFit').value=p.fit||''; F('fComp').value=p.composition||''; F('fOrigin').value=p.origin||''; F('fModel').value=p.model||''; $('colRows').innerHTML=''; (p.colors||[]).forEach(c=>addCol(c)); if(!(p.colors||[]).length)addCol(); catOpts(); if(!p.sku)F('fSku').value=genSku();
+  F('fSizes').value = (p.sizes||[]).join(', '); oosSet = new Set((p.oosVariants||[]).map(x=>String(x).toUpperCase())); calcOff(); buildChips();
+}
+const parseSizes = () => F('fSizes').value.split(',').map(x=>x.trim()).filter(Boolean);
+const parseCols = () => [...document.querySelectorAll('.crow')].map(r=>{const im=r.querySelector('.ci').value.split('\n').map(x=>x.trim()).filter(Boolean);return {name:r.querySelector('.cn').value.trim(),hex:r.querySelector('.ch').value,images:im,image:im[0]||''}}).filter(c=>c.name);
+window.addCol=(c={})=>{const d=document.createElement('div');d.className='crow';d.innerHTML=`<input class="cn" placeholder="Colour name" oninput="buildChips()" value="${esc(c.name||'')}"><input class="ch" type="color" value="${/^#[0-9a-f]{6}$/i.test(c.hex||'')?c.hex:'#dddddd'}"><textarea class="ci" placeholder="Photo links, one per line">${esc((c.images||[c.image].filter(Boolean)).join('\n'))}</textarea><button class="btn l" onclick="this.parentNode.remove();buildChips()">×</button>`;document.getElementById('colRows').appendChild(d)};
+window.catOpts=()=>{const g=F('fGen').value,m={WOMEN:['Dresses','Shirts','Knitwear','Trousers','Skirts','Outerwear','Scarves'],MEN:['T-Shirts','Shirts','Knitwear','Trousers','Outerwear','Hoodies'],KIDS:['T-Shirts','Dresses','Sets','Outerwear'],UNISEX:['T-Shirts','Hoodies','Accessories']};$('cats').innerHTML=[...new Set([...(m[g]||[]),...Object.values(CAT).filter(p=>p.gender===g).map(p=>p.category)])].map(c=>`<option value="${esc(c)}">`).join('')};
+window.genSku=()=>{const n=Math.max(0,...Object.values(CAT).map(p=>+((p.sku||'').match(/-(\d{4})$/)||[])[1]||0))+1;const c=(F('fCat').value.replace(/[^a-z]/gi,'').toUpperCase()+'XXX').slice(0,3);return `MNT-${F('fGen').value[0]}-${c}-${String(n).padStart(4,'0')}`};
+window.autoSku=()=>{if(!editId||!(CAT[editId]||{}).sku)F('fSku').value=genSku();buildChips()};
+window.buildChips = () => {
+  const items = [...parseSizes(), ...parseCols().map(c=>c.name)];
+  $('chipBox').innerHTML = items.map(x=>`<button class="${oosSet.has(x.toUpperCase())?'off':''}" data-v="${esc(x)}" onclick="togChip(this)">${esc(x)}</button>`).join('') || '<span class="eb">Add sizes or colours first</span>';
+};
+window.togChip = b => { const v = b.dataset.v.toUpperCase(); oosSet.has(v) ? oosSet.delete(v) : oosSet.add(v); b.classList.toggle('off'); };
+window.calcOff = () => { const p = +F('fPrice').value, m = +F('fMrp').value; F('fOff').value = m > p && p > 0 ? Math.round((1-p/m)*100) + '% off' : 'No discount'; };
+window.saveProd = async () => {
+  const name = F('fName').value.trim(), price = +F('fPrice').value, mrp = +F('fMrp').value || +F('fPrice').value;
+  let images = F('fImgs').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  if (!name || !F('fCat').value.trim()) return toast('Name and category are required');
+  if (!(price > 0)) return toast('Enter a valid selling price');
+  const cols0=parseCols(); if(!cols0.length) return toast('Add at least one colour with photos'); if(cols0.some(c=>!c.images.length)&&!images.length) return toast('Every colour needs at least one photo');
+  for(const [k,l] of [['fDesc','description'],['fComp','composition'],['fOrigin','country of origin'],['fCare','care instructions']]) if(!F(k).value.trim()) return toast('Please fill '+l);
+  if(!parseSizes().length) return toast('Add sizes'); if(!images.length) images=cols0[0].images;
+  const launchTs = F('fStatus').value === 'COMING_SOON' ? new Date(F('fLaunch').value).getTime() : 0;
+  if (F('fStatus').value === 'COMING_SOON' && !(launchTs > Date.now())) return toast('Pick a future launch date and time');
+  const id = editId || slug(name) + '-' + Math.random().toString(36).slice(2,6), old = CAT[id] || {};
+  const sizes = parseSizes(), colors = parseCols();
+  const valid = new Set([...sizes, ...colors.map(c=>c.name)].map(x=>x.toUpperCase()));
+  const data = { name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
+    details: F('fDet').value.split('\n').map(x=>x.trim()).filter(Boolean), care: F('fCare').value.trim(),
+    price, mrp: Math.max(mrp, price), offerText: F('fOffer').value.trim(), badge: F('fBadge').value.trim(), status: F('fStatus').value,
+    images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: launchTs, createdAt: old.createdAt || Date.now() };
+  try { await set(ref(db, 'catalog/' + id), data); toast('Product saved, live on website'); closeEdit(); }
+  catch(e){ toast('Failed: ' + e.message); }
+};
+window.delProd = id => confirm('Delete "' + (CAT[id]||{}).name + '" permanently?') && remove(ref(db, 'catalog/' + id)).then(() => toast('Deleted'));
+window.importDefault = async () => { const u = {}; Object.entries(DEFAULT_PRODUCTS).forEach(([k,v]) => u[k] = {...v, createdAt: Date.now()}); await update(ref(db, 'catalog'), u); toast('Imported'); };
+window.bulkDiscount = async (clear) => {
+  const pct = +$('bulkPct').value; if (!clear && !(pct > 0 && pct < 90)) return toast('Enter a % between 1 and 89');
+  if (!confirm(clear ? 'Set every product price equal to its MRP?' : `Apply ${pct}% off MRP to ALL products?`)) return;
+  const u = {}; Object.entries(CAT).forEach(([id,p]) => { u[id + '/price'] = clear ? +p.mrp : Math.max(1, Math.round(p.mrp * (1 - pct/100))); });
+  try { await update(ref(db, 'catalog'), u); toast('Prices updated'); } catch(e){ toast('Failed: ' + e.message); }
+};
+
+/* ---------- Settings ---------- */
+function fillSettings(v){
+  const s = v.site || {}, b = v.business || {};
+  $('sBanner').value = s.offerText || ''; $('sBannerOn').value = s.offerActive ? '1' : '0';
+  $('sName').value = b.legalName||''; $('sGst').value = b.gstin||''; $('sMail').value = b.email||''; $('sPhone').value = b.phone||'';
+  $('sAddr').value = b.address||''; $('sGrv').value = b.grievanceName||''; $('sGrvMail').value = b.grievanceEmail||''; $('sRet').value = b.returnDays ?? 7;
+}
+window.saveSettings = async () => {
+  try { await set(ref(db, 'settings'), { site: { offerText: $('sBanner').value.trim(), offerActive: $('sBannerOn').value === '1' },
+    business: { legalName: $('sName').value.trim(), gstin: $('sGst').value.trim(), email: $('sMail').value.trim(), phone: $('sPhone').value.trim(),
+      address: $('sAddr').value.trim(), grievanceName: $('sGrv').value.trim(), grievanceEmail: $('sGrvMail').value.trim(), returnDays: Math.max(0, parseInt($('sRet').value) || 0) } });
+    toast('Settings saved'); } catch(e){ toast('Failed: ' + e.message); }
+};
+
+/* ---------- Coupons ---------- */
+function renderCoupons(c){
+  $('cb').innerHTML = Object.entries(c).map(([code,v]) => `<tr><td><b style="font-weight:500">${esc(code)}</b></td><td>${inr(v.discount)}</td>
+    <td><span class="tag">${v.active ? 'Active' : 'Paused'}</span></td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="togCoupon('${esc(code)}',${!v.active})">${v.active?'Pause':'Activate'}</button>
+    <button class="btn l" onclick="delCoupon('${esc(code)}')">Delete</button></td></tr>`).join('')
+    || '<tr><td colspan="4" style="text-align:center;color:#999;padding:40px">No coupons yet</td></tr>';
+}
+window.addCoupon = async () => {
+  const code = $('cCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), disc = parseInt($('cDisc').value);
+  if (!code || !(disc > 0)) return toast('Enter code and discount');
+  try { await set(ref(db, 'coupons/' + code), { discount: disc, active: true }); $('cCode').value = $('cDisc').value = ''; toast('Coupon added'); }
+  catch(e){ toast('Failed: ' + e.message); }
+};
+window.togCoupon = (c, a) => update(ref(db, 'coupons/' + c), { active: a }).then(() => toast('Updated'));
+window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => toast('Deleted'));
+</script>
+</body>
+</html>
