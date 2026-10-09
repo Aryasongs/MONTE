@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MONTÈ</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--ink:#1a1a1a;--mute:#8a8a8a;--line:#ececec;--soft:#f6f5f3;--accent:#e8651a;--spring:cubic-bezier(.32,.72,0,1)}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--ink:#f2f2f2;--mute:#8d8d8d;--line:#262626;--soft:#1b1b1b}}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:300 14px/1.6 Inter,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.serif{font-family:'Playfair Display',serif}
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:calc(14px + env(safe-area-inset-top,0px)) 28px 14px;background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid transparent;transition:border-color .4s}
+header.s{border-color:var(--line)}
+.logo{font-family:'Playfair Display',serif;letter-spacing:.42em;font-size:20px;padding-left:.42em}
+nav{display:flex;gap:26px}nav a,.bagb{font-size:13px;letter-spacing:.04em;color:var(--ink);text-decoration:none;position:relative;padding:4px 0}
+nav a:after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--ink);transition:right .5s var(--spring)}
+nav a:hover:after,nav a.on:after{right:0}
+.bagb{justify-self:end;transition:transform .4s var(--spring)}.bagb:active{transform:scale(.93)}
+main{padding-top:64px;min-height:100vh}
+.view{animation:in .9s var(--spring) both}
+@keyframes in{from{opacity:0;transform:translateY(18px) scale(.995)}to{opacity:1;transform:none}}
+/* home */
+.panels{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;height:calc(100vh - 64px)}
+.panel{position:relative;overflow:hidden;background:var(--soft);display:flex;align-items:flex-end;padding:36px;color:#fff;text-decoration:none}
+.panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.6s var(--spring)}
+.panel:hover img{transform:scale(1.045)}
+.panel:before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.38));z-index:1}
+.panel span{position:relative;z-index:2;font:400 clamp(28px,3.4vw,46px) 'Playfair Display',serif}
+.panel.n{color:var(--ink)}.panel.n:before{display:none}
+/* listing */
+.head{padding:70px 28px 34px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.head h1{font:400 clamp(34px,5vw,60px)/1.05 'Playfair Display',serif}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chips button{padding:7px 16px;border-radius:99px;border:1px solid var(--line);font-size:12px;transition:all .4s var(--spring)}
+.chips button:active{transform:scale(.94)}.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:34px 4px;padding:0 4px 90px}
+.card{text-decoration:none;color:inherit;display:block;opacity:0;transform:translateY(26px);transition:opacity .9s var(--spring),transform .9s var(--spring)}
+.card.v{opacity:1;transform:none}
+.ph{aspect-ratio:4/5;background:var(--soft);overflow:hidden;position:relative}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .7s var(--spring),transform 1.4s var(--spring)}
+.ph img+img{opacity:0}.card:hover .ph img+img{opacity:1}.card:hover .ph img{transform:scale(1.03)}
+.tag{position:absolute;top:14px;left:14px;z-index:2;font-size:11px;background:var(--bg);padding:3px 10px;border-radius:99px}
+.meta{padding:14px 14px 0}.meta b{font-weight:400;display:block}.meta small{color:var(--mute)}
+.dots{display:flex;gap:6px;margin-top:8px}.dots i{width:11px;height:11px;border-radius:50%;border:1px solid var(--line)}
+.empty{padding:120px 28px;text-align:center;color:var(--mute)}
+/* product */
+.pdp{display:grid;grid-template-columns:1.25fr 1fr;gap:0}
+.gal{display:grid;grid-template-columns:1fr 1fr;gap:4px;transition:opacity .45s var(--spring),transform .45s var(--spring)}
+.gal.sw{opacity:0;transform:scale(.985)}
+.gal img{width:100%;aspect-ratio:4/5;object-fit:cover;background:var(--soft);display:block}.gal img:first-child{grid-column:span 2;aspect-ratio:1/1.05}
+.info{position:sticky;top:64px;align-self:start;padding:56px 56px 40px;height:calc(100vh - 64px);overflow:auto}
+.crumb{font-size:12px;color:var(--mute);text-decoration:none}
+.info h1{font:400 clamp(28px,3vw,40px)/1.15 'Playfair Display',serif;margin:14px 0 6px}
+.price{font-size:16px}.price s{color:var(--mute);margin-left:8px;font-size:13px}
+.lbl{margin:30px 0 10px;font-size:12px;color:var(--mute)}.lbl b{color:var(--ink);font-weight:400}
+.sws{display:flex;gap:12px}.sws button{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);position:relative;transition:transform .5s var(--spring)}
+.sws button:active{transform:scale(.88)}.sws button.on:after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--ink);animation:ring .5s var(--spring)}
+@keyframes ring{from{transform:scale(.7);opacity:0}}
+.sz{display:flex;flex-wrap:wrap;gap:8px}.sz button{min-width:54px;padding:11px 0;border:1px solid var(--line);border-radius:12px;transition:all .4s var(--spring)}
+.sz button:active{transform:scale(.93)}.sz button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.sz button:disabled{color:var(--mute);text-decoration:line-through;cursor:not-allowed;opacity:.5}
+.add{width:100%;margin-top:30px;padding:17px;border-radius:14px;background:var(--accent);color:#fff;font-size:14px;letter-spacing:.04em;transition:transform .35s var(--spring),filter .3s}
+.add:hover{filter:brightness(.95)}.add:active{transform:scale(.97)}
+.acc{margin-top:34px;border-top:1px solid var(--line)}.acc>div{border-bottom:1px solid var(--line)}
+.acc button{width:100%;display:flex;justify-content:space-between;padding:16px 0;text-align:left}.acc button i{transition:transform .5s var(--spring);font-style:normal}
+.acc .bd{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--spring)}.acc .bd>div{overflow:hidden;color:var(--mute)}
+.acc .o .bd{grid-template-rows:1fr}.acc .o button i{transform:rotate(45deg)}.acc .bd p,.acc .bd li{padding-bottom:10px}.acc ul{padding-left:18px}
+.sku{margin-top:20px;font-size:11px;color:var(--mute)}
+/* bag sheet */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.32);opacity:0;pointer-events:none;transition:opacity .5s var(--spring);z-index:40}
+.sheet{position:fixed;right:12px;top:12px;bottom:12px;width:min(420px,calc(100% - 24px));background:var(--bg);border-radius:26px;z-index:41;transform:translateX(112%);transition:transform .65s var(--spring);display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.25)}
+.bagopen .scrim{opacity:1;pointer-events:auto}.bagopen .sheet{transform:none}
+.sh{padding:24px 26px;display:flex;justify-content:space-between;border-bottom:1px solid var(--line)}
+.items{flex:1;overflow:auto;padding:8px 26px}.it{display:grid;grid-template-columns:76px 1fr auto;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);animation:in .6s var(--spring) both}
+.it img{width:76px;height:94px;object-fit:cover;border-radius:10px;background:var(--soft)}.it small{color:var(--mute);display:block}
+.q{display:inline-flex;gap:14px;margin-top:8px;border:1px solid var(--line);border-radius:99px;padding:2px 12px}
+.sf{padding:22px 26px 26px;border-top:1px solid var(--line)}.sf .row{display:flex;justify-content:space-between;margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,120px);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:99px;z-index:60;transition:transform .6s var(--spring)}.toast.s{transform:translate(-50%,0)}
+footer{padding:50px 28px;border-top:1px solid var(--line);color:var(--mute);font-size:12px;display:flex;justify-content:space-between}
+@media(max-width:900px){header{padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px}.logo{font-size:16px}nav{gap:14px}nav a{font-size:12px}
+.panels{grid-template-columns:1fr;height:auto}.panel{height:42vh;padding:24px}.grid{grid-template-columns:repeat(2,1fr);gap:26px 3px}
+.pdp{grid-template-columns:1fr}.info{position:static;height:auto;padding:28px 20px 50px}.head{padding:44px 16px 24px}.sheet{left:8px;right:8px;top:auto;bottom:8px;width:auto;height:78vh;transform:translateY(112%)}.meta{padding:10px 8px 0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+</style></head><body>
+<header id="hd"><nav id="nv"><a href="#/women" data-g="WOMEN">Women</a><a href="#/men" data-g="MEN">Men</a><a href="#/kids" data-g="KIDS">Kids</a></nav>
+<a class="logo" href="#/" style="text-decoration:none;color:inherit">MONTÈ</a><button class="bagb" onclick="bag(1)">Bag (<span id="bc">0</span>)</button></header>
+<main id="app"></main>
+<footer><span class="serif" style="letter-spacing:.3em">MONTÈ</span><span>Complimentary delivery · Easy returns</span></footer>
+<div class="scrim" onclick="bag(0)"></div>
+<aside class="sheet"><div class="sh"><span class="serif" style="font-size:20px">Your bag</span><button onclick="bag(0)" style="font-size:22px;line-height:1">×</button></div><div class="items" id="items"></div>
+<div class="sf"><div class="row"><span>Subtotal</span><b style="font-weight:400" id="sub"></b></div><button class="add" style="margin:0" onclick="checkout()">Proceed to checkout</button></div></aside>
+<div class="toast" id="toast"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import {getDatabase,ref,onValue} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+/* Same Firebase project as admin. Products added in admin appear here instantly. */
+const db=getDatabase(initializeApp({apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",authDomain:"pulse2-92372.firebaseapp.com",databaseURL:"https://pulse2-92372-default-rtdb.firebaseio.com",projectId:"pulse2-92372",appId:"1:276235725177:web:0f4e0789fae80a435927a8"}));
+const CHECKOUT_URL="monte_redesign.html"; // connect your existing checkout here
+const $=i=>document.getElementById(i),inr=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let CAT={},BAG=[];try{BAG=JSON.parse(localStorage.monteBag||'[]')}catch(e){}
+const imgs=(p,c)=>c&&(c.images?.length?c.images:c.image?[c.image]:null)||p.images||[];
+const prods=g=>Object.entries(CAT).filter(([,p])=>p.status!=='DRAFT'&&(!g||p.gender===g||((!p.gender||p.gender==='UNISEX')&&g!=='KIDS')));
+const cover=g=>{const x=prods(g)[0];return x?imgs(x[1],(x[1].colors||[])[0])[0]:''};
+onValue(ref(db,'catalog'),s=>{CAT=s.val()||{};route()});
+window.addEventListener('hashchange',()=>{route();scrollTo(0,0)});addEventListener('scroll',()=>$('hd').classList.toggle('s',scrollY>10));
+function route(){const h=location.hash.replace('#/','').split('/');const a=$('app');let html='';
+ document.querySelectorAll('nav a').forEach(n=>n.classList.toggle('on','#/'+n.dataset.g.toLowerCase()===location.hash.split('/').slice(0,2).join('/')));
+ if(h[0]==='p')html=pdp(h[1]);else if(['women','men','kids'].includes(h[0]))html=list(h[0].toUpperCase(),h[1]);else html=home();
+ a.innerHTML='<div class="view">'+html+'</div>';
+ requestAnimationFrame(()=>{const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('v'),(e.target.dataset.i%4)*90);io.unobserve(e.target)}}),{threshold:.08});a.querySelectorAll('.card').forEach(c=>io.observe(c))});
+ bagRender()}
+function home(){return '<div class="panels">'+[['WOMEN','Women'],['MEN','Men'],['KIDS','Kids']].map(([g,t])=>`<a class="panel ${cover(g)?'':'n'}" href="#/${g.toLowerCase()}">${cover(g)?`<img src="${esc(cover(g))}" alt="">`:''}<span>${t}</span></a>`).join('')+'</div>'}
+function list(g,cat){const all=prods(g),cats=[...new Set(all.map(([,p])=>p.category))];const shown=cat?all.filter(([,p])=>p.category===decodeURIComponent(cat)):all;
+ return `<div class="head"><h1>${g[0]+g.slice(1).toLowerCase()}</h1><div class="chips"><button class="${cat?'':'on'}" onclick="location.hash='#/${g.toLowerCase()}'">All</button>${cats.map(c=>`<button class="${cat&&decodeURIComponent(cat)===c?'on':''}" onclick="location.hash='#/${g.toLowerCase()}/${encodeURIComponent(c)}'">${esc(c)}</button>`).join('')}</div></div>`+
+ (shown.length?`<div class="grid">${shown.map(([id,p],i)=>{const cs=p.colors||[],im=imgs(p,cs[0]);return `<a class="card" data-i="${i}" href="#/p/${id}"><div class="ph">${p.badge?`<span class="tag">${esc(p.badge)}</span>`:''}<img src="${esc(im[0]||'')}" alt="">${im[1]?`<img src="${esc(im[1])}" alt="">`:''}</div><div class="meta"><b>${esc(p.name)}</b><small>${inr(p.price)}</small><div class="dots">${cs.map(c=>`<i style="background:${esc(c.hex)}"></i>`).join('')}</div></div></a>`}).join('')}</div>`:'<div class="empty">New pieces arrive soon.</div>')}
+let cur={};
+function pdp(id){const p=CAT[id];if(!p)return '<div class="empty">Loading…</div>';cur={id,c:0,z:null};const cs=p.colors||[],off=+p.mrp>+p.price;
+ const oos=new Set((p.oosVariants||[]).map(x=>String(x).toUpperCase()));
+ return `<div class="pdp"><div class="gal" id="gal">${gal(p,cs[0])}</div><div class="info"><a class="crumb" href="#/${(p.gender||'women').toLowerCase()==='unisex'?'women':(p.gender||'women').toLowerCase()}">← ${esc(p.category)}</a><h1>${esc(p.name)}</h1>
+ <div class="price">${inr(p.price)}${off?`<s>${inr(p.mrp)}</s>`:''}</div>
+ ${cs.length?`<div class="lbl">Colour · <b id="cn">${esc(cs[0].name)}</b></div><div class="sws">${cs.map((c,i)=>`<button class="${i?'':'on'}" style="background:${esc(c.hex)}" aria-label="${esc(c.name)}" onclick="pick(${i})"></button>`).join('')}</div>`:''}
+ <div class="lbl">Size</div><div class="sz">${(p.sizes||[]).map(z=>`<button ${oos.has(z.toUpperCase())||p.status==='OUT_OF_STOCK'?'disabled':''} onclick="size(this,'${esc(z)}')">${esc(z)}</button>`).join('')}</div>
+ <button class="add" onclick="add()">${p.status==='OUT_OF_STOCK'?'Sold out':'Add to bag'}</button>
+ ${p.offerText?`<p style="margin-top:14px;color:var(--mute)">${esc(p.offerText)}</p>`:''}
+ <div class="acc">${[['Description',`<p>${esc(p.description)}</p>${p.model?`<p>${esc(p.model)}</p>`:''}`],['Details',`<ul>${[p.fit&&'Fit: '+p.fit,...(p.details||[])].filter(Boolean).map(d=>`<li>${esc(d)}</li>`).join('')}</ul>`],['Composition & care',`<p>${esc(p.composition||'')}${p.origin?' · Made in '+esc(p.origin):''}</p><p>${esc(p.care||'')}</p>`],['Delivery & returns','<p>Complimentary delivery. Returns accepted within 7 days of receipt.</p>']].map(([t,b],i)=>`<div class="${i?'':'o'}"><button onclick="this.parentNode.classList.toggle('o')">${t}<i>+</i></button><div class="bd"><div>${b}</div></div></div>`).join('')}</div>
+ <p class="sku" id="sku">${esc(p.sku||'')}</p></div></div>`}
+const gal=(p,c)=>imgs(p,c).map(u=>`<img src="${esc(u)}" alt="">`).join('');
+window.pick=i=>{const p=CAT[cur.id],c=p.colors[i];cur.c=i;document.querySelectorAll('.sws button').forEach((b,j)=>b.classList.toggle('on',j===i));$('cn').textContent=c.name;
+ const g=$('gal');g.classList.add('sw');setTimeout(()=>{g.innerHTML=gal(p,c);g.classList.remove('sw')},260);syncSku()};
+window.size=(b,z)=>{cur.z=z;document.querySelectorAll('.sz button').forEach(x=>x.classList.toggle('on',x===b));syncSku()};
+function syncSku(){const p=CAT[cur.id],c=(p.colors||[])[cur.c];const v=p.variantSkus&&c&&cur.z&&p.variantSkus[c.name+'|'+cur.z];$('sku').textContent=v||p.sku||''}
+window.add=()=>{const p=CAT[cur.id];if(p.status==='OUT_OF_STOCK')return;if(!cur.z)return toast('Please select a size');const c=(p.colors||[])[cur.c]||{};
+ const k=cur.id+c.name+cur.z,e=BAG.find(x=>x.k===k);e?e.q++:BAG.push({k,id:cur.id,n:p.name,col:c.name||'',z:cur.z,pr:p.price,im:imgs(p,c)[0]||'',q:1});save();bagRender();toast('Added to your bag');setTimeout(()=>bag(1),450)};
+const save=()=>{try{localStorage.monteBag=JSON.stringify(BAG)}catch(e){}};
+window.bag=o=>document.body.classList.toggle('bagopen',!!o);
+window.qty=(k,d)=>{const e=BAG.find(x=>x.k===k);e.q+=d;if(e.q<1)BAG=BAG.filter(x=>x.k!==k);save();bagRender()};
+function bagRender(){$('bc').textContent=BAG.reduce((a,b)=>a+b.q,0);$('sub').textContent=inr(BAG.reduce((a,b)=>a+b.q*b.pr,0));
+ $('items').innerHTML=BAG.map(b=>`<div class="it"><img src="${esc(b.im)}" alt=""><div>${esc(b.n)}<small>${esc(b.col)} · ${esc(b.z)}</small><span class="q"><button onclick="qty('${b.k}',-1)">−</button>${b.q}<button onclick="qty('${b.k}',1)">+</button></span></div><div>${inr(b.pr*b.q)}</div></div>`).join('')||'<p style="color:var(--mute);padding:40px 0;text-align:center">Your bag is empty.</p>'}
+window.checkout=()=>{if(!BAG.length)return toast('Your bag is empty');location.href=CHECKOUT_URL+'#checkout'};
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('s');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('s'),2200)}
+window.toast=toast;
+</script></body></html>
