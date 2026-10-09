@@ -118,7 +118,8 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Selling price ₹ *<input id="fPrice" type="number" min="1" oninput="calcOff()"></label><label class="eb">MRP ₹ *<input id="fMrp" type="number" min="1" oninput="calcOff()"></label><label class="eb">Discount<input id="fOff" disabled></label></div>
         <div class="row"><label class="eb">Offer line on product page<input id="fOffer" placeholder="Buy now and get free delivery"></label><label class="eb">Tag (shown on photo)<input id="fBadge" placeholder="NEW, BESTSELLER"></label></div>
         <p class="eb sub">Availability</p>
-        <select id="fStatus" style="max-width:300px"><option value="ACTIVE">Available</option><option value="OUT_OF_STOCK">Sold out</option><option value="DRAFT">Hidden (draft)</option></select>
+        <select id="fStatus" style="max-width:300px"><option value="ACTIVE">Available</option><option value="OUT_OF_STOCK">Sold out</option><option value="COMING_SOON">Scheduled launch (countdown)</option><option value="DRAFT">Hidden (draft)</option></select>
+        <label class="eb" id="launchRow" style="max-width:300px">Launch date &amp; time (shown as countdown; orders open exactly then)<input id="fLaunch" type="datetime-local"></label>
         <p class="eb sub">Photos &amp; variants</p>
         <label class="eb">Shared photos (optional, used when a colour has none)<textarea id="fImgs" placeholder="https://…/front.jpg&#10;https://…/back.jpg"></textarea></label>
         <p class="eb" style="margin-top:16px">Colours: each colour gets its own photos, the website switches photos when the customer picks a colour *</p><div id="colRows"></div><button class="btn l" style="margin-top:8px" onclick="addCol()">+ Add colour</button>
@@ -240,7 +241,7 @@ function renderProducts(){
   $('pb').innerHTML = rows.map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
     <td><b style="font-weight:500">${esc(p.name)}</b><br><span class="eb">${esc(p.category)} ${p.sku?'· '+esc(p.sku):''}</span></td>
     <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
-    <td><span class="tag">${lab[p.status]||p.status}</span></td>
+    <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
     <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
     || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
 }
@@ -252,7 +253,7 @@ window.closeEdit = () => { $('pedit').classList.add('hide'); $('plist').classLis
 function fillForm(p){
   F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
   F('fDet').value = (p.details||[]).join('\n'); F('fCare').value = p.care||''; F('fPrice').value = p.price||''; F('fMrp').value = p.mrp||'';
-  F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE';
+  F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE'; F('fLaunch').value = p.launchTimestamp ? new Date(+p.launchTimestamp - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
   F('fImgs').value = (p.images||[]).join('\n'); F('fGen').value=p.gender||'WOMEN'; F('fColl').value=p.collection||''; F('fFit').value=p.fit||''; F('fComp').value=p.composition||''; F('fOrigin').value=p.origin||''; F('fModel').value=p.model||''; $('colRows').innerHTML=''; (p.colors||[]).forEach(c=>addCol(c)); if(!(p.colors||[]).length)addCol(); catOpts(); if(!p.sku)F('fSku').value=genSku();
   F('fSizes').value = (p.sizes||[]).join(', '); oosSet = new Set((p.oosVariants||[]).map(x=>String(x).toUpperCase())); calcOff(); buildChips();
 }
@@ -276,13 +277,15 @@ window.saveProd = async () => {
   const cols0=parseCols(); if(!cols0.length) return toast('Add at least one colour with photos'); if(cols0.some(c=>!c.images.length)&&!images.length) return toast('Every colour needs at least one photo');
   for(const [k,l] of [['fDesc','description'],['fComp','composition'],['fOrigin','country of origin'],['fCare','care instructions']]) if(!F(k).value.trim()) return toast('Please fill '+l);
   if(!parseSizes().length) return toast('Add sizes'); if(!images.length) images=cols0[0].images;
+  const launchTs = F('fStatus').value === 'COMING_SOON' ? new Date(F('fLaunch').value).getTime() : 0;
+  if (F('fStatus').value === 'COMING_SOON' && !(launchTs > Date.now())) return toast('Pick a future launch date and time');
   const id = editId || slug(name) + '-' + Math.random().toString(36).slice(2,6), old = CAT[id] || {};
   const sizes = parseSizes(), colors = parseCols();
   const valid = new Set([...sizes, ...colors.map(c=>c.name)].map(x=>x.toUpperCase()));
   const data = { name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
     details: F('fDet').value.split('\n').map(x=>x.trim()).filter(Boolean), care: F('fCare').value.trim(),
     price, mrp: Math.max(mrp, price), offerText: F('fOffer').value.trim(), badge: F('fBadge').value.trim(), status: F('fStatus').value,
-    images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: old.launchTimestamp || 0, createdAt: old.createdAt || Date.now() };
+    images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: launchTs, createdAt: old.createdAt || Date.now() };
   try { await set(ref(db, 'catalog/' + id), data); toast('Product saved, live on website'); closeEdit(); }
   catch(e){ toast('Failed: ' + e.message); }
 };
