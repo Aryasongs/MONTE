@@ -50,7 +50,7 @@ textarea:focus{border-color:#000}
 .chipz{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .chipz button{min-width:52px;height:38px;border:1px solid #000;background:#fff;cursor:pointer}
 .chipz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
-</style>
+.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}</style>
 </head>
 <body>
 
@@ -105,18 +105,23 @@ textarea:focus{border-color:#000}
       </div>
       <div id="pedit" class="card hide">
         <p class="eb" id="pTitle">New product</p>
-        <div class="row"><label class="eb">Product name *<input id="fName"></label><label class="eb">Category *<input id="fCat" list="cats" placeholder="T-Shirts, Hoodies, Jeans…"><datalist id="cats"></datalist></label><label class="eb">SKU<input id="fSku"></label></div>
-        <label class="eb">Description<textarea id="fDesc" placeholder="Write about the product, fit and feel"></textarea></label>
-        <div class="row"><label class="eb">Details / features (one per line)<textarea id="fDet" placeholder="100% cotton&#10;Oversized fit&#10;Chest 42 in, length 28 in"></textarea></label>
-        <label class="eb">Fabric &amp; care<textarea id="fCare" placeholder="Machine wash cold. Do not bleach."></textarea></label></div>
+        <p class="eb sub">Section &amp; identity</p>
+        <div class="row"><label class="eb">Section *<select id="fGen" onchange="catOpts();autoSku()"><option value="WOMEN">Women</option><option value="MEN">Men</option><option value="KIDS">Kids</option><option value="UNISEX">Unisex</option></select></label><label class="eb">Category *<input id="fCat" list="cats" oninput="autoSku()" placeholder="Shirts, Dresses, Knitwear…"><datalist id="cats"></datalist></label><label class="eb">Product name *<input id="fName"></label></div>
+        <div class="row"><label class="eb">SKU (auto)<input id="fSku" readonly></label><label class="eb">Collection<input id="fColl" placeholder="Autumn Winter 2026"></label><label class="eb">Fit<input id="fFit" placeholder="Relaxed, Slim, Oversized"></label></div>
+        <p class="eb" id="skuPrev" style="margin-top:8px"></p>
+        <p class="eb sub">Story &amp; craft</p>
+        <label class="eb">Description *<textarea id="fDesc" placeholder="Design story, silhouette, feel"></textarea></label>
+        <div class="row"><label class="eb">Composition / material *<input id="fComp" placeholder="100% organic cotton, 280 gsm"></label><label class="eb">Made in *<input id="fOrigin" placeholder="India"></label><label class="eb">Model wears<input id="fModel" placeholder="Model is 6'1&quot;, wears size M"></label></div>
+        <div class="row"><label class="eb">Details (one per line)<textarea id="fDet" placeholder="Mother-of-pearl buttons&#10;Chest 42 in, length 28 in"></textarea></label>
+        <label class="eb">Care instructions *<textarea id="fCare" placeholder="Machine wash cold. Do not bleach."></textarea></label></div>
         <p class="eb sub">Price &amp; offer</p>
         <div class="row"><label class="eb">Selling price ₹ *<input id="fPrice" type="number" min="1" oninput="calcOff()"></label><label class="eb">MRP ₹ *<input id="fMrp" type="number" min="1" oninput="calcOff()"></label><label class="eb">Discount<input id="fOff" disabled></label></div>
         <div class="row"><label class="eb">Offer line on product page<input id="fOffer" placeholder="Buy now and get free delivery"></label><label class="eb">Tag (shown on photo)<input id="fBadge" placeholder="NEW, BESTSELLER"></label></div>
         <p class="eb sub">Availability</p>
         <select id="fStatus" style="max-width:300px"><option value="ACTIVE">Available</option><option value="OUT_OF_STOCK">Sold out</option><option value="DRAFT">Hidden (draft)</option></select>
         <p class="eb sub">Photos &amp; variants</p>
-        <label class="eb">Image links (one per line, first is the main photo) *<textarea id="fImgs" placeholder="https://…/front.jpg&#10;https://…/back.jpg"></textarea></label>
-        <label class="eb">Colours (one per line: Name | #hex | image link optional)<textarea id="fCols" placeholder="Midnight Navy | #1A2332 | https://…&#10;Off White | #F5F5F5"></textarea></label>
+        <label class="eb">Shared photos (optional, used when a colour has none)<textarea id="fImgs" placeholder="https://…/front.jpg&#10;https://…/back.jpg"></textarea></label>
+        <p class="eb" style="margin-top:16px">Colours: each colour gets its own photos, the website switches photos when the customer picks a colour *</p><div id="colRows"></div><button class="btn l" style="margin-top:8px" onclick="addCol()">+ Add colour</button>
         <label class="eb">Sizes (comma separated)<input id="fSizes" oninput="buildChips()" placeholder="S, M, L, XL"></label>
         <p class="eb" style="margin-top:16px">Tap a size or colour to mark it out of stock</p><div class="chipz" id="chipBox"></div>
         <div style="margin-top:28px;display:flex;gap:10px"><button class="btn" onclick="saveProd()">Save product</button><button class="btn l" onclick="closeEdit()">Cancel</button></div>
@@ -240,7 +245,7 @@ function renderProducts(){
     || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
 }
 const F = id => $(id);
-window.newProd = () => { editId = null; fillForm({status:'ACTIVE',price:'',mrp:''}); $('pTitle').textContent = 'New product'; showEdit(); };
+window.newProd = () => { editId = null; fillForm({status:'ACTIVE',price:'',mrp:''}); F('fSku').value=genSku(); $('pTitle').textContent = 'New product'; showEdit(); };
 window.editProd = id => { editId = id; fillForm(CAT[id]); $('pTitle').textContent = 'Edit product'; showEdit(); };
 function showEdit(){ $('plist').classList.add('hide'); $('pedit').classList.remove('hide'); window.scrollTo(0,0); }
 window.closeEdit = () => { $('pedit').classList.add('hide'); $('plist').classList.remove('hide'); };
@@ -248,11 +253,15 @@ function fillForm(p){
   F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
   F('fDet').value = (p.details||[]).join('\n'); F('fCare').value = p.care||''; F('fPrice').value = p.price||''; F('fMrp').value = p.mrp||'';
   F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE';
-  F('fImgs').value = (p.images||[]).join('\n'); F('fCols').value = (p.colors||[]).map(c=>[c.name,c.hex||'',c.image||''].join(' | ').replace(/( \| )+$/,'')).join('\n');
+  F('fImgs').value = (p.images||[]).join('\n'); F('fGen').value=p.gender||'WOMEN'; F('fColl').value=p.collection||''; F('fFit').value=p.fit||''; F('fComp').value=p.composition||''; F('fOrigin').value=p.origin||''; F('fModel').value=p.model||''; $('colRows').innerHTML=''; (p.colors||[]).forEach(c=>addCol(c)); if(!(p.colors||[]).length)addCol(); catOpts(); if(!p.sku)F('fSku').value=genSku();
   F('fSizes').value = (p.sizes||[]).join(', '); oosSet = new Set((p.oosVariants||[]).map(x=>String(x).toUpperCase())); calcOff(); buildChips();
 }
 const parseSizes = () => F('fSizes').value.split(',').map(x=>x.trim()).filter(Boolean);
-const parseCols = () => F('fCols').value.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]).map(a=>({name:a[0],hex:a[1]||'#dddddd',image:a[2]||''}));
+const parseCols = () => [...document.querySelectorAll('.crow')].map(r=>{const im=r.querySelector('.ci').value.split('\n').map(x=>x.trim()).filter(Boolean);return {name:r.querySelector('.cn').value.trim(),hex:r.querySelector('.ch').value,images:im,image:im[0]||''}}).filter(c=>c.name);
+window.addCol=(c={})=>{const d=document.createElement('div');d.className='crow';d.innerHTML=`<input class="cn" placeholder="Colour name" oninput="buildChips()" value="${esc(c.name||'')}"><input class="ch" type="color" value="${/^#[0-9a-f]{6}$/i.test(c.hex||'')?c.hex:'#dddddd'}"><textarea class="ci" placeholder="Photo links, one per line">${esc((c.images||[c.image].filter(Boolean)).join('\n'))}</textarea><button class="btn l" onclick="this.parentNode.remove();buildChips()">×</button>`;document.getElementById('colRows').appendChild(d)};
+window.catOpts=()=>{const g=F('fGen').value,m={WOMEN:['Dresses','Shirts','Knitwear','Trousers','Skirts','Outerwear','Scarves'],MEN:['T-Shirts','Shirts','Knitwear','Trousers','Outerwear','Hoodies'],KIDS:['T-Shirts','Dresses','Sets','Outerwear'],UNISEX:['T-Shirts','Hoodies','Accessories']};$('cats').innerHTML=[...new Set([...(m[g]||[]),...Object.values(CAT).filter(p=>p.gender===g).map(p=>p.category)])].map(c=>`<option value="${esc(c)}">`).join('')};
+window.genSku=()=>{const n=Math.max(0,...Object.values(CAT).map(p=>+((p.sku||'').match(/-(\d{4})$/)||[])[1]||0))+1;const c=(F('fCat').value.replace(/[^a-z]/gi,'').toUpperCase()+'XXX').slice(0,3);return `MNT-${F('fGen').value[0]}-${c}-${String(n).padStart(4,'0')}`};
+window.autoSku=()=>{if(!editId||!(CAT[editId]||{}).sku)F('fSku').value=genSku();buildChips()};
 window.buildChips = () => {
   const items = [...parseSizes(), ...parseCols().map(c=>c.name)];
   $('chipBox').innerHTML = items.map(x=>`<button class="${oosSet.has(x.toUpperCase())?'off':''}" data-v="${esc(x)}" onclick="togChip(this)">${esc(x)}</button>`).join('') || '<span class="eb">Add sizes or colours first</span>';
@@ -261,14 +270,16 @@ window.togChip = b => { const v = b.dataset.v.toUpperCase(); oosSet.has(v) ? oos
 window.calcOff = () => { const p = +F('fPrice').value, m = +F('fMrp').value; F('fOff').value = m > p && p > 0 ? Math.round((1-p/m)*100) + '% off' : 'No discount'; };
 window.saveProd = async () => {
   const name = F('fName').value.trim(), price = +F('fPrice').value, mrp = +F('fMrp').value || +F('fPrice').value;
-  const images = F('fImgs').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  let images = F('fImgs').value.split('\n').map(x=>x.trim()).filter(Boolean);
   if (!name || !F('fCat').value.trim()) return toast('Name and category are required');
   if (!(price > 0)) return toast('Enter a valid selling price');
-  if (!images.length) return toast('Add at least one image link');
+  const cols0=parseCols(); if(!cols0.length) return toast('Add at least one colour with photos'); if(cols0.some(c=>!c.images.length)&&!images.length) return toast('Every colour needs at least one photo');
+  for(const [k,l] of [['fDesc','description'],['fComp','composition'],['fOrigin','country of origin'],['fCare','care instructions']]) if(!F(k).value.trim()) return toast('Please fill '+l);
+  if(!parseSizes().length) return toast('Add sizes'); if(!images.length) images=cols0[0].images;
   const id = editId || slug(name) + '-' + Math.random().toString(36).slice(2,6), old = CAT[id] || {};
   const sizes = parseSizes(), colors = parseCols();
   const valid = new Set([...sizes, ...colors.map(c=>c.name)].map(x=>x.toUpperCase()));
-  const data = { name, category: F('fCat').value.trim(), sku: F('fSku').value.trim(), description: F('fDesc').value.trim(),
+  const data = { name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
     details: F('fDet').value.split('\n').map(x=>x.trim()).filter(Boolean), care: F('fCare').value.trim(),
     price, mrp: Math.max(mrp, price), offerText: F('fOffer').value.trim(), badge: F('fBadge').value.trim(), status: F('fStatus').value,
     images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: old.launchTimestamp || 0, createdAt: old.createdAt || Date.now() };
