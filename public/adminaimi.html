@@ -31,7 +31,7 @@ main{padding:24px;max-width:1200px;margin:auto}
 .st b{display:block;font-weight:400;font-size:24px;margin-top:8px}
 .card{background:#fff;border:1px solid var(--line);padding:24px;margin-bottom:16px}
 .tw{overflow-x:auto;background:#fff;border:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;min-width:860px}
+table{width:100%;border-collapse:collapse;min-width:760px}
 th{text-align:left;font-weight:400;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);padding:14px;border-bottom:1px solid var(--line)}
 td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
 td select{margin:0;padding:8px;width:auto}
@@ -51,14 +51,32 @@ textarea:focus{border-color:#000}
 .chipz button{min-width:52px;height:38px;border:1px solid #000;background:#fff;cursor:pointer}
 .chipz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
 .crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}
-:root{--or:#F37021}.logo,.eb{} header{border-bottom:2px solid var(--or)} nav button.on{border-color:var(--or)} .btn{background:#2b1a12}.btn.l{background:#fff}
-.tag.r{border-color:var(--or);color:var(--or)} .bdg{background:var(--or);color:#fff;border-radius:9px;padding:1px 6px;font-size:10px;margin-left:4px}
-.chat{display:grid;grid-template-columns:280px 1fr;gap:12px;height:68vh}.cl,.ct{background:#fff;border:1px solid var(--line);overflow-y:auto}
-.ci2{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer}.ci2.on{background:#fff4ec}.ci2 b{font-weight:500}
-.ct{display:flex;flex-direction:column}.cms{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#faf6f1}
-.cm{max-width:80%;padding:8px 12px;line-height:1.45}.cm.u{background:#fff;border:1px solid var(--line);align-self:flex-start}.cm.a{background:var(--or);color:#fff;align-self:flex-end}
-.cf{display:flex;border-top:1px solid var(--line)}.cf input{margin:0;border:0;flex:1}
-@media(max-width:700px){main{padding:12px}header{padding:10px 12px}nav{overflow-x:auto;flex-wrap:nowrap;width:100%;order:3}nav button{white-space:nowrap}input,select,textarea{font-size:16px}.chat{grid-template-columns:1fr;height:auto}.cl{max-height:200px}.ct{height:60vh}.crow{grid-template-columns:1fr 54px 40px}.crow textarea{grid-column:1/4}}
+.badge{display:inline-block;min-width:16px;padding:1px 5px;margin-left:4px;font-size:9px;background:#b00020;color:#fff;border-radius:9px;letter-spacing:0}
+.chatwrap{display:grid;grid-template-columns:280px 1fr;gap:12px;min-height:460px}
+.tl{background:#fff;border:1px solid var(--line);overflow-y:auto;max-height:560px}
+.tl div.it{padding:14px;border-bottom:1px solid var(--line);cursor:pointer}
+.tl div.it.on{background:#f3f3f3}.tl div.it.un b{font-weight:500}
+.cbox{background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;height:560px}
+.cmsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#fafafa}
+.cm{max-width:75%;padding:9px 12px;border:1px solid var(--line);background:#fff;word-break:break-word;line-height:1.5}
+.cm.me{align-self:flex-end;background:#000;color:#fff;border-color:#000}
+.cm small{display:block;font-size:9px;opacity:.55;margin-top:3px}
+.cform{display:flex;border-top:1px solid var(--line)}.cform input{margin:0;border:0;flex:1}
+.sw{display:flex;align-items:center;gap:8px;margin-top:6px}.sw input{width:auto;margin:0}
+.btn.s{padding:7px 10px;font-size:9px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:760px){
+ body{font-size:14px}
+ header{padding:12px 14px}
+ nav{width:100%;order:3;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ nav button{white-space:nowrap;padding:8px 10px}
+ main{padding:14px}
+ input,select,textarea{font-size:16px}
+ .crow{grid-template-columns:1fr 54px}.crow textarea{grid-column:1/-1;height:70px}
+ .chatwrap{grid-template-columns:1fr}.tl{max-height:200px}.cbox{height:70vh}
+ .box{padding:28px 20px}
+ .btn{padding:12px 16px}
+}
 </style>
 </head>
 <body>
@@ -80,8 +98,11 @@ textarea:focus{border-color:#000}
     <nav id="tabs">
       <button class="on" data-t="orders">Orders</button>
       <button data-t="product">Products</button>
+      <button data-t="customers">Customers</button>
+      <button data-t="refunds">Refunds<span class="badge hide" id="bdRef">0</span></button>
+      <button data-t="chat">Chat<span class="badge hide" id="bdChat">0</span></button>
       <button data-t="coupons">Coupons</button>
-      <button data-t="customers">Customers</button><button data-t="chat">Chat<span class="bdg hide" id="chBdg">0</span></button><button data-t="settings">Settings</button>
+      <button data-t="settings">Settings</button>
     </nav>
     <button class="btn l" onclick="doOut()">Sign out</button>
   </header>
@@ -90,7 +111,9 @@ textarea:focus{border-color:#000}
       <div class="st"><span class="eb">Total orders</span><b id="sT">0</b></div>
       <div class="st"><span class="eb">To ship</span><b id="sP">0</b></div>
       <div class="st"><span class="eb">Shipped</span><b id="sS">0</b></div>
-      <div class="st"><span class="eb">Revenue (excl. cancelled)</span><b id="sR">₹0</b></div><div class="st"><span class="eb">Refunds open</span><b id="sF">0</b></div><div class="st"><span class="eb">Customers</span><b id="sC">0</b></div>
+      <div class="st"><span class="eb">Revenue (excl. cancelled)</span><b id="sR">₹0</b></div>
+      <div class="st"><span class="eb">Customers</span><b id="sC">0</b></div>
+      <div class="st"><span class="eb">Refunds to process</span><b id="sF">0</b></div>
     </div>
 
     <section id="t-orders">
@@ -98,7 +121,7 @@ textarea:focus{border-color:#000}
         <input id="q" placeholder="Search order ID, name, email…" oninput="renderOrders()">
         <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
       </div>
-      <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th><th>Refund</th></tr></thead><tbody id="ob"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="ob"></tbody></table></div>
     </section>
 
     <section id="t-product" class="hide">
@@ -138,6 +161,28 @@ textarea:focus{border-color:#000}
       </div>
     </section>
 
+    <section id="t-customers" class="hide">
+      <input id="cq" placeholder="Search customer name, email, phone…" oninput="renderCustomers()" style="margin:0 0 12px">
+      <div class="tw"><table style="min-width:900px"><thead><tr><th>Customer</th><th>Orders / Spent</th><th>Cancels</th><th>M-Coins</th><th>Status</th><th>Actions</th></tr></thead><tbody id="cub"></tbody></table></div>
+    </section>
+
+    <section id="t-refunds" class="hide">
+      <div class="row" style="margin-bottom:12px"><select id="rf" onchange="renderRefunds()"><option value="OPEN">Needs action (pending / initiated)</option><option value="ALL">All cancelled UPI orders</option><option value="COMPLETED">Completed</option></select></div>
+      <div class="tw"><table style="min-width:820px"><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Refund status</th><th>Reference / note</th><th></th></tr></thead><tbody id="rb"></tbody></table></div>
+      <p class="eb" style="margin-top:12px;text-transform:none;letter-spacing:0;font-size:11px">Pending = customer cancelled a verified UPI order. Pay the money back from your UPI app, enter the UTR here, then mark Initiated / Completed. Customers see this status on their Track page.</p>
+    </section>
+
+    <section id="t-chat" class="hide">
+      <div class="chatwrap">
+        <div class="tl" id="chatList"><div class="it eb">No chats yet</div></div>
+        <div class="cbox"><div class="card eb" id="chatHead" style="margin:0;padding:12px 16px;border:0;border-bottom:1px solid var(--line)">Select a conversation</div>
+          <div class="cmsgs" id="chatMsgs"></div>
+          <form class="cform" onsubmit="sendAdminChat(event)"><input id="chatIn" placeholder="Reply as MONTÈ support…" autocomplete="off" disabled><button class="btn" disabled id="chatSend">Send</button></form></div>
+      </div>
+      <p class="eb sub">Contact form messages</p>
+      <div class="tw"><table style="min-width:640px"><thead><tr><th>From</th><th>Message</th><th>Status</th><th></th></tr></thead><tbody id="inqb"></tbody></table></div>
+    </section>
+
     <section id="t-coupons" class="hide">
       <div class="card">
         <p class="eb">New coupon</p>
@@ -149,11 +194,6 @@ textarea:focus{border-color:#000}
       </div>
       <div class="tw"><table style="min-width:520px"><thead><tr><th>Code</th><th>Discount</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
     </section>
-  <section id="t-customers" class="hide">
-      <input id="cq" placeholder="Search name, email, phone…" oninput="renderCustomers()" style="margin:0 0 12px">
-      <div class="tw"><table style="min-width:900px"><thead><tr><th>Customer</th><th>Orders</th><th>Cancels</th><th>M-Coins</th><th>Status</th><th></th></tr></thead><tbody id="cu"></tbody></table></div>
-    </section>
-    <section id="t-chat" class="hide"><div class="chat"><div class="cl" id="cList"></div><div class="ct"><div class="eb" id="cHead" style="padding:12px 14px;border-bottom:1px solid var(--line)">Select a conversation</div><div class="cms" id="cMsgs"></div><form class="cf" onsubmit="return admSend(event)"><input id="cIn" placeholder="Reply to customer" autocomplete="off"><button class="btn">Send</button></form></div></div></section>
   <section id="t-settings" class="hide">
       <div class="card">
         <p class="eb">Website offer banner (top strip)</p>
@@ -163,10 +203,10 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Support email<input id="sMail" type="email"></label><label class="eb">Support phone<input id="sPhone"></label></div>
         <label class="eb">Registered address<textarea id="sAddr"></textarea></label>
         <div class="row"><label class="eb">Grievance officer name<input id="sGrv"></label><label class="eb">Grievance officer email<input id="sGrvMail" type="email"></label><label class="eb">Return window (days, 0 = no returns)<input id="sRet" type="number" min="0" max="60"></label></div>
-        <p class="eb sub">Store rules</p>
-        <div class="row"><label class="eb">Express delivery fee ₹<input id="rFee" type="number" min="0"></label><label class="eb">UPI ID for payments<input id="rUpi" placeholder="name@bank"></label><label class="eb">M-Coins earned per order<input id="rCoins" type="number" min="0"></label></div>
-        <div class="row"><label class="eb">Cash on delivery<select id="rCod"><option value="1">Enabled</option><option value="0">Disabled for everyone</option></select></label><label class="eb">Live chat<select id="rChat"><option value="1">Enabled</option><option value="0">Disabled</option></select></label><label class="eb">Store mode<select id="rMaint"><option value="0">Open for orders</option><option value="1">Paused (maintenance)</option></select></label></div>
-        <div class="row"><label class="eb">Suspend account after N cancellations<input id="rMax" type="number" min="1"></label><label class="eb">Restrict COD after N cancellations<input id="rCodL" type="number" min="1"></label></div>
+        <p class="eb sub">Store controls</p>
+        <div class="row"><label class="eb">Express delivery fee ₹<input id="sExp" type="number" min="0"></label><label class="eb">Cash on delivery<select id="sCod"><option value="1">Enabled</option><option value="0">Disabled for everyone</option></select></label><label class="eb">Live chat for customers<select id="sChat"><option value="1">On</option><option value="0">Off</option></select></label></div>
+        <div class="row"><label class="eb">COD restriction after 2 cancels (days)<input id="sCodD" type="number" min="1" max="365"></label><label class="eb">Suspend account after total cancels<input id="sMax" type="number" min="3" max="100"></label></div>
+        <div class="row"><label class="eb">Pause new orders (maintenance)<select id="sMaint"><option value="0">Off</option><option value="1">On</option></select></label><label class="eb">Message shown while paused<input id="sMaintT" placeholder="We are restocking. Orders reopen soon."></label></div>
         <button class="btn" style="margin-top:24px" onclick="saveSettings()">Save settings</button>
       </div>
     </section>
@@ -177,7 +217,7 @@ textarea:focus{border-color:#000}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getDatabase, ref, get, set, update, remove, onValue, push, query, limitToLast, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, get, set, update, remove, onValue, push, query, limitToLast, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 /* ====== ONLY these emails can use the panel. Edit this list. ====== */
 const ADMIN_EMAILS = ["sgursharn076@gmail.com"];
@@ -189,7 +229,7 @@ const app = initializeApp({
 const auth = getAuth(app), db = getDatabase(app);
 const $ = id => document.getElementById(id);
 const SIZES = ["S","M","L","XL","2XL","3XL","4XL"];
-let orders = {}, oos = [], started = false;
+let orders = {}, oos = [], started = false, USERS = {}, CHATS = {}, INQ = {}, openChat = null, chatUnsub = null;
 const inr = n => '₹' + Number(n||0).toLocaleString('en-IN');
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
@@ -211,14 +251,17 @@ onAuthStateChanged(auth, u => {
 
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-  ['orders','product','coupons','customers','chat','settings'].forEach(t => $('t-'+t).classList.toggle('hide', t !== b.dataset.t));
+  ['orders','product','customers','refunds','chat','coupons','settings'].forEach(t => $('t-'+t).classList.toggle('hide', t !== b.dataset.t));
 });
 
-function start(){ startX();
+function start(){
   onValue(ref(db,'orders'), s => { orders = s.val() || {}; renderOrders(); });
   onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
   onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
   onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
+  onValue(ref(db,'users'), s => { USERS = s.val() || {}; renderCustomers(); renderOrders(); });
+  onValue(ref(db,'chatMeta'), s => { CHATS = s.val() || {}; renderChatList(); });
+  onValue(ref(db,'inquiries'), s => { INQ = s.val() || {}; renderInq(); });
 }
 
 /* ---------- Orders ---------- */
@@ -229,36 +272,104 @@ window.renderOrders = () => {
   list.forEach(o => { const st = (o.orderPipelineTrackingState||'').toUpperCase();
     if (st !== 'CANCELLED') rev += Number(o.transactionSettlementAmount||0);
     if (st === 'PLACED' || st === 'VERIFIED') pend++; if (st === 'SHIPPED') ship++; });
-  $('sT').textContent = list.length; $('sP').textContent = pend; $('sS').textContent = ship; $('sR').textContent = inr(rev); $('sF').textContent = list.filter(o=>o.refund&&['REQUESTED','INITIATED','PROCESSING'].includes(o.refund.status)).length;
+  $('sT').textContent = list.length; $('sP').textContent = pend; $('sS').textContent = ship; $('sR').textContent = inr(rev); $('sC').textContent = Object.keys(USERS).length; const rp = refundRows('OPEN').length; $('sF').textContent = rp; const bd = $('bdRef'); bd.textContent = rp; bd.classList.toggle('hide', !rp);
   const rows = list.filter(o => (!f || (o.orderPipelineTrackingState||'').toUpperCase() === f) &&
     (!q || [o.orderId,o.clientIdentityName,o.email].join(' ').toLowerCase().includes(q)));
+  renderRefunds();
   $('ob').innerHTML = rows.map(o => {
     const st = (o.orderPipelineTrackingState||'').toUpperCase();
     return `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN')}</span></td>
     <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
     <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span></td>
-    <td>${inr(o.transactionSettlementAmount)}</td>
-    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${o.cancelledBy?`<br><span class="eb">by ${esc(o.cancelledBy)}</span>`:''}</td><td>${refundCell(o)}</td></tr>`;
-  }).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
+    <td>${inr(o.transactionSettlementAmount)}${o.refundStatus&&['PENDING','INITIATED','COMPLETED'].includes(o.refundStatus)?`<br><span class="tag">Refund ${esc(o.refundStatus)}</span>`:''}</td>
+    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select></td></tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
 };
 window.setStatus = async (k, v) => {
-  const o = orders[k] || {}, u = {}, now = Date.now();
-  u[`orders/${k}/orderPipelineTrackingState`] = v; u[`tracking/${k}/orderPipelineTrackingState`] = v; u[`orders/${k}/updatedAt`] = now;
-  if (v === 'CANCELLED' && (o.orderPipelineTrackingState||'').toUpperCase() !== 'CANCELLED') {
-    u[`orders/${k}/cancelledBy`] = o.cancelledBy || 'ADMIN'; u[`orders/${k}/cancelledAt`] = now;
-    if (String(o.protocolMethodType).startsWith('UPI') && (o.orderPipelineTrackingState||'').toUpperCase() === 'VERIFIED' && !o.refund && +o.transactionSettlementAmount > 0) u[`orders/${k}/refund`] = { status: 'REQUESTED', amount: +o.transactionSettlementAmount, ts: now };
-    if (!o.coinsSettled && o.uid) { u[`users/${o.uid}/mCoins`] = Math.max(0, ((users[o.uid]||{}).mCoins||0) + +(o.appliedMCoins||0) - +(o.earnedMCoins||0)); u[`orders/${k}/coinsSettled`] = true; }
-  }
-  try { await update(ref(db), u); toast('Order marked ' + v); } catch(e){ toast('Failed: ' + e.message); }
+  try {
+    const o = orders[k] || {}, prev = String(o.orderPipelineTrackingState||'').toUpperCase(), upd = { orderPipelineTrackingState: v };
+    if (v === 'CANCELLED' && prev !== 'CANCELLED') {
+      upd.cancelledAt = Date.now(); upd.cancelledBy = 'admin';
+      upd.refundStatus = String(o.protocolMethodType||'').startsWith('UPI') && prev !== 'PLACED' && Number(o.transactionSettlementAmount) > 0 ? 'PENDING' : 'NOT_REQUIRED';
+      if (o.uid) { const us = await get(ref(db,'users/'+o.uid)); if (us.exists()) { const u = us.val();
+        await update(ref(db,'users/'+o.uid), { mCoins: Math.max(0,(u.mCoins||0)+Number(o.appliedMCoins||0)-Number(o.earnedMCoins||0)), completedOrdersCount: Math.max(0,(u.completedOrdersCount||0)-1) }); } }
+    }
+    await update(ref(db, 'orders/' + k), upd); toast('Order marked ' + v + (upd.refundStatus === 'PENDING' ? ' · refund pending' : ''));
+  } catch(e){ toast('Failed: ' + e.message); }
 };
-const RF = ['NONE','REQUESTED','INITIATED','PROCESSING','COMPLETED','REJECTED'];
-window.refundCell = o => { const r = o.refund || {status:'NONE'}, st = (o.orderPipelineTrackingState||'').toUpperCase();
-  if (r.status === 'NONE' && st !== 'CANCELLED') return '<span class="eb">–</span>';
-  return `<select onchange="setRefund('${esc(o.k)}',this.value)">${RF.map(x=>`<option ${x===r.status?'selected':''}>${x}</option>`).join('')}</select>${r.amount?`<br><span class="eb">${inr(r.amount)}</span>`:''}${r.ref?`<br><span class="eb">Ref ${esc(r.ref)}</span>`:''}`; };
-window.setRefund = async (k, v) => { const o = orders[k] || {}, u = {}; let r = '';
-  if (v === 'INITIATED' || v === 'COMPLETED') r = prompt('Refund reference / UTR (optional)') || '';
-  u[`orders/${k}/refund/status`] = v; u[`orders/${k}/refund/updatedAt`] = Date.now(); if (!(o.refund||{}).amount) u[`orders/${k}/refund/amount`] = +o.transactionSettlementAmount || 0; if (r) u[`orders/${k}/refund/ref`] = r;
-  try { await update(ref(db), u); toast('Refund ' + v.toLowerCase()); } catch(e){ toast('Failed: ' + e.message); } };
+
+/* ---------- Customers ---------- */
+const userStats = uid => { let n = 0, sp = 0; Object.values(orders).forEach(o => { if (o.uid === uid) { n++; if (String(o.orderPipelineTrackingState).toUpperCase() !== 'CANCELLED') sp += Number(o.transactionSettlementAmount||0); } }); return {n, sp}; };
+window.renderCustomers = () => {
+  const q = ($('cq').value||'').toLowerCase(), max = 15;
+  const rows = Object.entries(USERS).map(([id,u]) => ({id,...u})).filter(u => !q || [u.name,u.email,u.phone].join(' ').toLowerCase().includes(q))
+    .sort((a,b) => userStats(b.id).sp - userStats(a.id).sp);
+  $('cub').innerHTML = rows.map(u => { const st = userStats(u.id), tc = u.totalCancelCount ?? u.cancelCount ?? 0, sus = u.suspended === true;
+    const codOff = u.codBlocked === true || ((u.cancelCount||0) >= 2 && Date.now() - (u.lastCancelTimestamp||0) < 24*864e5);
+    return `<tr><td><b style="font-weight:500">${esc(u.name||'—')}</b><br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(u.email)}</span><br><span style="color:#777;font-size:11px">${esc(u.phone||'')}</span></td>
+    <td>${st.n} orders<br><span class="eb">${inr(st.sp)}</span></td><td>${tc} total<br><span class="eb">${u.cancelCount||0} recent</span></td><td>${Number(u.mCoins||0)}</td>
+    <td><span class="tag">${sus?'Suspended':'Active'}</span> ${codOff?'<span class="tag">COD off</span>':''}</td>
+    <td><div class="acts"><button class="btn l s" onclick="userAct('${esc(u.id)}','sus')">${sus?'Reactivate':'Suspend'}</button><button class="btn l s" onclick="userAct('${esc(u.id)}','cod')">${u.codBlocked===true?'Allow COD':'Block COD'}</button><button class="btn l s" onclick="userAct('${esc(u.id)}','reset')">Reset cancels</button><button class="btn l s" onclick="userAct('${esc(u.id)}','coins')">Coins</button><button class="btn l s" onclick="openChatWith('${esc(u.id)}')">Chat</button></div></td></tr>`; }).join('')
+    || '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px">No customers</td></tr>';
+};
+window.userAct = async (id, a) => {
+  const u = USERS[id] || {}; try {
+    if (a === 'sus') { if (!confirm((u.suspended?'Reactivate ':'Suspend ')+(u.name||u.email)+'?')) return; await update(ref(db,'users/'+id), u.suspended ? {suspended:false,totalCancelCount:0,cancelCount:0,lastCancelTimestamp:0} : {suspended:true}); }
+    if (a === 'cod') await update(ref(db,'users/'+id), {codBlocked: u.codBlocked !== true});
+    if (a === 'reset') { if (!confirm('Reset cancellation counters?')) return; await update(ref(db,'users/'+id), {cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0}); }
+    if (a === 'coins') { const v = prompt('Add (or subtract with -) M-Coins. Current: '+(u.mCoins||0)); const n = parseInt(v); if (!v || isNaN(n)) return; await update(ref(db,'users/'+id), {mCoins: Math.max(0,(u.mCoins||0)+n)}); }
+    toast('Customer updated');
+  } catch(e){ toast('Failed: ' + e.message); } };
+
+/* ---------- Refunds ---------- */
+function refundRows(f) {
+  return Object.entries(orders).map(([k,o]) => ({k,...o})).filter(o => String(o.orderPipelineTrackingState).toUpperCase() === 'CANCELLED' && String(o.protocolMethodType||'').startsWith('UPI') && o.refundStatus !== 'NOT_REQUIRED')
+    .filter(o => f === 'ALL' || (f === 'OPEN' ? (o.refundStatus === 'PENDING' || o.refundStatus === 'INITIATED') : o.refundStatus === 'COMPLETED'))
+    .sort((a,b) => (b.cancelledAt||b.chronologicalCreationTimestamp||0) - (a.cancelledAt||a.chronologicalCreationTimestamp||0));
+}
+window.renderRefunds = () => {
+  $('rb').innerHTML = refundRows($('rf').value).map(o => `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${o.cancelledAt?new Date(o.cancelledAt).toLocaleString('en-IN'):''}</span></td>
+    <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span></td><td>${inr(o.transactionSettlementAmount)}</td>
+    <td><select onchange="setRefund('${esc(o.k)}',this.value)">${['NONE','PENDING','INITIATED','COMPLETED','NOT_REQUIRED'].map(x=>`<option ${x===(o.refundStatus||'NONE')?'selected':''}>${x}</option>`).join('')}</select></td>
+    <td><input id="rr-${esc(o.k)}" value="${esc(o.refundRef||'')}" placeholder="UTR / note" style="margin:0"></td>
+    <td><button class="btn l s" onclick="saveRefundRef('${esc(o.k)}')">Save ref</button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px">No refunds in this view</td></tr>';
+};
+window.setRefund = (k, v) => { const u = {refundStatus: v}; const r = document.getElementById('rr-'+k); if (r) u.refundRef = r.value.trim(); if (v === 'INITIATED') u.refundInitiatedAt = Date.now(); if (v === 'COMPLETED') u.refundCompletedAt = Date.now();
+  update(ref(db,'orders/'+k), u).then(() => toast('Refund ' + v)).catch(e => toast('Failed: ' + e.message)); };
+window.saveRefundRef = k => update(ref(db,'orders/'+k), {refundRef: document.getElementById('rr-'+k).value.trim()}).then(() => toast('Saved'));
+
+/* ---------- Live chat ---------- */
+window.renderChatList = () => {
+  const list = Object.entries(CHATS).map(([id,c]) => ({id,...c})).sort((a,b) => (b.lastTs||0)-(a.lastTs||0)); let unread = 0;
+  $('chatList').innerHTML = list.map(c => { const n = c.unreadAdmin||0; unread += n ? 1 : 0;
+    return `<div class="it ${n?'un':''} ${c.id===openChat?'on':''}" onclick="openChatWith('${esc(c.id)}')"><b>${esc(c.name||c.email)}</b>${n?`<span class="badge">${n}</span>`:''}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(c.lastMsg||'')}</span></div>`; }).join('') || '<div class="it eb">No chats yet</div>';
+  const b = $('bdChat'); b.textContent = unread; b.classList.toggle('hide', !unread);
+};
+window.openChatWith = id => {
+  document.querySelector('#tabs button[data-t="chat"]').click(); openChat = id; if (chatUnsub) chatUnsub();
+  const u = USERS[id] || {}, c = CHATS[id] || {};
+  $('chatHead').textContent = (u.name || c.name || 'Customer') + ' · ' + (u.email || c.email || '');
+  $('chatIn').disabled = false; $('chatSend').disabled = false; renderChatList();
+  update(ref(db,'chatMeta/'+id), {unreadAdmin: 0}).catch(()=>{});
+  chatUnsub = onValue(query(ref(db,'chats/'+id+'/messages'), limitToLast(200)), sn => {
+    const l = Object.values(sn.val()||{}).sort((a,b)=>a.ts-b.ts), box = $('chatMsgs');
+    box.innerHTML = l.map(m => `<div class="cm ${m.from==='admin'?'me':''}">${esc(m.text)}<small>${new Date(m.ts).toLocaleString('en-IN')}</small></div>`).join('') || '<span class="eb">No messages yet</span>';
+    box.scrollTop = box.scrollHeight; if (CHATS[id] && CHATS[id].unreadAdmin) update(ref(db,'chatMeta/'+id), {unreadAdmin:0}).catch(()=>{});
+  });
+};
+window.sendAdminChat = async e => {
+  e.preventDefault(); const t = $('chatIn').value.trim(); if (!t || !openChat) return; $('chatIn').value = '';
+  try { await push(ref(db,'chats/'+openChat+'/messages'), {from:'admin', text:t.slice(0,500), ts:Date.now()});
+    await update(ref(db,'chatMeta/'+openChat), {lastMsg:'You: '+t.slice(0,70), lastTs:Date.now(), lastFrom:'admin', unreadAdmin:0});
+    runTransaction(ref(db,'chatMeta/'+openChat+'/unreadUser'), v => (v||0)+1);
+  } catch(err){ toast('Failed: ' + err.message); $('chatIn').value = t; }
+};
+window.renderInq = () => {
+  $('inqb').innerHTML = Object.entries(INQ).map(([k,i]) => ({k,...i})).sort((a,b)=>(b.ts||0)-(a.ts||0)).map(i => `<tr><td>${esc(i.name)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(i.email)}</span>${i.orderRef?`<br><span class="eb">${esc(i.orderRef)}</span>`:''}<br><span class="eb">${new Date(i.ts||0).toLocaleString('en-IN')}</span></td><td style="max-width:420px;white-space:pre-wrap">${esc(i.message)}</td><td><span class="tag">${esc(i.status||'NEW')}</span></td>
+    <td class="acts"><a class="btn l s" href="mailto:${esc(i.email)}?subject=Re: your MONTÈ enquiry" style="text-decoration:none">Reply</a><button class="btn l s" onclick="inqDone('${esc(i.k)}')">Done</button><button class="btn l s" onclick="inqDel('${esc(i.k)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:#999;padding:30px">No messages</td></tr>';
+};
+window.inqDone = k => update(ref(db,'inquiries/'+k), {status:'DONE'});
+window.inqDel = k => confirm('Delete this message?') && remove(ref(db,'inquiries/'+k));
 
 /* ---------- Products ---------- */
 const DEFAULT_PRODUCTS = {monte_signature_tee:{name:'MONTÈ Signature Tee',category:'T-Shirts',sku:'MNT-TEE-001',description:'Effortless, refined and timeless. A relaxed, oversized silhouette cut from premium cotton for all-day comfort and a clean, elevated line.',details:['Premium cotton fabric','Oversized contemporary fit','Soft-touch organic finish','Breathable and ultra-light'],care:'Machine wash cold with similar colours. Do not bleach. Dry in shade. Iron on low heat.',price:999,mrp:1499,status:'ACTIVE',badge:'',offerText:'',launchTimestamp:0,createdAt:1,images:['https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png','https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png','https://aryasongs.github.io/Pulse/9BF12F78-C4CF-4BEF-86AE-A489D8B36021.png','https://aryasongs.github.io/Pulse/B0ED3981-14B8-4A5D-83BF-D23C1DB14F2E.png'],colors:[{name:'Midnight Navy',hex:'#1A2332',image:'https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png'},{name:'Arctic Blanc',hex:'#F5F5F5',image:'https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png'}],sizes:['S','M','L','XL','2XL','3XL','4XL'],oosVariants:[]}};
@@ -331,14 +442,15 @@ window.bulkDiscount = async (clear) => {
 };
 
 /* ---------- Settings ---------- */
-function fillSettings(v){ fillRules(v.rules||{});
+function fillSettings(v){
   const s = v.site || {}, b = v.business || {};
   $('sBanner').value = s.offerText || ''; $('sBannerOn').value = s.offerActive ? '1' : '0';
   $('sName').value = b.legalName||''; $('sGst').value = b.gstin||''; $('sMail').value = b.email||''; $('sPhone').value = b.phone||'';
+  $('sExp').value = s.expressFee ?? 150; $('sCod').value = s.codEnabled === false ? '0' : '1'; $('sChat').value = s.chatEnabled === false ? '0' : '1'; $('sCodD').value = s.codDays ?? 24; $('sMax').value = s.maxCancels ?? 15; $('sMaint').value = s.maintenance ? '1' : '0'; $('sMaintT').value = s.maintenanceText || '';
   $('sAddr').value = b.address||''; $('sGrv').value = b.grievanceName||''; $('sGrvMail').value = b.grievanceEmail||''; $('sRet').value = b.returnDays ?? 7;
 }
 window.saveSettings = async () => {
-  try { await set(ref(db, 'settings'), { rules: readRules(), site: { offerText: $('sBanner').value.trim(), offerActive: $('sBannerOn').value === '1' },
+  try { await set(ref(db, 'settings'), { site: { offerText: $('sBanner').value.trim(), offerActive: $('sBannerOn').value === '1', expressFee: Math.max(0, parseInt($('sExp').value)||0), codEnabled: $('sCod').value === '1', chatEnabled: $('sChat').value === '1', codDays: Math.max(1, parseInt($('sCodD').value)||24), maxCancels: Math.max(3, parseInt($('sMax').value)||15), maintenance: $('sMaint').value === '1', maintenanceText: $('sMaintT').value.trim() },
     business: { legalName: $('sName').value.trim(), gstin: $('sGst').value.trim(), email: $('sMail').value.trim(), phone: $('sPhone').value.trim(),
       address: $('sAddr').value.trim(), grievanceName: $('sGrv').value.trim(), grievanceEmail: $('sGrvMail').value.trim(), returnDays: Math.max(0, parseInt($('sRet').value) || 0) } });
     toast('Settings saved'); } catch(e){ toast('Failed: ' + e.message); }
@@ -360,46 +472,6 @@ window.addCoupon = async () => {
 };
 window.togCoupon = (c, a) => update(ref(db, 'coupons/' + c), { active: a }).then(() => toast('Updated'));
 window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => toast('Deleted'));
-
-/* ---------- Rules ---------- */
-const readRules = () => ({ expressFee: +$('rFee').value || 0, upiId: $('rUpi').value.trim(), coinsPerOrder: +$('rCoins').value || 0, codEnabled: $('rCod').value === '1', chatEnabled: $('rChat').value === '1', maintenance: $('rMaint').value === '1', maxCancels: Math.max(1, +$('rMax').value || 15), codCancelLimit: Math.max(1, +$('rCodL').value || 2) });
-const fillRules = r => { $('rFee').value = r.expressFee ?? 150; $('rUpi').value = r.upiId || ''; $('rCoins').value = r.coinsPerOrder ?? 2; $('rCod').value = r.codEnabled === false ? '0' : '1'; $('rChat').value = r.chatEnabled === false ? '0' : '1'; $('rMaint').value = r.maintenance ? '1' : '0'; $('rMax').value = r.maxCancels ?? 15; $('rCodL').value = r.codCancelLimit ?? 2; };
-
-/* ---------- Customers & chat ---------- */
-let users = {}, flags = {}, metas = {}, curChat = null, offChat = null;
-function startX(){
-  onValue(ref(db,'users'), s => { users = s.val() || {}; $('sC').textContent = Object.keys(users).length; renderCustomers(); });
-  onValue(ref(db,'adminFlags'), s => { flags = s.val() || {}; renderCustomers(); });
-  onValue(ref(db,'chatMeta'), s => { metas = s.val() || {}; renderChatList(); });
-}
-window.renderCustomers = () => {
-  const q = $('cq').value.toLowerCase(), cnt = {};
-  Object.values(orders).forEach(o => { if (o.uid && (o.orderPipelineTrackingState||'').toUpperCase() !== 'CANCELLED') cnt[o.uid] = (cnt[o.uid]||0) + 1; });
-  const rows = Object.entries(users).filter(([id,u]) => !q || [u.name,u.email,u.phone].join(' ').toLowerCase().includes(q));
-  $('cu').innerHTML = rows.map(([id,u]) => { const f = flags[id] || {};
-    return `<tr><td><b style="font-weight:500">${esc(u.name)}</b><br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(u.email)} · ${esc(u.phone)}</span></td><td>${cnt[id]||0}</td><td>${u.cancelCount||0}</td><td>${u.mCoins||0}</td>
-    <td>${f.blocked?'<span class="tag r">Blocked</span>':'<span class="tag">Active</span>'} ${f.codOff?'<span class="tag r">No COD</span>':''}</td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="toggleFlag('${id}','blocked')">${f.blocked?'Unblock':'Block'}</button> <button class="btn l" onclick="toggleFlag('${id}','codOff')">${f.codOff?'Allow COD':'Stop COD'}</button> <button class="btn l" onclick="resetCancels('${id}')">Reset cancels</button> <button class="btn l" onclick="addCoins('${id}')">Coins</button> <button class="btn l" onclick="openChat('${id}')">Chat</button></td></tr>`; }).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px">No customers found</td></tr>';
-};
-window.toggleFlag = (id, k) => update(ref(db,'adminFlags/'+id), { [k]: !(flags[id]||{})[k] }).then(() => toast('Updated')).catch(e => toast('Failed: '+e.message));
-window.resetCancels = id => update(ref(db,'users/'+id), { cancelCount: 0, lastCancelTimestamp: 0 }).then(() => toast('Cancellations reset'));
-window.addCoins = id => { const n = parseInt(prompt('Add (or subtract) M-Coins:')); if (!n) return; update(ref(db,'users/'+id), { mCoins: Math.max(0, ((users[id]||{}).mCoins||0) + n) }).then(() => toast('Coins updated')); };
-function renderChatList(){
-  const l = Object.entries(metas).sort((a,b) => (b[1].lastTs||0) - (a[1].lastTs||0)), un = l.reduce((n,[,m]) => n + (m.unreadAdmin>0?1:0), 0);
-  $('chBdg').textContent = un; $('chBdg').classList.toggle('hide', !un);
-  $('cList').innerHTML = l.map(([id,m]) => `<div class="ci2 ${id===curChat?'on':''}" onclick="openChat('${id}')"><b>${esc(m.name||m.email)}</b>${m.unreadAdmin>0?`<span class="bdg">${m.unreadAdmin}</span>`:''}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(m.lastMsg)}</span></div>`).join('') || '<p class="eb" style="padding:20px">No conversations yet</p>';
-}
-window.openChat = id => {
-  curChat = id; document.querySelector('[data-t=chat]').click();
-  const m = metas[id] || users[id] || {}; $('cHead').textContent = (m.name || '') + ' · ' + (m.email || '');
-  if (offChat) offChat();
-  offChat = onValue(query(ref(db,'chats/'+id), limitToLast(100)), s => { const v = Object.values(s.val() || {}).sort((a,b) => a.ts-b.ts), b = $('cMsgs');
-    b.innerHTML = v.map(x => `<div class="cm ${x.from==='admin'?'a':'u'}"></div>`).join(''); [...b.children].forEach((el,i) => el.textContent = v[i].text); b.scrollTop = b.scrollHeight; });
-  update(ref(db,'chatMeta/'+id), { unreadAdmin: 0 }).catch(() => {}); renderChatList();
-};
-window.admSend = async e => { e.preventDefault(); const t = $('cIn').value.trim(); if (!t || !curChat) return false; $('cIn').value = '';
-  try { await push(ref(db,'chats/'+curChat), { from: 'admin', text: t.slice(0,500), ts: Date.now() }); await update(ref(db,'chatMeta/'+curChat), { lastMsg: 'You: ' + t.slice(0,70), lastTs: Date.now(), unreadAdmin: 0, unreadUser: increment(1) }); }
-  catch(err){ toast('Failed: ' + err.message); } return false; };
 </script>
 </body>
 </html>
