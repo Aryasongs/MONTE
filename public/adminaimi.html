@@ -83,13 +83,13 @@ textarea:focus{border-color:#000}
       <div class="st"><span class="eb">Total orders</span><b id="sT">0</b></div>
       <div class="st"><span class="eb">To ship</span><b id="sP">0</b></div>
       <div class="st"><span class="eb">Shipped</span><b id="sS">0</b></div>
-      <div class="st"><span class="eb">Revenue (excl. cancelled)</span><b id="sR">₹0</b></div>
+      <div class="st"><span class="eb">Revenue (paid, excl. cancelled)</span><b id="sR">₹0</b></div>
     </div>
 
     <section id="t-orders">
       <div class="row" style="margin-bottom:12px">
         <input id="q" placeholder="Search order ID, name, email…" oninput="renderOrders()">
-        <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
+        <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PENDING_PAYMENT</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
       </div>
       <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="ob"></tbody></table></div>
     </section>
@@ -186,6 +186,22 @@ const SIZES = ["S","M","L","XL","2XL","3XL","4XL"];
 let orders = {}, oos = [], started = false;
 const inr = n => '₹' + Number(n||0).toLocaleString('en-IN');
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PAY = "https://monte-pay.sgursharn076.workers.dev"; // must be allowed in monte-pay ALLOWED_ORIGINS
+const payCall = async (path, body) => {
+  const r = await fetch(PAY + path, { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + await auth.currentUser.getIdToken() }, body: JSON.stringify(body || {}) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || "Request failed");
+  return j;
+};
+window.checkPay = async (k, silent) => {
+  try { const r = await payCall("/pay/admin-check", { orderId: k });
+    if (!silent) toast(r.paymentStatus === "PAID" ? "Cashfree confirmed payment. Order VERIFIED" : "Cashfree: payment not received yet"); }
+  catch (e) { if (!silent) toast("Check failed: " + e.message); }
+};
+const autoChecked = new Set();
+function autoCheck(){ // any online order still waiting for payment is verified against Cashfree automatically (once per session)
+  Object.entries(orders).filter(([k,o]) => o.orderPipelineTrackingState === 'PENDING_PAYMENT' && o.protocolMethodType === 'ONLINE' && o.cfOrderId && !autoChecked.has(k)).slice(0, 10).forEach(([k]) => { autoChecked.add(k); checkPay(k, true); });
+}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
 window.doLogin = async () => {
@@ -209,7 +225,7 @@ document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
 });
 
 function start(){
-  onValue(ref(db,'orders'), s => { orders = s.val() || {}; renderOrders(); });
+  onValue(ref(db,'orders'), s => { orders = s.val() || {}; renderOrders(); autoCheck(); });
   onValue(ref(db,'users'), s => { USERS = s.val() || {}; renderUsers(); }, () => {});
   onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
   onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
@@ -217,12 +233,27 @@ function start(){
 }
 
 /* ---------- Orders ---------- */
+const payTag = o => {
+  const m = o.protocolMethodType, p = o.paymentStatus, st = (o.orderPipelineTrackingState||'').toUpperCase();
+  let t = p === 'PAID' ? 'PAID' : p === 'COD' ? 'COD (pay on delivery)' : p === 'AMOUNT_MISMATCH' ? '⚠ AMOUNT MISMATCH' : (m === 'ONLINE' ? (st === 'CANCELLED' ? 'UNPAID' : 'AWAITING PAYMENT') : (p || ''));
+  if (o.refundStatus === 'PENDING') t += ' · REFUND DUE';
+  else if (o.refundStatus === 'REFUNDED') t += ' · REFUNDED';
+  return `<span class="tag">${esc(t)}</span>`;
+};
+const actionBtns = (o, st) => {
+  let b = '';
+  if (st === 'PENDING_PAYMENT' && o.protocolMethodType === 'ONLINE') b += `<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="checkPay('${esc(o.k)}')">Check payment</button>`;
+  if (o.paymentStatus === 'AMOUNT_MISMATCH') b += `<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="checkPay('${esc(o.k)}')">Re-check</button>`;
+  if (o.refundStatus === 'PENDING') b += `<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="markRefunded('${esc(o.k)}')">Mark refunded</button>`;
+  return b;
+};
+window.markRefunded = k => confirm('Have you refunded this payment in the Cashfree dashboard?') && update(ref(db,'orders/'+k),{ refundStatus:'REFUNDED', refundedAt: Date.now() }).then(() => toast('Marked refunded'));
 window.renderOrders = () => {
   const q = $('q').value.toLowerCase(), f = $('fs').value;
   const list = Object.entries(orders).map(([k,o]) => ({k,...o})).sort((a,b) => (b.chronologicalCreationTimestamp||0) - (a.chronologicalCreationTimestamp||0));
   let rev = 0, pend = 0, ship = 0;
   list.forEach(o => { const st = (o.orderPipelineTrackingState||'').toUpperCase();
-    if (st !== 'CANCELLED') rev += Number(o.transactionSettlementAmount||0);
+    if (st !== 'CANCELLED' && st !== 'PENDING_PAYMENT') rev += Number(o.transactionSettlementAmount||0);
     if (st === 'PLACED' || st === 'VERIFIED') pend++; if (st === 'SHIPPED') ship++; });
   $('sT').textContent = list.length; $('sP').textContent = pend; $('sS').textContent = ship; $('sR').textContent = inr(rev);
   const rows = list.filter(o => (!f || (o.orderPipelineTrackingState||'').toUpperCase() === f) &&
@@ -232,13 +263,27 @@ window.renderOrders = () => {
     return `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN')}</span></td>
     <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
     <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span></td>
-    <td>${inr(o.transactionSettlementAmount)}</td>
-    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select></td></tr>`;
+    <td>${inr(o.transactionSettlementAmount)}<br>${payTag(o)}</td>
+    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}</td></tr>`;
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
 };
 window.setStatus = async (k, v) => {
-  try { await update(ref(db, 'orders/' + k), { orderPipelineTrackingState: v }); toast('Order marked ' + v); }
-  catch(e){ toast('Failed: ' + e.message); }
+  const o = orders[k] || {}, cur = (o.orderPipelineTrackingState || '').toUpperCase();
+  if (v === cur) return;
+  const online = o.protocolMethodType === 'ONLINE', paid = o.paymentStatus === 'PAID';
+  if (cur === 'CANCELLED') { toast('Cancelled orders cannot be reopened'); return renderOrders(); }
+  if (v === 'PENDING_PAYMENT') { toast('Cannot move an order back to pending payment'); return renderOrders(); }
+  if (online && !paid && v !== 'CANCELLED') { toast('Payment not confirmed by Cashfree yet. Tap "Check payment" first.'); return renderOrders(); }
+  try {
+    const patch = { orderPipelineTrackingState: v };
+    if (v === 'CANCELLED') {
+      if (!confirm('Cancel this order?' + (online && paid ? ' It is PAID, so a refund will be marked due.' : ''))) return renderOrders();
+      patch.cancelledAt = Date.now(); patch.cancelledBy = 'admin'; patch.refundStatus = (online && paid) ? 'PENDING' : 'NOT_REQUIRED';
+      const back = Number(o.appliedMCoins || 0) - (o.coinsAwarded ? Number(o.earnedMCoins || 0) : 0);
+      if (back && o.uid) { const us = await get(ref(db, 'users/' + o.uid + '/mCoins')); await set(ref(db, 'users/' + o.uid + '/mCoins'), Math.max(0, Number(us.val() || 0) + back)); }
+    }
+    await update(ref(db, 'orders/' + k), patch); toast('Order marked ' + v);
+  } catch(e){ toast('Failed: ' + e.message); }
 };
 
 /* ---------- Products ---------- */
