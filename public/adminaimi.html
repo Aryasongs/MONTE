@@ -50,7 +50,8 @@ textarea:focus{border-color:#000}
 .chipz{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .chipz button{min-width:52px;height:38px;border:1px solid #000;background:#fff;cursor:pointer}
 .chipz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
-.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}</style>
+.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}
+.pk{border:1px solid var(--line);background:#fff;padding:8px 12px;cursor:pointer;font-size:12px}.pk.on{background:#000;color:#fff;border-color:#000}</style>
 </head>
 <body>
 
@@ -103,7 +104,7 @@ textarea:focus{border-color:#000}
           <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount(true)">Remove all discounts</button>
           <button id="impBtn" class="btn l hide" style="flex:0 0 auto" onclick="importDefault()">Import Signature Tee</button>
         </div>
-        <div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
+        <input id="pq" placeholder="Search products (name, SKU, category, colour)…" oninput="renderProducts()" style="margin:0 0 12px"><div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
       </div>
       <div id="pedit" class="card hide">
         <p class="eb" id="pTitle">New product</p>
@@ -133,18 +134,32 @@ textarea:focus{border-color:#000}
 
     <section id="t-coupons" class="hide">
       <div class="card">
-        <p class="eb">New coupon</p>
+        <p class="eb" id="cpTitle">New coupon</p>
         <div class="row">
-          <label class="eb">Code<input id="cCode" placeholder="DIWALI100" style="text-transform:uppercase"></label>
-          <label class="eb">Discount (₹ off)<input id="cDisc" type="number" min="1"></label>
-          <div style="display:flex;align-items:flex-end"><button class="btn" onclick="addCoupon()" style="width:100%">Add coupon</button></div>
+          <label class="eb">Code<input id="cCode" placeholder="DIWALI20" style="text-transform:uppercase"></label>
+          <label class="eb">Category<select id="cCat"><option>General</option><option>Festival</option><option>Welcome (first order)</option><option>MONTÈ+ VIP</option><option>Product special</option><option>Clearance</option><option>Influencer / referral</option></select></label>
+          <label class="eb">Who can use<select id="cAud"><option value="ALL">Everyone</option><option value="NEW">New customers (0 orders)</option><option value="PLUS">MONTÈ+ members only</option></select></label>
         </div>
+        <div class="row">
+          <label class="eb">Type<select id="cType" onchange="cpType()"><option value="PERCENT">Percentage off</option><option value="FLAT">Flat ₹ off</option></select></label>
+          <label class="eb" id="cValL">Percent (%)<input id="cVal" type="number" min="1"></label>
+          <label class="eb" id="cCapL">Max discount ₹ (optional)<input id="cCap" type="number" min="0"></label>
+          <label class="eb">Min order ₹ (optional)<input id="cMin" type="number" min="0"></label>
+        </div>
+        <p class="eb sub">Works on (nothing selected = all products)</p>
+        <div id="cProds" class="chipz"></div>
+        <div class="row"><label class="eb">Only these sizes (comma separated, empty = all)<input id="cSizes" placeholder="M, L"></label><label class="eb">Only these colours (comma separated, empty = all)<input id="cCols" placeholder="Midnight Navy"></label></div>
+        <p class="eb sub">Timing &amp; limits</p>
+        <div class="row"><label class="eb">Starts (empty = now)<input id="cFrom" type="datetime-local"></label><label class="eb">Ends (empty = no expiry)<input id="cTo" type="datetime-local"></label><label class="eb">Or active for (hours from start)<input id="cHrs" type="number" min="0"></label></div>
+        <div class="row"><label class="eb">Total uses allowed (0 = unlimited)<input id="cMax" type="number" min="0" value="0"></label><label class="eb">Max different customers (0 = unlimited)<input id="cUsers" type="number" min="0" value="0"></label><label class="eb">Uses per customer (0 = unlimited)<input id="cPer" type="number" min="0" value="1"></label></div>
+        <div class="row"><label class="eb">Show on product page<select id="cShow"><option value="1">Yes, public offer</option><option value="0">No, secret code</option></select></label><label class="eb">Offer line (optional)<input id="cDesc" placeholder="Festive week special"></label></div>
+        <div style="margin-top:24px;display:flex;gap:10px"><button class="btn" onclick="addCoupon()">Save coupon</button><button class="btn l" onclick="resetCp()">Clear</button></div>
       </div>
-      <div class="tw"><table style="min-width:520px"><thead><tr><th>Code</th><th>Discount</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
+      <div class="tw"><table style="min-width:980px"><thead><tr><th>Code</th><th>Offer</th><th>Works on</th><th>Validity</th><th>Usage</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
     </section>
   <section id="t-users" class="hide">
       <div class="card"><div class="row"><label class="eb">Search customer (name, phone or email)<input id="uq" oninput="renderUsers()" placeholder="Type to search"></label></div></div>
-      <div class="tw"><table style="min-width:760px"><thead><tr><th>Customer</th><th>Orders</th><th>Cancels</th><th>Status</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
+      <div class="tw"><table style="min-width:760px"><thead><tr><th>Customer</th><th>Orders</th><th>M-Coins</th><th>Cancels</th><th>Status</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
     </section>
     <section id="t-settings" class="hide">
       <div class="card">
@@ -171,7 +186,7 @@ textarea:focus{border-color:#000}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getDatabase, ref, get, set, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, get, set, update, remove, onValue, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 /* ====== ONLY these emails can use the panel. Edit this list. ====== */
 const ADMIN_EMAILS = ["sgursharn076@gmail.com"];
@@ -229,7 +244,7 @@ function start(){
   onValue(ref(db,'users'), s => { USERS = s.val() || {}; renderUsers(); }, () => {});
   onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
   onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
-  onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
+  onValue(ref(db,'coupons'), s => { COUPONS = s.val() || {}; renderCoupons(); });
 }
 
 /* ---------- Orders ---------- */
@@ -291,12 +306,14 @@ const DEFAULT_PRODUCTS = {monte_signature_tee:{name:'MONTÈ Signature Tee',categ
 let CAT = {}, editId = null, oosSet = new Set();
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'product';
 const offPct = p => (+p.mrp > +p.price) ? Math.round((1 - p.price/p.mrp)*100) : 0;
+const pMatch = p => { const q = (($('pq')||{}).value||'').toLowerCase().trim(); return !q || [p.name,p.category,p.sku,p.collection,p.gender,...(p.colors||[]).map(c=>c.name)].join(' ').toLowerCase().includes(q); };
 function renderProducts(){
+  fillCpProducts();
   const rows = Object.entries(CAT).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
   $('impBtn').classList.toggle('hide', rows.length > 0);
   $('cats').innerHTML = [...new Set(rows.map(r=>r[1].category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
   const lab = {ACTIVE:'Available',OUT_OF_STOCK:'Sold out',DRAFT:'Hidden'};
-  $('pb').innerHTML = rows.map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
+  $('pb').innerHTML = rows.filter(([id,p])=>pMatch(p)).map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
     <td><b style="font-weight:500">${esc(p.name)}</b><br><span class="eb">${esc(p.category)} ${p.sku?'· '+esc(p.sku):''}</span></td>
     <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
     <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
@@ -385,30 +402,95 @@ let USERS = {};
 window.renderUsers = () => {
   const q = ($('uq').value || '').toLowerCase().trim();
   const rows = Object.entries(USERS).filter(([id,u]) => !q || [u.name,u.phone,u.email].join(' ').toLowerCase().includes(q)).slice(0, 200);
-  $('ub').innerHTML = rows.map(([id,u]) => `<tr><td><b style="font-weight:500">${esc(u.name||'—')}</b><br><span class="eb">${esc(u.phone||'')} · ${esc(u.email||'')}</span></td><td>${u.completedOrdersCount||0}</td><td>${u.totalCancelCount ?? u.cancelCount ?? 0}</td>
+  $('ub').innerHTML = rows.map(([id,u]) => `<tr><td><b style="font-weight:500">${esc(u.name||'—')}</b><br><span class="eb">${esc(u.phone||'')} · ${esc(u.email||'')}</span></td><td>${u.completedOrdersCount||0}</td><td><b style="font-weight:500">${u.mCoins||0}</b></td><td>${u.totalCancelCount ?? u.cancelCount ?? 0}</td>
     <td>${u.suspended ? '<span class="tag">Suspended</span> ' : ''}${u.codBlocked ? '<span class="tag">COD blocked</span>' : ''}${!u.suspended && !u.codBlocked ? '<span class="tag">Normal</span>' : ''}</td>
     <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="uSet('${id}',{codBlocked:${!u.codBlocked}})">${u.codBlocked ? 'Allow COD' : 'Block COD'}</button>
     <button class="btn l" onclick="uSet('${id}',{suspended:${!u.suspended}})">${u.suspended ? 'Reinstate' : 'Suspend'}</button>
-    <button class="btn l" onclick="uSet('${id}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button></td></tr>`).join('') || '<tr><td colspan="5" class="eb">No customers found</td></tr>';
+    <button class="btn l" onclick="uCoins('${id}')">M-Coins</button>
+    <button class="btn l" onclick="uSet('${id}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button></td></tr>`).join('') || '<tr><td colspan="6" class="eb">No customers found</td></tr>';
+};
+window.uCoins = async id => {
+  const u = USERS[id] || {}, cur = Number(u.mCoins || 0);
+  const raw = prompt((u.name || 'Customer') + ' has ' + cur + ' M-Coins.\nType +50 to add, -20 to remove, or =200 to set exactly:', '+');
+  if (raw === null) return;
+  const m = raw.trim().match(/^([+\-=]?)\s*(\d+)$/); if (!m) return toast('Use +50, -20 or =200');
+  const op = m[1], n = parseInt(m[2]), next = op === '-' ? Math.max(0, cur - n) : op === '=' ? n : cur + n;
+  const note = (prompt('Reason (optional, customer can see it):', '') || '').trim();
+  try {
+    await runTransaction(ref(db, 'users/' + id + '/mCoins'), v => op === '=' ? n : op === '-' ? Math.max(0, (v || 0) - n) : (v || 0) + n);
+    await push(ref(db, 'users/' + id + '/coinLog'), { delta: next - cur, balance: next, by: 'admin', note, at: Date.now() }).catch(() => {});
+    toast('M-Coins updated: ' + next);
+  } catch(e){ toast('Failed: ' + e.message); }
 };
 window.uSet = async (id, patch) => { try { await update(ref(db, 'users/' + id), patch); toast('Updated'); } catch(e){ toast('Failed: ' + e.message); } };
 
 /* ---------- Coupons ---------- */
-function renderCoupons(c){
-  $('cb').innerHTML = Object.entries(c).map(([code,v]) => `<tr><td><b style="font-weight:500">${esc(code)}</b></td><td>${inr(v.discount)}</td>
-    <td><span class="tag">${v.active ? 'Active' : 'Paused'}</span></td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="togCoupon('${esc(code)}',${!v.active})">${v.active?'Pause':'Activate'}</button>
-    <button class="btn l" onclick="delCoupon('${esc(code)}')">Delete</button></td></tr>`).join('')
-    || '<tr><td colspan="4" style="text-align:center;color:#999;padding:40px">No coupons yet</td></tr>';
+let COUPONS = {}, cpSel = new Set(), cpEdit = null;
+const toTs = id => { const v = $(id).value; return v ? new Date(v).getTime() : 0; };
+const fromTs = t => t ? new Date(+t - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
+const csv = id => $(id).value.split(',').map(x => x.trim()).filter(Boolean);
+const fdt = t => new Date(+t).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
+window.cpType = () => { const f = $('cType').value === 'FLAT'; $('cValL').firstChild.textContent = f ? 'Amount (₹ off)' : 'Percent (%)'; $('cCapL').classList.toggle('hide', f); };
+function fillCpProducts(){
+  const box = $('cProds'); if (!box) return;
+  box.innerHTML = Object.entries(CAT).map(([id,p]) => `<button type="button" class="pk ${cpSel.has(id)?'on':''}" onclick="cpPick('${esc(id)}',this)">${esc(p.name)}</button>`).join('') || '<span class="eb">No products yet</span>';
 }
+window.cpPick = (id, b) => { cpSel.has(id) ? cpSel.delete(id) : cpSel.add(id); b.classList.toggle('on'); };
+window.resetCp = () => {
+  cpEdit = null; cpSel = new Set(); $('cpTitle').textContent = 'New coupon'; $('cCode').readOnly = false;
+  ['cCode','cVal','cCap','cMin','cSizes','cCols','cFrom','cTo','cHrs','cDesc'].forEach(i => $(i).value = '');
+  $('cMax').value = 0; $('cUsers').value = 0; $('cPer').value = 1; $('cType').value = 'PERCENT'; $('cCat').selectedIndex = 0; $('cAud').value = 'ALL'; $('cShow').value = '1'; cpType(); fillCpProducts();
+};
+window.editCoupon = code => {
+  const v = COUPONS[code]; if (!v) return; resetCp(); cpEdit = code;
+  $('cpTitle').textContent = 'Edit coupon ' + code; $('cCode').value = code; $('cCode').readOnly = true;
+  $('cType').value = v.type === 'PERCENT' ? 'PERCENT' : 'FLAT'; cpType();
+  $('cVal').value = v.type === 'PERCENT' ? v.value : (v.value ?? v.discount ?? ''); $('cCap').value = v.maxDiscount || ''; $('cMin').value = v.minOrder || '';
+  if (v.category) $('cCat').value = v.category; $('cAud').value = v.audience || 'ALL'; $('cShow').value = v.showOnProduct ? '1' : '0'; $('cDesc').value = v.desc || '';
+  cpSel = new Set(v.products || []); fillCpProducts(); $('cSizes').value = (v.sizes || []).join(', '); $('cCols').value = (v.colors || []).join(', ');
+  $('cFrom').value = fromTs(v.startAt); $('cTo').value = fromTs(v.endAt); $('cMax').value = v.maxUses || 0; $('cUsers').value = v.maxUsers || 0; $('cPer').value = v.perUser ?? 1;
+  window.scrollTo(0, 0);
+};
+const cpState = v => { const n = Date.now(); if (v.active === false) return 'Paused'; if (+v.startAt > n) return 'Scheduled'; if (+v.endAt && +v.endAt < n) return 'Expired'; if (+v.maxUses && (v.uses||0) >= +v.maxUses) return 'Used up'; return 'Active'; };
+function renderCoupons(){
+  const rows = Object.entries(COUPONS);
+  $('cb').innerHTML = rows.map(([code,v]) => {
+    const pct = v.type === 'PERCENT', val = pct ? v.value + '% off' + (v.maxDiscount ? ' (max ' + inr(v.maxDiscount) + ')' : '') : inr(v.value ?? v.discount) + ' off';
+    const names = (v.products || []).map(id => (CAT[id] || {}).name || id).join(', ');
+    const scope = [names || 'All products', (v.sizes||[]).length ? 'Sizes: ' + v.sizes.join(', ') : '', (v.colors||[]).length ? 'Colours: ' + v.colors.join(', ') : '', v.minOrder ? 'Min ' + inr(v.minOrder) : '', v.audience === 'PLUS' ? 'MONTÈ+ only' : v.audience === 'NEW' ? 'New customers' : ''].filter(Boolean).join(' · ');
+    const when = (+v.startAt ? fdt(v.startAt) : 'Now') + ' → ' + (+v.endAt ? fdt(v.endAt) : 'No expiry');
+    const users = Object.keys(v.usedBy || {}).length;
+    const use = (v.uses || 0) + (+v.maxUses ? ' / ' + v.maxUses : '') + ' uses<br>' + users + (+v.maxUsers ? ' / ' + v.maxUsers : '') + ' customers' + (v.perUser === 0 ? '' : ' · ' + (v.perUser ?? 1) + ' each');
+    return `<tr><td><b style="font-weight:500">${esc(code)}</b><br><span class="eb">${esc(v.category||'General')}${v.showOnProduct?' · public':''}</span></td><td>${esc(val)}</td><td style="max-width:260px">${esc(scope)}</td><td>${esc(when)}</td><td>${use}</td>
+    <td><span class="tag">${cpState(v)}</span></td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editCoupon('${esc(code)}')">Edit</button> <button class="btn l" onclick="togCoupon('${esc(code)}',${v.active===false})">${v.active===false?'Activate':'Pause'}</button>
+    <button class="btn l" onclick="delCoupon('${esc(code)}')">Delete</button></td></tr>`;
+  }).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:40px">No coupons yet</td></tr>';
+}
+const pubOffer = (code, d) => ({ code, category: d.category || 'General', audience: d.audience || 'ALL', type: d.type, value: d.value, maxDiscount: d.maxDiscount || 0, minOrder: d.minOrder || 0, products: d.products || [], sizes: d.sizes || [], colors: d.colors || [], startAt: d.startAt || 0, endAt: d.endAt || 0, desc: d.desc || '' });
+const syncOffer = (code, d) => (d.showOnProduct && d.active !== false) ? set(ref(db, 'publicOffers/' + code), pubOffer(code, d)) : remove(ref(db, 'publicOffers/' + code));
 window.addCoupon = async () => {
-  const code = $('cCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), disc = parseInt($('cDisc').value);
-  if (!code || !(disc > 0)) return toast('Enter code and discount');
-  try { await set(ref(db, 'coupons/' + code), { discount: disc, active: true }); $('cCode').value = $('cDisc').value = ''; toast('Coupon added'); }
+  const code = $('cCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), type = $('cType').value, val = parseFloat($('cVal').value);
+  if (!code) return toast('Enter a code');
+  if (!cpEdit && COUPONS[code]) return toast('This code already exists. Use Edit.');
+  if (!(val > 0)) return toast('Enter the discount value');
+  if (type === 'PERCENT' && val >= 100) return toast('Percent must be below 100');
+  const from = toTs('cFrom'), hrs = parseFloat($('cHrs').value) || 0; let to = toTs('cTo');
+  if (hrs > 0 && !to) to = (from || Date.now()) + hrs * 36e5;
+  if (to && from && to <= from) return toast('End must be after start');
+  if (to && to < Date.now()) return toast('End time is already in the past');
+  const old = COUPONS[code] || {}, pu = parseInt($('cPer').value);
+  const d = { category: $('cCat').value, audience: $('cAud').value, type, value: type === 'PERCENT' ? val : Math.round(val), discount: type === 'FLAT' ? Math.round(val) : 0,
+    maxDiscount: type === 'PERCENT' ? Math.max(0, parseInt($('cCap').value) || 0) : 0, minOrder: Math.max(0, parseInt($('cMin').value) || 0),
+    products: [...cpSel], sizes: csv('cSizes'), colors: csv('cCols'), startAt: from, endAt: to,
+    maxUses: Math.max(0, parseInt($('cMax').value) || 0), maxUsers: Math.max(0, parseInt($('cUsers').value) || 0), perUser: isNaN(pu) ? 1 : Math.max(0, pu),
+    showOnProduct: $('cShow').value === '1', desc: $('cDesc').value.trim(), active: old.active !== false, updatedAt: Date.now() };
+  if (!cpEdit) d.createdAt = Date.now();
+  try { await update(ref(db, 'coupons/' + code), d); await syncOffer(code, d).catch(() => toast('Saved, but public offer sync failed (check rules)')); toast(cpEdit ? 'Coupon updated' : 'Coupon added'); resetCp(); }
   catch(e){ toast('Failed: ' + e.message); }
 };
-window.togCoupon = (c, a) => update(ref(db, 'coupons/' + c), { active: a }).then(() => toast('Updated'));
-window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => toast('Deleted'));
+window.togCoupon = async (c, a) => { try { await update(ref(db, 'coupons/' + c), { active: a }); await syncOffer(c, { ...COUPONS[c], active: a }).catch(() => {}); toast('Updated'); } catch(e){ toast('Failed: ' + e.message); } };
+window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => remove(ref(db, 'publicOffers/' + c)).catch(() => {})).then(() => toast('Deleted'));
 </script>
 </body>
 </html>
