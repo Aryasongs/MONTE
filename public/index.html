@@ -212,23 +212,6 @@ input,textarea,select{font-size:16px}
 .shop-search input{flex:1;border:0!important;outline:0;background:transparent;padding:8px 0;font-size:14px}
 .shop-search:focus-within{border-color:#111}
 
-.pf-avatar{width:68px;height:68px;border-radius:50%;background:#111;color:#e9c768;display:flex;align-items:center;justify-content:center;font:400 28px 'Playfair Display',serif;flex:none}
-.pf-k{font-size:9px;letter-spacing:.28em;text-transform:uppercase;opacity:.6}
-.pf-sub{font-size:12px;line-height:1.7;opacity:.7;margin-top:8px}
-.pf-big{font:400 54px/1 'Playfair Display',serif;font-variant-numeric:tabular-nums}
-.pf-coin{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 100% 0%,#2a2210 0%,#0d0d0d 55%);color:#fff;padding:34px}
-.pf-coin .bg{position:absolute;right:-34px;top:-34px;width:190px;height:190px;opacity:.12;pointer-events:none}
-.pf-link{font-size:10px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:3px}
-.pf-ledger{margin-top:26px;border-top:1px solid rgba(255,255,255,.14);padding-top:18px}
-.pf-ledger .lg{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px}
-.pf-ledger .lg small{display:block;opacity:.5;font-size:10px;margin-top:2px}
-.pf-ledger .up{color:#9be3a8}.pf-ledger .dn{color:#ff9e94}
-.pf-plus{position:relative;background:#fff;border:1px solid var(--line);padding:34px;overflow:hidden}
-.pf-plus.on{border-color:#c9971f;background:linear-gradient(160deg,#fffdf5,#fff 60%)}
-.pf-bar{height:3px;background:#eee;margin-top:22px}.pf-bar i{display:block;height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);transition:width 1s var(--sp)}
-.pf-perks{margin-top:22px;font-size:12px;line-height:1.9;color:#555;list-style:none}
-.pf-perks li:before{content:'';display:inline-block;width:5px;height:5px;background:#c9971f;border-radius:50%;margin-right:10px;vertical-align:middle}
-.pf-stat{border:1px solid var(--line);padding:22px;background:#fff}
 
 .pd-perks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}
 .pd-perks div{border:1px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center;font-size:10px;color:#555;line-height:1.4}
@@ -248,6 +231,58 @@ input,textarea,select{font-size:16px}
 #lbox img.z{transform:scale(2.2);cursor:zoom-out}
 #lbox .x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:18px;font-size:30px;line-height:1;z-index:3;width:44px;height:44px}
 #lbox .pd-arr{opacity:1}
+
+/* ===== v3: minimal portfolio, reviews, bag, pay ===== */
+.pf-strip{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
+.pf-strip>div{padding:34px 24px 34px 0}
+.pf-strip>div+div{padding-left:24px;border-left:1px solid var(--line)}
+.pf-strip span{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#888}
+.pf-strip b{display:block;font:400 44px/1 'Playfair Display',serif;margin-top:16px;font-variant-numeric:tabular-nums}
+.pf-strip b.sm{font-size:26px;margin-top:22px;line-height:1.2}
+.pf-strip em{display:block;font-style:normal;font-size:11px;color:#888;margin-top:10px;line-height:1.6}
+@media(max-width:640px){.pf-strip{grid-template-columns:1fr}.pf-strip>div,.pf-strip>div+div{padding:24px 0;border-left:0;border-bottom:1px solid var(--line)}.pf-strip>div:last-child{border-bottom:0}.pf-strip b{font-size:36px}}
+.pf-sec{padding:40px 0;border-bottom:1px solid var(--line)}
+.pf-sec h3{font-size:10px;letter-spacing:.24em;text-transform:uppercase;font-weight:500;margin-bottom:14px}
+.pf-sub{font-size:12px;line-height:1.8;color:#777}
+.pf-link{font-size:10px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid currentColor;padding-bottom:3px;display:inline-block;margin-top:22px}
+#accCoinLedger{margin-top:18px}
+#accCoinLedger .lg{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--line);font-size:12px}
+#accCoinLedger .lg small{display:block;color:#999;font-size:10px;margin-top:2px}
+#accCoinLedger .up{color:#2f7d4f}#accCoinLedger .dn{color:#b4231a}
+.pf-line{height:1px;background:var(--line);margin:22px 0 0;position:relative}.pf-line i{position:absolute;left:0;top:-1px;height:3px;background:#111;transition:width 1s var(--sp)}
+#plusCard.on .pf-line i{background:#c9971f}
+.pf-perks{margin-top:22px;font-size:12px;line-height:2;color:#666;list-style:none}
+.pf-perks li:before{content:'';display:inline-block;width:12px;height:1px;background:#999;margin-right:12px;vertical-align:middle}
+.pf-dl>div{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line);font-size:12px}
+.pf-dl>div span:first-child{color:#777}
+#accountOrderHistoryContainer{margin-top:6px}
+
+.star{font-size:34px;line-height:1;color:#ddd;padding:6px 3px;transition:color .2s,transform .2s}
+.star.on{color:#c9971f}.star:active{transform:scale(.9)}
+.rv-i{padding:16px 0!important;border-top:1px solid var(--line)}
+.rv-i .top{display:flex;justify-content:space-between;padding:0!important;color:#111}
+.rv-i .top span{color:#999;font-size:11px}
+.rv-i .st{padding:4px 0!important;color:#c9971f;letter-spacing:.12em;font-size:12px}
+.rv-i p{color:#555;font-size:13px;line-height:1.8}
+
+#bagScrim{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;z-index:1100}
+#bagScrim.on{opacity:1;visibility:visible}
+#bag{position:fixed;top:0;right:0;bottom:0;width:min(430px,100vw);background:#fff;z-index:1101;transform:translateX(100%);transition:transform .5s var(--sp);display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.08)}
+#bag.on{transform:none}
+#bag header{display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 24px 20px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.24em;text-transform:uppercase}
+#bag header button{font-size:26px;line-height:1;letter-spacing:0}
+#bagBody{flex:1;overflow-y:auto;padding:0 24px;-webkit-overflow-scrolling:touch}
+#bagFoot{padding:20px 24px calc(env(safe-area-inset-bottom,0px) + 22px);border-top:1px solid var(--line);background:#fff}
+.bl{display:flex;gap:16px;padding:22px 0;border-bottom:1px solid var(--line)}
+.bl img{width:84px;height:105px;object-fit:cover;background:#f4f3f1;flex:none}
+.bl b{display:block;font-weight:400;font-size:13px;line-height:1.4}
+.bl small{display:block;color:#888;font-size:11px;margin-top:4px}
+.bl .acts{display:flex;gap:18px;margin-top:14px}
+.bl .acts button{font-size:10px;letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid #111;padding-bottom:2px}
+.bl .acts button.m{border-color:#ccc;color:#888}
+.bl.gone{opacity:.55}
+@keyframes bump{40%{transform:scale(1.25)}}
+.bump{animation:bump .5s var(--sp)}
 </style>
 </head>
 <body class="antialiased">
@@ -279,6 +314,8 @@ input,textarea,select{font-size:16px}
     <button id="srchMore" onclick="srchGo()" class="cta mt-8" style="display:none"></button>
   </div>
 </div>
+<div id="bagScrim" onclick="closeBag()"></div>
+<aside id="bag" aria-label="Shopping bag"><header><span>Bag <span id="bagCount"></span></span><button onclick="closeBag()" aria-label="Close bag">&times;</button></header><div id="bagBody"></div><div id="bagFoot"></div></aside>
 <!-- Photo lightbox -->
 <div id="lbox" aria-hidden="true"><button class="x" onclick="lbClose()" aria-label="Close">&times;</button><img alt=""></div>
 
@@ -304,7 +341,7 @@ input,textarea,select{font-size:16px}
             <div class="flex items-center justify-end gap-6 sm:gap-9">
                 <button onclick="openSearch()" class="nav-link" aria-label="Search" style="display:inline-flex;align-items:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5" stroke-linecap="round"/></svg></button>
                 <button onclick="handleNavAccountClick()" id="navAccountBtn" class="nav-link">Login</button>
-                <button onclick="showToast('Your bag is currently empty.', 'info')" class="nav-link">Bag (0)</button>
+                <button id="navBagBtn" onclick="openBag()" class="nav-link">Bag (0)</button>
             </div>
         </div>
     </nav>
@@ -420,7 +457,8 @@ input,textarea,select{font-size:16px}
                         <div class="grid grid-cols-4 gap-2" id="sizeSelectorContainer"></div>
                     </div>
                     <p id="pdPick" class="text-center text-neutral-500 mb-3" style="font-size:11px;letter-spacing:.04em"></p>
-                    <button id="masterAcquireBtn" onclick="initiateCheckoutProcess()" class="w-full bg-black text-white py-[18px] fine btn-luxury focus:outline-none mb-3" style="font-size:10px;letter-spacing:.26em">Add to bag</button>
+                    <button id="masterAcquireBtn" onclick="addToBag()" class="w-full bg-black text-white py-[18px] fine btn-luxury focus:outline-none mb-3" style="font-size:10px;letter-spacing:.26em">Add to bag</button>
+                    <button id="buyNowBtn" onclick="window.__bagLine=null;initiateCheckoutProcess()" class="w-full premium-border bg-white text-black py-[17px] fine mb-3 hover:border-black transition" style="font-size:10px;letter-spacing:.26em;border-radius:14px">Buy now</button>
                     <p id="pdAssure" class="text-center text-neutral-400 mb-6" style="font-size:10px"></p>
                     <div class="pd-perks">
                         <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Free delivery</div>
@@ -434,6 +472,7 @@ input,textarea,select{font-size:16px}
                     <details class="acc"><summary>Details</summary><div><ul id="pdDetails" style="list-style:disc;padding-left:18px"></ul></div></details>
                     <details class="acc"><summary>Fabric &amp; care</summary><div id="pdCare"></div></details>
                     <details class="acc"><summary>Delivery &amp; returns</summary><div>See our <a href="#/shipping" class="underline">shipping</a> and <a href="#/refund" class="underline">returns &amp; refunds</a> policies. Estimated delivery for your location is shown at checkout.</div></details>
+                    <details id="pdRevWrap" class="acc"><summary>Reviews <span id="pdRevCount" class="ml-2 text-neutral-400" style="letter-spacing:0"></span></summary><div id="pdReviews"></div></details>
                     <div class="acc"></div>
                 </div>
             </div>
@@ -528,38 +567,19 @@ input,textarea,select{font-size:16px}
                         </label>
                     </div>
 
-                    <div id="paymentMethodsContainer">
-                        <span class="premium-label mb-6 text-black">Transaction Pathway</span>
-                        <div class="space-y-5 text-xs mb-10">
-                            <label class="flex items-start gap-4 p-5 premium-border cursor-pointer hover:border-black transition duration-300 group">
-                                <input type="radio" name="paymentProtocolSelection" value="UPI" checked onchange="synchronizePaymentMethodUIPanelView()" class="mt-0.5 accent-black w-3.5 h-3.5">
-                                <div>
-                                    <div class="font-medium tracking-[0.15em] uppercase text-black text-[10px]">Instant UPI Protocol</div>
-                                    <div class="text-neutral-400 text-[9px] uppercase mt-1.5 tracking-widest">Automated App Routing</div>
-                                </div>
-                            </label>
-                            <label id="codSelectorUILabelAnchor" class="flex items-start gap-4 p-5 premium-border cursor-pointer hover:border-black transition duration-300 group">
-                                <input type="radio" name="paymentProtocolSelection" value="COD" onchange="synchronizePaymentMethodUIPanelView()" class="mt-0.5 accent-black w-3.5 h-3.5">
-                                <div>
-                                    <div class="font-medium tracking-[0.15em] uppercase text-black text-[10px]">Cash-on-Delivery</div>
-                                    <div id="codUIRestrictionReasonBanner" class="text-neutral-400 text-[9px] uppercase mt-1.5 tracking-widest">Settlement on handover.</div>
-                                </div>
-                            </label>
-                        </div>
+                    <div id="paymentMethodsContainer" class="hidden">
+                        <label id="codSelectorUILabelAnchor"><input type="radio" name="paymentProtocolSelection" value="UPI" checked><input type="radio" name="paymentProtocolSelection" value="COD"><span id="codUIRestrictionReasonBanner">Settlement on handover.</span></label>
                     </div>
 
-                    <!-- UPI PANEL -->
-                    <div id="panelUPIProtocol" class="bg-[#FAFAFA] premium-border p-8 text-center mb-8">
-                        <p class="font-medium uppercase tracking-[0.2em] text-[9px] text-black mb-6">Select Application</p>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-                            <button onclick="processCheckoutFinalization('UPI_GPAY', this)" class="bg-white premium-border py-4 text-[9px] font-bold tracking-widest uppercase hover:border-black transition duration-300">GPay</button>
-                            <button onclick="processCheckoutFinalization('UPI_PHONEPE', this)" class="bg-white premium-border py-4 text-[9px] font-bold tracking-widest uppercase hover:border-black transition duration-300">PhonePe</button>
-                            <button onclick="processCheckoutFinalization('UPI_PAYTM', this)" class="bg-white premium-border py-4 text-[9px] font-bold tracking-widest uppercase hover:border-black transition duration-300">Paytm</button>
-                            <button onclick="processCheckoutFinalization('UPI_OTHER', this)" class="bg-black text-white py-4 text-[9px] font-bold tracking-widest uppercase btn-luxury">Other UPI</button>
+                    <!-- PAY PANEL: opens Cashfree directly -->
+                    <div id="panelUPIProtocol" class="mb-8">
+                        <span class="premium-label mb-4 text-black">Payment</span>
+                        <button id="payNowBtn" onclick="processCheckoutFinalization('ONLINE', this)" class="w-full bg-black text-white text-[10px] font-medium tracking-[0.2em] uppercase py-5 btn-luxury focus:outline-none">Pay securely</button>
+                        <p class="text-center text-neutral-400 mt-4" style="font-size:11px;line-height:1.7">UPI, cards, net banking and wallets. Secured by Cashfree.</p>
+                        <div id="codAltWrap" class="mt-6 text-center">
+                            <button id="codAltBtn" onclick="processCheckoutFinalization('COD', this)" class="text-[10px] uppercase tracking-[0.18em] border-b border-neutral-400 text-neutral-500 pb-0.5 hover:text-black hover:border-black transition">Pay cash on delivery instead</button>
+                            <p id="codAltNote" class="text-neutral-400 mt-2" style="font-size:10px"></p>
                         </div>
-                        <p class="text-neutral-400 uppercase text-[8px] tracking-[0.15em] px-2 leading-relaxed premium-border-t pt-6">
-                            Post payment, transmit screenshot to <span class="font-bold text-black">+91 79738 04008</span> enclosing Order ID.
-                        </p>
                     </div>
 
                     <!-- COD PANEL -->
@@ -709,66 +729,55 @@ input,textarea,select{font-size:16px}
         </div>
 
         <!-- ================= VIEW: ACCOUNT DASHBOARD ================= -->
-        <div id="accountView" class="view-section max-w-5xl mx-auto px-4">
-            <div class="mt-8 mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-                <div class="flex items-center gap-5">
-                    <div id="accAvatar" class="pf-avatar">M</div>
-                    <div>
-                        <p class="eyebrow text-neutral-400 mb-2">Portfolio</p>
-                        <h2 id="accProfileName" class="hero-t text-3xl sm:text-4xl">---</h2>
-                        <p class="text-[12px] text-neutral-500 mt-2 break-all"><span id="accProfileEmail">---</span> &nbsp;·&nbsp; <span id="accProfilePhone">---</span></p>
-                    </div>
+        <div id="accountView" class="view-section max-w-4xl mx-auto px-5 sm:px-8">
+            <div class="pt-6 pb-10 flex items-start justify-between gap-6 premium-border-b">
+                <div class="min-w-0">
+                    <p class="eyebrow text-neutral-400 mb-3">Portfolio</p>
+                    <h2 id="accProfileName" class="hero-t text-4xl sm:text-5xl">---</h2>
+                    <p class="mt-4 text-[12px] text-neutral-500 break-all"><span id="accProfileEmail">---</span><span class="mx-3 text-neutral-300">/</span><span id="accProfilePhone">---</span></p>
                 </div>
-                <button onclick="triggerSignOutSession()" class="text-[9px] uppercase tracking-[0.2em] font-medium premium-border text-black px-8 py-3.5 hover:bg-black hover:text-white transition duration-300 focus:outline-none self-start sm:self-auto">Sign Out</button>
+                <button onclick="triggerSignOutSession()" class="cta flex-none mt-2">Sign out</button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                <!-- M Coin wallet -->
-                <div class="pf-coin">
-                    <svg class="mc bg"><use href="#mcoin"/></svg>
-                    <p class="pf-k">M Coin wallet</p>
-                    <div class="flex items-center gap-4 mt-5">
-                        <svg class="mc" style="width:52px;height:52px"><use href="#mcoin"/></svg>
-                        <span id="accCoinsBalance" class="pf-big">0</span>
-                    </div>
-                    <p id="accCoinsValue" class="pf-sub">Worth ₹0 at checkout &nbsp;·&nbsp; 1 M Coin = ₹1</p>
-                    <div class="flex gap-6 mt-7">
-                        <a href="#/shop" class="pf-link">Spend coins</a>
-                        <a href="#/mcoin-terms" class="pf-link" style="opacity:.7">Coin terms</a>
-                    </div>
-                    <div class="pf-ledger">
-                        <p class="pf-k mb-2">Recent activity</p>
-                        <div id="accCoinLedger"><p class="pf-sub">Adjustments from MONTÈ appear here.</p></div>
-                    </div>
-                </div>
+            <div class="pf-strip">
+                <div><span><svg class="mc" style="width:15px;height:15px"><use href="#mcoin"/></svg>M Coins</span><b id="accCoinsBalance">0</b><em id="accCoinsValue">Worth ₹0</em></div>
+                <div><span>Valid orders</span><b id="accValidOrders">0</b><em>12 valid orders unlock MONTÈ+</em></div>
+                <div><span>Membership</span><b id="accPlusTitle" class="sm">Standard</b><em id="accPlusNote">Complete 12 valid orders to unlock MONTÈ+.</em></div>
+            </div>
 
-                <!-- MONTÈ+ -->
-                <div id="plusCard" class="pf-plus">
-                    <div id="montePlusCrown" class="hidden absolute top-0 right-0 px-5 py-2.5 text-[8px] font-bold tracking-[0.2em] uppercase monte-plus-text">MONTÈ+ VIP</div>
-                    <p class="pf-k">MONTÈ+</p>
-                    <h3 id="accPlusTitle" class="hero-t text-3xl mt-5">Not a member yet</h3>
-                    <p id="accPlusNote" class="pf-sub" style="opacity:.75">Complete 12 valid orders to unlock MONTÈ+.</p>
-                    <div class="pf-bar"><i id="accPlusBar" style="width:0%"></i></div>
-                    <p class="pf-sub" style="margin-top:10px"><span id="accValidOrders" class="text-black" style="opacity:1">0</span> / 12 valid orders</p>
+            <div class="grid md:grid-cols-2 md:gap-x-20">
+                <section class="pf-sec">
+                    <h3>M Coin activity</h3>
+                    <p class="pf-sub">1 M Coin takes ₹1 off your order. Switch on your vault at checkout to use them.</p>
+                    <div id="accCoinLedger"><p class="pf-sub">Adjustments from MONTÈ appear here.</p></div>
+                    <a href="#/mcoin-terms" class="pf-link text-neutral-500">M Coin terms</a>
+                </section>
+                <section id="plusCard" class="pf-sec">
+                    <h3 class="flex items-center gap-3">MONTÈ+ <span id="montePlusCrown" class="hidden monte-plus-text" style="font-size:9px;letter-spacing:.2em">ACTIVE</span></h3>
+                    <p class="pf-sub">Early access to new drops, 24 hours before everyone.</p>
+                    <div class="pf-line"><i id="accPlusBar" style="width:0%"></i></div>
                     <ul class="pf-perks">
-                        <li>Early access to scheduled launches, 24 hours before everyone</li>
-                        <li>Members-only drops and offers when announced</li>
-                        <li>The gold member mark on your portfolio</li>
+                        <li>Early access to scheduled launches</li>
+                        <li>Members-only drops and offers</li>
+                        <li>A gold mark on your portfolio</li>
                     </ul>
-                    <a href="#/plus-terms" class="pf-link inline-block mt-6" style="color:#8a6a12">MONTÈ+ terms</a>
+                    <a href="#/plus-terms" class="pf-link text-neutral-500">MONTÈ+ terms</a>
+                </section>
+            </div>
+
+            <section class="pf-sec">
+                <h3>Account</h3>
+                <div class="pf-dl">
+                    <div><span>Cancellations</span><span id="accCancelCount">0 / 15</span></div>
+                    <div><span>Account status</span><span id="accSuspensionStatus" class="text-emerald-600 text-[11px] tracking-[0.16em]">SECURE</span></div>
+                    <div><span>Cash on delivery</span><span id="accCodStatus" class="text-emerald-600 text-[11px] tracking-[0.16em]">ACTIVE</span></div>
                 </div>
-            </div>
+            </section>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-14">
-                <div class="pf-stat"><span class="premium-label">Revocations</span><span id="accCancelCount" class="text-[15px]">0 / 15</span></div>
-                <div class="pf-stat"><span class="premium-label">Access status</span><span id="accSuspensionStatus" class="premium-value text-emerald-600 text-[10px] tracking-[0.2em]">Secure</span></div>
-                <div class="pf-stat"><span class="premium-label">Cash on delivery</span><span id="accCodStatus" class="premium-value text-emerald-600 text-[10px] tracking-[0.2em]">Active</span></div>
-            </div>
-
-            <h3 class="text-xs font-medium tracking-[0.2em] uppercase text-black mb-6 premium-border-b pb-4">Order history</h3>
-            <div id="accountOrderHistoryContainer" class="text-[10px] text-neutral-400 py-4 space-y-4 tracking-widest uppercase">
-                Syncing ledger...
-            </div>
+            <section class="pf-sec" style="border-bottom:0">
+                <h3>Orders</h3>
+                <div id="accountOrderHistoryContainer" class="text-[11px] text-neutral-400 py-4">Syncing...</div>
+            </section>
         </div>
 
         <!-- ================= VIEW: REFUND POLICY ================= -->
@@ -897,7 +906,7 @@ input,textarea,select{font-size:16px}
         </div>
     </footer>
     <div id="ckBar">We use essential cookies and storage to run this site. <a href="#/cookies" style="text-decoration:underline">Learn more</a> <button onclick="try{localStorage.setItem('mck',1)}catch(e){};this.parentNode.style.display='none'" style="display:block;margin-top:12px;border:1px solid #fff;padding:8px 18px;font-size:10px;letter-spacing:.2em;text-transform:uppercase">Accept</button></div>
-    <div class="mbar"><button onclick="initiateCheckoutProcess()" class="w-full bg-black text-white py-4 fine" style="font-size:10px;letter-spacing:.26em">Add to bag — <span class="js-price">₹999</span></button></div>
+    <div class="mbar"><button onclick="addToBag()" class="w-full bg-black text-white py-4 fine" style="font-size:10px;letter-spacing:.26em">Add to bag — <span class="js-price">₹999</span></button></div>
 
     <button id="mchatBtn" onclick="toggleChat()" aria-label="Live chat"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg><span class="dot" id="mchatDot"></span></button>
     <div id="mchat"><header><span>Live chat</span><button onclick="toggleChat()" style="font-size:20px;line-height:1">&times;</button></header>
@@ -957,24 +966,17 @@ input,textarea,select{font-size:16px}
         </div>
 
         <!-- MODAL D: PRODUCT REVIEW -->
-        <div id="reviewDialog" class="hidden bg-white p-10 sm:p-14 max-w-[450px] w-full shadow-2xl relative modal-content text-center rounded-sm">
-            <button onclick="dismissModals()" class="absolute top-6 right-6 text-2xl font-light text-neutral-400 hover:text-black transition focus:outline-none">&times;</button>
-            <h2 class="text-xl font-serif font-medium tracking-widest uppercase mb-5">Collector Review</h2>
-            <p class="text-[9px] text-neutral-400 uppercase tracking-[0.2em] mb-10">Rate your MONTÈ acquisition</p>
-            
-            <div class="flex gap-6 mb-12 text-3xl cursor-pointer justify-center" id="starSelectionContainer">
-                <span onclick="setRatingStars(1)" class="star text-neutral-200 hover:text-black transition duration-300">&#9733;</span>
-                <span onclick="setRatingStars(2)" class="star text-neutral-200 hover:text-black transition duration-300">&#9733;</span>
-                <span onclick="setRatingStars(3)" class="star text-neutral-200 hover:text-black transition duration-300">&#9733;</span>
-                <span onclick="setRatingStars(4)" class="star text-neutral-200 hover:text-black transition duration-300">&#9733;</span>
-                <span onclick="setRatingStars(5)" class="star text-neutral-200 hover:text-black transition duration-300">&#9733;</span>
+        <div id="reviewDialog" class="hidden bg-white p-8 sm:p-12 max-w-[460px] w-full shadow-2xl relative modal-content text-left rounded-sm">
+            <button onclick="dismissModals()" class="absolute top-5 right-6 text-2xl font-light text-neutral-400 hover:text-black transition focus:outline-none" aria-label="Close">&times;</button>
+            <p class="eyebrow text-neutral-400 mb-3">Your review</p>
+            <h2 id="reviewProdName" class="hero-t text-2xl mb-8">Write a review</h2>
+            <div id="starSelectionContainer" class="flex -ml-1">
+                <button type="button" class="star" onclick="setRatingStars(1)" aria-label="1 star">&#9733;</button><button type="button" class="star" onclick="setRatingStars(2)" aria-label="2 stars">&#9733;</button><button type="button" class="star" onclick="setRatingStars(3)" aria-label="3 stars">&#9733;</button><button type="button" class="star" onclick="setRatingStars(4)" aria-label="4 stars">&#9733;</button><button type="button" class="star" onclick="setRatingStars(5)" aria-label="5 stars">&#9733;</button>
             </div>
-            
-            <textarea id="reviewTextInput" placeholder="DETAILED EXPERIENCE..." class="w-full premium-border p-5 outline-none focus:border-black tracking-widest bg-transparent h-32 resize-none mb-10 text-[10px] uppercase font-medium transition"></textarea>
-            
-            <button onclick="submitProductReview(this)" class="w-full bg-black text-white text-[10px] font-medium tracking-[0.2em] uppercase py-5 btn-luxury focus:outline-none shadow-xl shadow-black/10">
-                Submit Rating
-            </button>
+            <p id="ratingWord" class="text-[12px] text-neutral-500 mb-6" style="min-height:18px">Tap a star to rate</p>
+            <textarea id="reviewTextInput" maxlength="600" rows="5" placeholder="How does it fit and feel? (optional)" oninput="document.getElementById('reviewCount').textContent=this.value.length+' / 600'" class="w-full premium-border p-4 outline-none focus:border-black bg-transparent resize-none text-[14px] leading-relaxed"></textarea>
+            <p id="reviewCount" class="text-right text-[10px] text-neutral-400 mt-1 mb-6">0 / 600</p>
+            <button onclick="submitProductReview(this)" class="w-full bg-black text-white text-[10px] font-medium tracking-[0.2em] uppercase py-5 btn-luxury focus:outline-none">Post review</button>
         </div>
 
     </div>
@@ -1154,7 +1156,7 @@ input,textarea,select{font-size:16px}
             for(let i = 0; i < 8; i++) {
                 try {
                     const st = await callW(PAY, "/pay/status", { orderId: oid });
-                    if(st.paymentStatus === "PAID") { showToast("Payment confirmed!", "success"); await syncAndEvaluateUserMatrix(window.sessionUserRecord.uid); window.renderActiveOrderTrackingPipelineDashboard(oid); return; }
+                    if(st.paymentStatus === "PAID") { bagPaid(oid); showToast("Payment confirmed!", "success"); await syncAndEvaluateUserMatrix(window.sessionUserRecord.uid); window.renderActiveOrderTrackingPipelineDashboard(oid); return; }
                 } catch(_) {}
                 await new Promise(r => setTimeout(r, 2500));
             }
@@ -1249,7 +1251,7 @@ input,textarea,select{font-size:16px}
             { const t = shopGender ? shopGender[0] + shopGender.slice(1).toLowerCase() : 'All products'; document.getElementById('shopTitle').textContent = shopQ ? '“' + shopQ + '”' : t; document.getElementById('shopEyebrow').textContent = shopQ ? 'Search results' : (shopGender ? 'Section' : 'Shop');
             ['WOMEN','MEN','KIDS'].forEach(g => { const x = full.find(p => p.gender === g) || full.find(p => g !== 'KIDS' && (!p.gender || p.gender === 'UNISEX')); const im = document.getElementById('gp-' + g); if(im && x) im.src = colImgs(x, (x.colors || [])[0])[0] || ''; }); }
             document.getElementById('shopCount').textContent = l.length + ' items';
-            document.getElementById('homeFeatured').innerHTML = full.slice(0, 4).map(mCard).join('');
+            document.getElementById('homeFeatured').innerHTML = full.slice(0, 4).map(mCard).join(''); try { paintBag(); } catch(e) {}
         }
         const colImgs = (p, c) => (c && ((c.images && c.images.length) ? c.images : (c.image ? [c.image] : null))) || (p.images || []).filter(Boolean);
         function buildThumbs(ims) { const th = ims.map((u, i) => `<img src="${mEsc(u)}" class="thumb ${i ? '' : 'on'}" onclick="updateMainImage(this.src);document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('on'));this.classList.add('on')">`).join(''); document.getElementById('pdThumbs').innerHTML = th; document.getElementById('pdThumbsM').innerHTML = th.replace(/class="thumb /g, 'class="thumb flex-shrink-0 '); }
@@ -1273,9 +1275,10 @@ input,textarea,select{font-size:16px}
             const o = $('pdOffer'); o.textContent = p.offerText || ''; o.classList.toggle('hidden', !p.offerText);
             $('pdSku').textContent = p.sku ? 'SKU ' + p.sku : '';
             $('pdAssure').textContent = 'Delivery across India · Cash on delivery available' + (RD() > 0 ? ` · ${RD()}-day returns for damaged or wrong items` : '');
-            liveUpdateProduct(); try { renderRelated(); window.__pick(); } catch(e) {} return true;
+            liveUpdateProduct(); try { renderRelated(); window.__pick(); watchReviews(); } catch(e) {} return true;
         }
         function tickLaunch() {
+            { const bn = document.getElementById('buyNowBtn'), mb = document.getElementById('masterAcquireBtn'); if(bn && mb) bn.style.display = mb.disabled ? 'none' : ''; }
             const now = Date.now() + (window.__tOff || 0), two = n => String(n).padStart(2, '0');
             document.querySelectorAll('.cd').forEach(e => { const t = +e.dataset.t - now; if(t <= 0) { e.textContent = 'Available now'; return; } e.textContent = `Drops in ${t >= 864e5 ? Math.floor(t / 864e5) + 'd ' : ''}${Math.floor(t % 864e5 / 36e5)}h ${Math.floor(t % 36e5 / 6e4)}m ${Math.floor(t % 6e4 / 1e3)}s`; });
             const p = currentProduct, pr = document.getElementById('pdPriceRow'); if(!p || !pr) return;
@@ -1886,32 +1889,16 @@ input,textarea,select{font-size:16px}
         }
 
         window.synchronizePaymentMethodUIPanelView = function() {
-            const upiPanel = document.getElementById('panelUPIProtocol');
-            const codPanel = document.getElementById('panelCODProtocol');
-            const mCoinFullPanel = document.getElementById('panelMCoinFullProtocol');
-            const methodsContainer = document.getElementById('paymentMethodsContainer');
-
-            if(currentCheckoutTotal === 0) {
-                methodsContainer.classList.add('hidden');
-                upiPanel.classList.add('hidden');
-                codPanel.classList.add('hidden');
-                mCoinFullPanel.classList.remove('hidden');
-                return;
-            }
-
-            methodsContainer.classList.remove('hidden');
-            mCoinFullPanel.classList.add('hidden');
-
-            const method = document.querySelector('input[name="paymentProtocolSelection"]:checked');
-            if(!method) return;
-
-            if(method.value === 'UPI') {
-                upiPanel.classList.remove('hidden');
-                codPanel.classList.add('hidden');
-            } else {
-                upiPanel.classList.add('hidden');
-                codPanel.classList.remove('hidden');
-            }
+            const g = x => document.getElementById(x), pay = g('panelUPIProtocol'), cod = g('panelCODProtocol'), coin = g('panelMCoinFullProtocol');
+            if(!pay || !coin) return;
+            if(cod) cod.classList.add('hidden');
+            if(currentCheckoutTotal === 0) { pay.classList.add('hidden'); coin.classList.remove('hidden'); return; }
+            coin.classList.add('hidden'); pay.classList.remove('hidden');
+            g('payNowBtn').textContent = 'Pay securely · ₹' + Number(currentCheckoutTotal).toLocaleString('en-IN');
+            const off = SITE.codEnabled === false, w = g('codAltWrap'), b = g('codAltBtn'), n = g('codAltNote');
+            w.style.display = off ? 'none' : '';
+            b.style.display = cacheIsCodRestrictedState ? 'none' : '';
+            n.textContent = cacheIsCodRestrictedState ? (g('codUIRestrictionReasonBanner').textContent || 'Cash on delivery is not available on your account.') : 'Pay when your order arrives.';
         };
 
         window.verifyAndApplyCoupon = async function() {
@@ -1983,7 +1970,7 @@ input,textarea,select{font-size:16px}
             g('montePlusCrown').classList.toggle('hidden', !st.on);
             g('plusCard').classList.toggle('on', st.on);
             g('accPlusBar').style.width = (st.on ? 100 : Math.min(100, Math.round(n / 12 * 100))) + '%';
-            g('accPlusTitle').textContent = st.on ? 'You are a MONTÈ+ member' : 'Not a member yet';
+            g('accPlusTitle').textContent = st.on ? 'MONTÈ+' : 'Standard';
             g('accPlusNote').textContent = st.on
                 ? (st.source === 'earned' ? 'Earned through 12 valid orders. Early access to new drops is unlocked.' : (st.until ? 'Your membership is active until ' + new Date(st.until).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) + '.' : 'Your membership is active.'))
                 : (n > 0 ? `${Math.max(0, 12 - n)} more valid order${12 - n === 1 ? '' : 's'} to unlock MONTÈ+.` : 'Complete 12 valid orders to unlock MONTÈ+.');
@@ -2098,6 +2085,7 @@ input,textarea,select{font-size:16px}
                     address: { fullName: orderData.fullName, phone: orderData.phone, address: orderData.address, pin: orderData.pin, city: orderData.city, state: orderData.state }
                 });
                 if(r.needsPayment) {
+                    try { localStorage.setItem('mbag_pay', JSON.stringify({ o: r.orderId, k: window.__bagLine || '' })); } catch(e) {}
                     showToast("Opening secure payment...", "info");
                     const p = await callW(PAY, "/pay/create", { orderId: r.orderId });
                     Cashfree({ mode: p.mode }).checkout({ paymentSessionId: p.paymentSessionId, redirectTarget: "_self" });
@@ -2105,6 +2093,7 @@ input,textarea,select{font-size:16px}
                     return;
                 }
                 window.__orderBusy = false;
+                if(window.__bagLine) { bagRemoveKey(window.__bagLine); window.__bagLine = null; }
                 await syncAndEvaluateUserMatrix(window.sessionUserRecord.uid);
                 setTimeout(() => {
                     window.renderActiveOrderTrackingPipelineDashboard(r.orderId);
@@ -2340,7 +2329,7 @@ input,textarea,select{font-size:16px}
                     const tc = data.totalCancelCount ?? data.cancelCount ?? 0; document.getElementById('accCancelCount').innerText = `${tc} / ${MAXC()}`;
                     
                     userMCoinsBalance = data.mCoins || 0;
-                    document.getElementById('accCoinsBalance').textContent = Number(userMCoinsBalance).toLocaleString('en-IN'); document.getElementById('accCoinsValue').innerHTML = 'Worth ' + mInr(userMCoinsBalance) + ' at checkout &nbsp;·&nbsp; 1 M Coin = ₹1'; paintCoinLedger(data.coinLedger); { const av = document.getElementById('accAvatar'); const nm = String(data.name || data.email || 'M').trim(); if(av) av.textContent = (nm[0] || 'M').toUpperCase(); }
+                    document.getElementById('accCoinsBalance').textContent = Number(userMCoinsBalance).toLocaleString('en-IN'); document.getElementById('accCoinsValue').innerHTML = 'Worth ' + mInr(userMCoinsBalance) + ''; paintCoinLedger(data.coinLedger); { const av = document.getElementById('accAvatar'); const nm = String(data.name || data.email || 'M').trim(); if(av) av.textContent = (nm[0] || 'M').toUpperCase(); }
                     
                     let validOrders = data.completedOrdersCount || 0;
                     document.getElementById('accValidOrders').innerText = validOrders;
@@ -2377,16 +2366,16 @@ input,textarea,select{font-size:16px}
                             if(displayMethod.startsWith('UPI_')) displayMethod = displayMethod.replace('_', ' ');
 
                             const div = document.createElement('div');
-                            div.className = "p-5 bg-[#FAFAFA] premium-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition hover:bg-neutral-50";
+                            div.className = "py-5 premium-border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4";
                             div.innerHTML = `
                                 <div>
-                                    <span class="block font-bold text-black text-[11px] uppercase mb-1.5 tracking-[0.2em]">${mEsc(item.orderId)}</span>
-                                    <span class="block text-[8px] text-neutral-500 uppercase tracking-widest font-bold">${mEsc(item.productTitleDescription)}</span>
+                                    <span class="block font-medium text-black text-[12px] mb-1 tracking-[0.12em]">${mEsc(item.orderId)}</span>
+                                    <span class="block text-[11px] text-neutral-500 normal-case tracking-normal">${mEsc(item.productTitleDescription)}</span>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-6 mt-2 sm:mt-0">
-                                    <span class="text-neutral-500 text-[9px] font-bold tracking-[0.2em] uppercase">${mEsc(item.orderPipelineTrackingState)}${item.refundStatus && ['PENDING','INITIATED','COMPLETED'].includes(item.refundStatus) ? ' · REFUND ' + mEsc(item.refundStatus) : ''}</span>
-                                    <button onclick="downloadInvoice('${item.orderId}', this)" class="text-[9px] border-b border-black font-bold uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.2em]">Invoice</button>
-                                    <button onclick="window.renderActiveOrderTrackingPipelineDashboard('${item.orderId}')" class="text-[9px] border-b border-black font-bold uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.2em]">Track</button>
+                                    <span class="text-neutral-500 text-[10px] tracking-[0.18em] uppercase">${mEsc(item.orderPipelineTrackingState)}${item.refundStatus && ['PENDING','INITIATED','COMPLETED'].includes(item.refundStatus) ? ' · REFUND ' + mEsc(item.refundStatus) : ''}</span>
+                                    <button onclick="downloadInvoice('${item.orderId}', this)" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Invoice</button>
+                                    <button onclick="window.renderActiveOrderTrackingPipelineDashboard('${item.orderId}')" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Track</button>${String(item.orderPipelineTrackingState).toUpperCase() === 'DELIVERED' && item.productId ? `<button onclick="triggerReviewSubmission('${mEsc(item.productId)}')" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Review</button>` : ''}
                                 </div>`;
                             wrapper.appendChild(div);
                         }
@@ -2406,7 +2395,7 @@ input,textarea,select{font-size:16px}
             document.getElementById('accProfileEmail').innerText = "---";
             document.getElementById('accProfilePhone').innerText = "---";
             document.getElementById('accCancelCount').innerText = "0 / 15";
-            document.getElementById('accCoinsBalance').textContent = '0'; document.getElementById('accCoinsValue').innerHTML = 'Worth ₹0 at checkout &nbsp;·&nbsp; 1 M Coin = ₹1'; paintCoinLedger(null);
+            document.getElementById('accCoinsBalance').textContent = '0'; document.getElementById('accCoinsValue').innerHTML = 'Worth ₹0'; paintCoinLedger(null);
             document.getElementById('accValidOrders').innerText = "0";
             paintPlus(null); { const av = document.getElementById('accAvatar'); if(av) av.textContent = 'M'; }
             document.getElementById('accSuspensionStatus').innerText = "SECURE";
@@ -2414,65 +2403,60 @@ input,textarea,select{font-size:16px}
             document.getElementById('accountOrderHistoryContainer').innerHTML = `<p class="uppercase font-medium text-neutral-400 tracking-wider">Authenticate to scan logs.</p>`;
         }
 
-        window.triggerReviewSubmission = async function() {
-            if(!window.sessionUserRecord) {
-                showToast("Authenticate to leave a verified review.", "error");
-                showModalWindow('authDialog');
-                toggleAuthTab('LOGIN');
-                return;
-            }
-
+        let reviewTarget = null, revUnsub = null, revWatched = null;
+        const RATE_WORDS = ['Tap a star to rate', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
+        window.triggerReviewSubmission = async function(pid) {
+            if(!window.sessionUserRecord) { showToast("Sign in to write a review.", "info"); showModalWindow('authDialog'); toggleAuthTab('LOGIN'); return; }
+            reviewTarget = (typeof pid === 'string' && pid && CATALOG[pid]) ? pid : currentProductId;
             try {
-                const snap = await get(query(ref(db, 'orders'), orderByChild('uid'), equalTo(window.sessionUserRecord.uid)));
-                let verified = false;
-                if(snap.exists()) {
-                    for(let key in snap.val()) {
-                        if(isMine(snap.val()[key])) { verified = true; break; }
-                    }
-                }
-                if(verified) {
-                    currentSelectedRating = 0;
-                    window.setRatingStars(0);
-                    document.getElementById('reviewTextInput').value = '';
-                    showModalWindow('reviewDialog');
-                } else { showToast("Only verified buyers can submit reviews.", "error"); }
-            } catch(e) {}
+                const snap = await loadMyOrders();
+                const list = snap.exists() ? Object.values(snap.val()) : [];
+                const ok = list.some(o => !['CANCELLED', 'PENDING_PAYMENT'].includes(String(o.orderPipelineTrackingState || '').toUpperCase()));
+                if(!ok) return showToast("Reviews are open to customers with an order. Place one and come back.", "info");
+            } catch(e) { return showToast("Could not check your orders. Please try again.", "error"); }
+            const pr = CATALOG[reviewTarget] || currentProduct || {};
+            document.getElementById('reviewProdName').textContent = pr.name || 'Write a review';
+            const t = document.getElementById('reviewTextInput'); t.value = ''; document.getElementById('reviewCount').textContent = '0 / 600';
+            setRatingStars(0);
+            try { const mine = await get(ref(db, `reviews/${reviewTarget}/${window.sessionUserRecord.uid}`)); if(mine.exists()) { const r = mine.val(); setRatingStars(Number(r.starRating) || 0); t.value = r.writtenReview || ''; document.getElementById('reviewCount').textContent = t.value.length + ' / 600'; } } catch(e) {}
+            showModalWindow('reviewDialog');
         };
-
-        window.setRatingStars = function(starCount) {
-            currentSelectedRating = starCount;
-            document.querySelectorAll('#starSelectionContainer .star').forEach((node, index) => {
-                if(index < starCount) {
-                    node.classList.remove('text-neutral-200'); node.classList.add('text-black');
-                } else {
-                    node.classList.remove('text-black'); node.classList.add('text-neutral-200');
-                }
-            });
+        window.setRatingStars = function(n) {
+            currentSelectedRating = n;
+            document.querySelectorAll('#starSelectionContainer .star').forEach((el, i) => el.classList.toggle('on', i < n));
+            document.getElementById('ratingWord').textContent = RATE_WORDS[n] || RATE_WORDS[0];
         };
-
-        window.submitProductReview = function(btnElement) {
-            if(currentSelectedRating === 0) return showToast("Select a valid rating (1 to 5).", "error");
-            const text = document.getElementById('reviewTextInput').value.trim();
-            const originalText = btnElement.innerText;
-            btnElement.disabled = true; btnElement.innerText = "SUBMITTING...";
-
-            setTimeout(() => {
-                dismissModals();
-                showToast("Verified collector rating saved.", "success");
-                btnElement.disabled = false; btnElement.innerText = originalText;
-            }, 200);
-
-            let name = window.sessionUserRecord.displayName || "Verified Collector";
-            const payload = { uid: window.sessionUserRecord.uid, reviewerName: name, starRating: currentSelectedRating, writtenReview: text, timestamp: Date.now() };
-
-            get(ref(db, `users/${window.sessionUserRecord.uid}`)).then(userSnap => {
-                if(userSnap.exists() && userSnap.val().name) payload.reviewerName = userSnap.val().name;
-                push(ref(db, `reviews/${currentProductId}`), payload).catch(e => console.warn(e));
-            }).catch(() => {
-                push(ref(db, `reviews/${currentProductId}`), payload).catch(e => console.warn(e));
-            });
+        window.submitProductReview = async function(btn) {
+            if(!currentSelectedRating) return showToast("Tap the stars to rate first.", "error");
+            const u = window.sessionUserRecord; if(!u) return;
+            const text = document.getElementById('reviewTextInput').value.trim().slice(0, 600), orig = btn.innerText;
+            btn.disabled = true; btn.innerText = "Saving...";
+            try {
+                let name = u.displayName || '';
+                try { const us = await get(ref(db, `users/${u.uid}/name`)); name = us.val() || name; } catch(_) {}
+                const parts = String(name || 'Customer').trim().split(/\s+/), shown = parts[0] + (parts[1] ? ' ' + parts[1][0].toUpperCase() + '.' : '');
+                await set(ref(db, `reviews/${reviewTarget}/${u.uid}`), { uid: u.uid, reviewerName: shown, starRating: currentSelectedRating, writtenReview: text, timestamp: Date.now() });
+                dismissModals(); showToast("Thank you. Your review is live.", "success");
+            } catch(e) { showToast("Could not save your review. Please try again.", "error"); }
+            btn.disabled = false; btn.innerText = orig;
         };
-
+        const starStr = x => { const r = Math.round(x); return '★'.repeat(r) + '☆'.repeat(5 - r); };
+        function paintReviews(v) {
+            const list = v ? Object.values(v).filter(r => r && r.starRating).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : [];
+            const n = list.length, avg = n ? list.reduce((t, r) => t + Number(r.starRating), 0) / n : 0, lab = document.getElementById('ratingDisplayLabel');
+            if(lab) {
+                if(n) { lab.className = 'mt-3 block text-[12px] text-neutral-600 cursor-pointer'; lab.innerHTML = `<span style="color:#c9971f;letter-spacing:.1em">${starStr(avg)}</span> &nbsp;${avg.toFixed(1)} · ${n} review${n > 1 ? 's' : ''}`; lab.onclick = () => { const d = document.getElementById('pdRevWrap'); d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); }; }
+                else lab.className = 'hidden';
+            }
+            document.getElementById('pdRevCount').textContent = n ? `(${n})` : '';
+            document.getElementById('pdReviews').innerHTML = (n ? list.slice(0, 10).map(r => `<div class="rv-i"><div class="top"><b style="font-weight:500">${mEsc(r.reviewerName || 'Customer')}</b><span>${new Date(r.timestamp || 0).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div><div class="st">${starStr(r.starRating)}</div>${r.writtenReview ? `<p>${mEsc(r.writtenReview)}</p>` : ''}</div>`).join('') : '<p>No reviews yet. Be the first to share how it wears.</p>') + '<button onclick="triggerReviewSubmission()" class="cta mt-5">Write a review</button>';
+        }
+        function watchReviews() {
+            if(revWatched === currentProductId) return;
+            if(revUnsub) { try { revUnsub(); } catch(e) {} revUnsub = null; }
+            const pid = revWatched = currentProductId; paintReviews(null);
+            try { revUnsub = onValue(ref(db, `reviews/${pid}`), sn => { if(pid === currentProductId) paintReviews(sn.val()); }, () => {}); } catch(e) {}
+        }
 
         // ===== LIVE CHAT =====
         let chatOff = null, chatOpen = false, chatUid = null;
@@ -2549,6 +2533,70 @@ input,textarea,select{font-size:16px}
             const bits = [hasCol ? selectedColorProductShade : '', selectedProductSizeValue ? 'Size ' + selectedProductSizeValue : ''].filter(Boolean);
             el.textContent = selectedProductSizeValue ? bits.join('  ·  ') : 'Select a size to continue';
         };
+
+
+        // ===== BAG =====
+        const BAGK = 'mbag_v1';
+        let BAG = []; try { BAG = JSON.parse(localStorage.getItem(BAGK) || '[]'); } catch(e) {} if(!Array.isArray(BAG)) BAG = [];
+        const bagSave = () => { try { localStorage.setItem(BAGK, JSON.stringify(BAG)); } catch(e) {} };
+        const bagOpenNow = () => document.getElementById('bag').classList.contains('on');
+        function bagRemoveKey(k) { const n = BAG.length; BAG = BAG.filter(b => b.key !== k); if(BAG.length !== n) { bagSave(); paintBag(); } }
+        function bagPaid(oid) { try { const x = JSON.parse(localStorage.getItem('mbag_pay') || 'null'); if(x && x.o === oid) { if(x.k) bagRemoveKey(x.k); localStorage.removeItem('mbag_pay'); } } catch(e) {} }
+        window.openBag = () => { paintBag(); document.getElementById('bag').classList.add('on'); document.getElementById('bagScrim').classList.add('on'); document.body.style.overflow = 'hidden'; };
+        window.closeBag = () => { document.getElementById('bag').classList.remove('on'); document.getElementById('bagScrim').classList.remove('on'); if(!document.getElementById('srch').classList.contains('on')) document.body.style.overflow = ''; };
+        document.addEventListener('keydown', e => { if(e.key === 'Escape') closeBag(); });
+        window.addToBag = function() {
+            const p = currentProduct, btn = document.getElementById('masterAcquireBtn');
+            if(!p || !CATALOG[p.id]) return;
+            if(btn && btn.disabled) return showToast("This item is not available to order yet.", "info");
+            if(p.status === 'OUT_OF_STOCK') return showToast("This item is sold out.", "error");
+            if(!selectedProductSizeValue) { showToast("Select a size first.", "info"); const z = document.getElementById('sizeSelectorContainer'); if(z) z.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+            const key = [p.id, selectedColorProductShade, selectedProductSizeValue].join('|');
+            if(BAG.some(b => b.key === key)) showToast("Already in your bag.", "info");
+            else { BAG.push({ key, pid: p.id, color: selectedColorProductShade, size: selectedProductSizeValue, t: Date.now() }); bagSave(); }
+            paintBag(); openBag();
+            const nb = document.getElementById('navBagBtn'); nb.classList.remove('bump'); void nb.offsetWidth; nb.classList.add('bump');
+        };
+        window.bagRemove = i => { BAG.splice(i, 1); bagSave(); paintBag(); };
+        window.bagCheckout = function(i) {
+            const b = BAG[i]; if(!b) return;
+            const p = CATALOG[b.pid]; if(!p || p.status === 'DRAFT') return showToast("This item is no longer available.", "error");
+            if(p.status === 'OUT_OF_STOCK') return showToast("This item is sold out.", "error");
+            closeBag();
+            if(!renderProduct(b.pid)) return showToast("This item is no longer available.", "error");
+            const oos = (p.oosVariants || []).map(v => String(v).toUpperCase());
+            if(oos.includes(String(b.size).toUpperCase()) || oos.includes(String(b.color).toUpperCase())) return showToast("That size or colour is sold out now.", "error");
+            selectedColorProductShade = b.color; selectedProductSizeValue = b.size;
+            const c = (p.colors || []).find(x => x.name === b.color), im = colImgs(p, c)[0]; if(im) document.getElementById('primaryCanvas').src = im;
+            window.__bagLine = b.key;
+            initiateCheckoutProcess();
+        };
+        function paintBag() {
+            const n = BAG.length, body = document.getElementById('bagBody'), foot = document.getElementById('bagFoot'); if(!body) return;
+            document.getElementById('navBagBtn').textContent = `Bag (${n})`;
+            document.getElementById('bagCount').textContent = n ? `(${n})` : '';
+            if(!n) {
+                const sug = liveList().filter(p => p.status !== 'OUT_OF_STOCK').slice(0, 2);
+                body.innerHTML = `<div class="py-16 text-center"><p class="hero-t text-2xl mb-3">Your bag is empty</p><p class="text-neutral-500 mb-8" style="font-size:12px">Pieces you add will wait for you here.</p><a href="#/shop" onclick="closeBag()" class="cta">Shop now <span>→</span></a></div>` + (sug.length ? `<p class="eyebrow text-neutral-400 mb-2">New in</p>` + sug.map(p => { const im = colImgs(p, (p.colors || [])[0])[0] || ''; return `<a class="sr-row" href="#/product/${encodeURIComponent(p.id)}" onclick="closeBag()"><img src="${mEsc(im)}" alt=""><div><b>${mEsc(p.name)}</b><small>${mEsc(p.category || '')}</small></div><span class="p">${mInr(p.price)}</span></a>`; }).join('') : '');
+                foot.style.display = 'none'; return;
+            }
+            let sub = 0, save = 0, live = 0;
+            body.innerHTML = BAG.map((b, i) => {
+                const p = CATALOG[b.pid], gone = !p || p.status === 'DRAFT';
+                if(gone) return `<div class="bl gone"><div style="width:84px;height:105px;background:#f4f3f1" class="flex-none"></div><div class="flex-1"><b>No longer available</b><small>This item was removed from the store.</small><div class="acts"><button class="m" onclick="bagRemove(${i})">Remove</button></div></div></div>`;
+                const c = (p.colors || []).find(x => x.name === b.color), im = colImgs(p, c)[0] || '';
+                const oos = (p.oosVariants || []).map(v => String(v).toUpperCase()), sold = p.status === 'OUT_OF_STOCK' || oos.includes(String(b.size).toUpperCase()) || oos.includes(String(b.color).toUpperCase());
+                if(!sold) { sub += +p.price || 0; save += Math.max(0, (+p.mrp || 0) - (+p.price || 0)); live++; }
+                return `<div class="bl ${sold ? 'gone' : ''}"><a href="#/product/${encodeURIComponent(p.id)}" onclick="closeBag()" class="flex-none"><img src="${mEsc(im)}" alt=""></a><div class="flex-1 min-w-0"><div class="flex justify-between gap-3"><b>${mEsc(p.name)}</b><span style="font-size:13px;white-space:nowrap">${mInr(p.price)}</span></div><small>${b.color ? mEsc(b.color) + ' · ' : ''}Size ${mEsc(b.size)}</small>${+p.mrp > +p.price ? `<small><s>${mInr(p.mrp)}</s> <span style="color:#b4231a">${mOff(p)}% off</span></small>` : ''}${sold ? '<small style="color:#b4231a">Sold out</small>' : ''}<div class="acts">${sold ? '' : `<button onclick="bagCheckout(${i})">Checkout</button>`}<button class="m" onclick="bagRemove(${i})">Remove</button></div></div></div>`;
+            }).join('');
+            foot.style.display = '';
+            foot.innerHTML = `<div class="flex justify-between items-baseline mb-1"><span class="eyebrow text-neutral-500">Subtotal</span><span style="font-size:18px">${mInr(sub)}</span></div>
+                ${save > 0 ? `<p class="text-right mb-1" style="font-size:11px;color:#b4231a">You save ${mInr(save)}</p>` : ''}
+                <p class="text-neutral-400 mb-5" style="font-size:11px;line-height:1.7">Delivery is free. Taxes included.${live > 1 ? ' Each piece is checked out as its own order, so use Checkout on the item you want first.' : ''}</p>
+                ${live === 1 ? `<button onclick="bagCheckout(${BAG.findIndex(b => { const p = CATALOG[b.pid]; return p && p.status !== 'DRAFT' && p.status !== 'OUT_OF_STOCK'; })})" class="w-full bg-black text-white py-[18px] fine btn-luxury" style="font-size:10px;letter-spacing:.26em">Checkout</button>` : ''}
+                <p class="text-center mt-4 text-neutral-400 flex items-center justify-center gap-2" style="font-size:11px"><svg class="mc" style="width:16px;height:16px"><use href="#mcoin"/></svg>Earn M Coins on every order</p>`;
+        }
+        paintBag();
 
         window.sendChat = async function(e) {
             e.preventDefault(); const u = window.sessionUserRecord, inp = document.getElementById('mchatIn'), t = inp.value.trim();
