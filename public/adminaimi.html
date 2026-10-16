@@ -50,8 +50,17 @@ textarea:focus{border-color:#000}
 .chipz{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .chipz button{min-width:52px;height:38px;border:1px solid #000;background:#fff;cursor:pointer}
 .chipz button.off{background:#f0f0f0;color:#aaa;border-color:var(--line);text-decoration:line-through}
-.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}
-.pk{border:1px solid var(--line);background:#fff;padding:8px 12px;cursor:pointer;font-size:12px}.pk.on{background:#000;color:#fff;border-color:#000}</style>
+.crow{display:grid;grid-template-columns:1fr 54px 2fr 40px;gap:8px;margin-top:8px}.crow input[type=color]{padding:2px;height:42px}.crow textarea{height:42px;margin-top:6px}.chipz button.on{background:#000;color:#fff}
+.mdl{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 12px}
+.mdl.on{display:flex}
+.mdl .pn{background:#fff;border:1px solid var(--line);width:100%;max-width:640px;padding:28px;position:relative}
+.mdl .x{position:absolute;top:10px;right:14px;background:none;border:0;font-size:26px;cursor:pointer;line-height:1}
+.big{font-family:'Playfair Display',serif;font-size:40px;font-weight:400;line-height:1}
+.lg{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.lg small{display:block;color:var(--mute);font-size:10px}
+.up{color:#14804a}.dn{color:#b4231a}
+.mini{padding:8px 12px;font-size:10px}
+</style>
 </head>
 <body>
 
@@ -85,12 +94,16 @@ textarea:focus{border-color:#000}
       <div class="st"><span class="eb">To ship</span><b id="sP">0</b></div>
       <div class="st"><span class="eb">Shipped</span><b id="sS">0</b></div>
       <div class="st"><span class="eb">Revenue (paid, excl. cancelled)</span><b id="sR">₹0</b></div>
+      <div class="st"><span class="eb">Customers</span><b id="sC">0</b></div>
+      <div class="st"><span class="eb">M Coins held by customers</span><b id="sCoin">0</b></div>
+      <div class="st"><span class="eb">MONTÈ+ members</span><b id="sPlus">0</b></div>
     </div>
 
     <section id="t-orders">
       <div class="row" style="margin-bottom:12px">
         <input id="q" placeholder="Search order ID, name, email…" oninput="renderOrders()">
         <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PENDING_PAYMENT</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
+        <button class="btn l" style="flex:0 0 auto" onclick="exportOrders()">Export CSV</button>
       </div>
       <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="ob"></tbody></table></div>
     </section>
@@ -104,13 +117,13 @@ textarea:focus{border-color:#000}
           <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount(true)">Remove all discounts</button>
           <button id="impBtn" class="btn l hide" style="flex:0 0 auto" onclick="importDefault()">Import Signature Tee</button>
         </div>
-        <input id="pq" placeholder="Search products (name, SKU, category, colour)…" oninput="renderProducts()" style="margin:0 0 12px"><div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
+        <div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
       </div>
       <div id="pedit" class="card hide">
         <p class="eb" id="pTitle">New product</p>
         <p class="eb sub">Section &amp; identity</p>
         <div class="row"><label class="eb">Section *<select id="fGen" onchange="catOpts();autoSku()"><option value="WOMEN">Women</option><option value="MEN">Men</option><option value="KIDS">Kids</option><option value="UNISEX">Unisex</option></select></label><label class="eb">Category *<input id="fCat" list="cats" oninput="autoSku()" placeholder="Shirts, Dresses, Knitwear…"><datalist id="cats"></datalist></label><label class="eb">Product name *<input id="fName"></label></div>
-        <div class="row"><label class="eb">SKU (auto)<input id="fSku" readonly></label><label class="eb">Collection<input id="fColl" placeholder="Autumn Winter 2026"></label><label class="eb">Fit<input id="fFit" placeholder="Relaxed, Slim, Oversized"></label></div>
+        <div class="row"><label class="eb">SKU (auto)<input id="fSku" readonly></label><label class="eb">Collection<input id="fColl" placeholder="Autumn Winter 2026"></label><label class="eb">Fit<input id="fFit" placeholder="Relaxed, Slim, Oversized"></label><label class="eb">Search keywords<input id="fKw" placeholder="linen, summer, gift"></label></div>
         <p class="eb" id="skuPrev" style="margin-top:8px"></p>
         <p class="eb sub">Story &amp; craft</p>
         <label class="eb">Description *<textarea id="fDesc" placeholder="Design story, silhouette, feel"></textarea></label>
@@ -134,32 +147,40 @@ textarea:focus{border-color:#000}
 
     <section id="t-coupons" class="hide">
       <div class="card">
-        <p class="eb" id="cpTitle">New coupon</p>
+        <p class="eb">New coupon</p>
         <div class="row">
-          <label class="eb">Code<input id="cCode" placeholder="DIWALI20" style="text-transform:uppercase"></label>
-          <label class="eb">Category<select id="cCat"><option>General</option><option>Festival</option><option>Welcome (first order)</option><option>MONTÈ+ VIP</option><option>Product special</option><option>Clearance</option><option>Influencer / referral</option></select></label>
-          <label class="eb">Who can use<select id="cAud"><option value="ALL">Everyone</option><option value="NEW">New customers (0 orders)</option><option value="PLUS">MONTÈ+ members only</option></select></label>
+          <label class="eb">Code<input id="cCode" placeholder="DIWALI100" style="text-transform:uppercase"></label>
+          <label class="eb">Kind<select id="cKind" onchange="cpForm()"><option value="DISCOUNT">Discount coupon</option><option value="MONTE_PLUS">MONTÈ+ pass (secret, gives no discount)</option></select></label>
+          <div style="display:flex;align-items:flex-end"><button class="btn l" onclick="genCode()" style="width:100%">Generate code</button></div>
         </div>
-        <div class="row">
-          <label class="eb">Type<select id="cType" onchange="cpType()"><option value="PERCENT">Percentage off</option><option value="FLAT">Flat ₹ off</option></select></label>
-          <label class="eb" id="cValL">Percent (%)<input id="cVal" type="number" min="1"></label>
-          <label class="eb" id="cCapL">Max discount ₹ (optional)<input id="cCap" type="number" min="0"></label>
-          <label class="eb">Min order ₹ (optional)<input id="cMin" type="number" min="0"></label>
+        <div id="cpDisc">
+          <div class="row">
+            <label class="eb">Type<select id="cType"><option value="FLAT">Flat ₹ off</option><option value="PERCENT">Percent % off</option></select></label>
+            <label class="eb">Value<input id="cDisc" type="number" min="1"></label>
+            <label class="eb">Max ₹ off (percent only)<input id="cMax" type="number" min="0" placeholder="optional"></label>
+            <label class="eb">Minimum order ₹<input id="cMin" type="number" min="0" placeholder="optional"></label>
+          </div>
+          <label class="eb" style="max-width:340px">Works on<select id="cScope" onchange="cpScope()"><option value="ALL">Everything</option><option value="GENDER">Selected sections (Women, Men…)</option><option value="CATEGORY">Selected categories (Shirts, Dresses…)</option><option value="PRODUCT">Selected products</option></select></label>
+          <div id="cpScopeBox" class="chipz"></div>
         </div>
-        <p class="eb sub">Works on (nothing selected = all products)</p>
-        <div id="cProds" class="chipz"></div>
-        <div class="row"><label class="eb">Only these sizes (comma separated, empty = all)<input id="cSizes" placeholder="M, L"></label><label class="eb">Only these colours (comma separated, empty = all)<input id="cCols" placeholder="Midnight Navy"></label></div>
-        <p class="eb sub">Timing &amp; limits</p>
-        <div class="row"><label class="eb">Starts (empty = now)<input id="cFrom" type="datetime-local"></label><label class="eb">Ends (empty = no expiry)<input id="cTo" type="datetime-local"></label><label class="eb">Or active for (hours from start)<input id="cHrs" type="number" min="0"></label></div>
-        <div class="row"><label class="eb">Total uses allowed (0 = unlimited)<input id="cMax" type="number" min="0" value="0"></label><label class="eb">Max different customers (0 = unlimited)<input id="cUsers" type="number" min="0" value="0"></label><label class="eb">Uses per customer (0 = unlimited)<input id="cPer" type="number" min="0" value="1"></label></div>
-        <div class="row"><label class="eb">Show on product page<select id="cShow"><option value="1">Yes, public offer</option><option value="0">No, secret code</option></select></label><label class="eb">Offer line (optional)<input id="cDesc" placeholder="Festive week special"></label></div>
-        <div style="margin-top:24px;display:flex;gap:10px"><button class="btn" onclick="addCoupon()">Save coupon</button><button class="btn l" onclick="resetCp()">Clear</button></div>
+        <div id="cpPlus" class="hide">
+          <div class="row"><label class="eb">Membership length (days, 0 = lifetime)<input id="cDays" type="number" min="0" value="0"></label></div>
+          <p class="eb" style="margin-top:10px;text-transform:none;letter-spacing:0;line-height:1.7">The customer types this code in the normal coupon box at checkout. It upgrades their account to MONTÈ+ and is never mentioned on the website. Share it privately.</p>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <label class="eb">Expires on (optional)<input id="cExp" type="date"></label>
+          <label class="eb">Total uses (0 = unlimited)<input id="cUses" type="number" min="0" value="0"></label>
+          <div style="display:flex;align-items:flex-end"><button class="btn" onclick="addCoupon()" style="width:100%">Save coupon</button></div>
+        </div>
       </div>
-      <div class="tw"><table style="min-width:980px"><thead><tr><th>Code</th><th>Offer</th><th>Works on</th><th>Validity</th><th>Usage</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
+      <p class="eb" style="margin:22px 0 8px">Discount coupons</p>
+      <div class="tw"><table style="min-width:760px"><thead><tr><th>Code</th><th>Offer</th><th>Works on</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody id="cb"></tbody></table></div>
+      <p class="eb" style="margin:28px 0 8px">Private MONTÈ+ passes (secret)</p>
+      <div class="tw"><table style="min-width:760px"><thead><tr><th>Code</th><th>Gives</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody id="pb2"></tbody></table></div>
     </section>
   <section id="t-users" class="hide">
-      <div class="card"><div class="row"><label class="eb">Search customer (name, phone or email)<input id="uq" oninput="renderUsers()" placeholder="Type to search"></label></div></div>
-      <div class="tw"><table style="min-width:760px"><thead><tr><th>Customer</th><th>Orders</th><th>M-Coins</th><th>Cancels</th><th>Status</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
+      <div class="card"><div class="row" style="align-items:flex-end"><label class="eb">Search customer (name, phone or email)<input id="uq" oninput="renderUsers()" placeholder="Type to search"></label><button class="btn l" style="flex:0 0 auto" onclick="exportUsers()">Export CSV</button></div></div>
+      <div class="tw"><table style="min-width:760px"><thead><tr><th>Customer</th><th>Orders</th><th>M Coins</th><th>MONTÈ+</th><th>Cancels</th><th>Status</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
     </section>
     <section id="t-settings" class="hide">
       <div class="card">
@@ -181,12 +202,46 @@ textarea:focus{border-color:#000}
     </section>
   </main>
 </div>
+<div id="um" class="mdl"><div class="pn">
+  <button class="x" onclick="closeUser()">&times;</button>
+  <p class="eb">Customer</p>
+  <p id="umName" style="font-size:18px;margin-top:6px"></p>
+  <p id="umMeta" class="eb" style="text-transform:none;letter-spacing:0;margin-top:4px"></p>
+
+  <p class="eb sub">M Coins</p>
+  <div class="row" style="align-items:center"><div><span class="big" id="umBal">0</span> <span class="eb">coins · worth <span id="umVal"></span></span></div></div>
+  <div class="row" style="margin-top:10px">
+    <label class="eb">Action<select id="umMode"><option value="add">Add coins</option><option value="remove">Remove coins</option><option value="set">Set exact balance</option></select></label>
+    <label class="eb">Amount<input id="umAmt" type="number" min="0" step="1"></label>
+    <label class="eb" style="flex:2">Reason (customer sees this)<input id="umWhy" placeholder="Goodwill gesture" maxlength="80"></label>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center">
+    <button class="btn" onclick="applyCoins()">Apply</button>
+    <span class="eb">Quick:</span>
+    <button class="btn l mini" onclick="quickCoins(10)">+10</button><button class="btn l mini" onclick="quickCoins(50)">+50</button><button class="btn l mini" onclick="quickCoins(100)">+100</button><button class="btn l mini" onclick="quickCoins(-10)">−10</button>
+  </div>
+  <div id="umLedger" style="margin-top:14px"></div>
+
+  <p class="eb sub">MONTÈ+</p>
+  <p id="umPlus" style="margin-top:8px"></p>
+  <div class="row" style="margin-top:10px;align-items:flex-end">
+    <label class="eb">Grant for (days, 0 = lifetime)<input id="umDays" type="number" min="0" value="0"></label>
+    <button class="btn" style="flex:0 0 auto" onclick="grantPlus()">Grant MONTÈ+</button>
+    <button class="btn l" style="flex:0 0 auto" onclick="revokePlus()">Revoke granted</button>
+  </div>
+
+  <p class="eb sub">Account</p>
+  <div id="umAct" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+
+  <p class="eb sub">Orders</p>
+  <div id="umOrders" style="margin-top:8px"></div>
+</div></div>
 <div id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getDatabase, ref, get, set, update, remove, onValue, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, get, set, update, remove, onValue, runTransaction, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 /* ====== ONLY these emails can use the panel. Edit this list. ====== */
 const ADMIN_EMAILS = ["sgursharn076@gmail.com"];
@@ -244,7 +299,7 @@ function start(){
   onValue(ref(db,'users'), s => { USERS = s.val() || {}; renderUsers(); }, () => {});
   onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
   onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
-  onValue(ref(db,'coupons'), s => { COUPONS = s.val() || {}; renderCoupons(); });
+  onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
 }
 
 /* ---------- Orders ---------- */
@@ -306,18 +361,16 @@ const DEFAULT_PRODUCTS = {monte_signature_tee:{name:'MONTÈ Signature Tee',categ
 let CAT = {}, editId = null, oosSet = new Set();
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'product';
 const offPct = p => (+p.mrp > +p.price) ? Math.round((1 - p.price/p.mrp)*100) : 0;
-const pMatch = p => { const q = (($('pq')||{}).value||'').toLowerCase().trim(); return !q || [p.name,p.category,p.sku,p.collection,p.gender,...(p.colors||[]).map(c=>c.name)].join(' ').toLowerCase().includes(q); };
 function renderProducts(){
-  fillCpProducts();
   const rows = Object.entries(CAT).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
   $('impBtn').classList.toggle('hide', rows.length > 0);
   $('cats').innerHTML = [...new Set(rows.map(r=>r[1].category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
   const lab = {ACTIVE:'Available',OUT_OF_STOCK:'Sold out',DRAFT:'Hidden'};
-  $('pb').innerHTML = rows.filter(([id,p])=>pMatch(p)).map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
+  $('pb').innerHTML = rows.map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
     <td><b style="font-weight:500">${esc(p.name)}</b><br><span class="eb">${esc(p.category)} ${p.sku?'· '+esc(p.sku):''}</span></td>
     <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
     <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="dupProd('${esc(id)}')">Duplicate</button> <button class="btn l" onclick="togProd('${esc(id)}')">${p.status==='DRAFT'?'Show':'Hide'}</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
     || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
 }
 const F = id => $(id);
@@ -326,7 +379,7 @@ window.editProd = id => { editId = id; fillForm(CAT[id]); $('pTitle').textConten
 function showEdit(){ $('plist').classList.add('hide'); $('pedit').classList.remove('hide'); window.scrollTo(0,0); }
 window.closeEdit = () => { $('pedit').classList.add('hide'); $('plist').classList.remove('hide'); };
 function fillForm(p){
-  F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
+  F('fKw').value = p.keywords||''; F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
   F('fDet').value = (p.details||[]).join('\n'); F('fCare').value = p.care||''; F('fPrice').value = p.price||''; F('fMrp').value = p.mrp||'';
   F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE'; F('fLaunch').value = p.launchTimestamp ? new Date(+p.launchTimestamp - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
   F('fImgs').value = (p.images||[]).join('\n'); F('fGen').value=p.gender||'WOMEN'; F('fColl').value=p.collection||''; F('fFit').value=p.fit||''; F('fComp').value=p.composition||''; F('fOrigin').value=p.origin||''; F('fModel').value=p.model||''; $('colRows').innerHTML=''; (p.colors||[]).forEach(c=>addCol(c)); if(!(p.colors||[]).length)addCol(); catOpts(); if(!p.sku)F('fSku').value=genSku();
@@ -357,7 +410,7 @@ window.saveProd = async () => {
   const id = editId || slug(name) + '-' + Math.random().toString(36).slice(2,6), old = CAT[id] || {};
   const sizes = parseSizes(), colors = parseCols();
   const valid = new Set([...sizes, ...colors.map(c=>c.name)].map(x=>x.toUpperCase()));
-  const data = { name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
+  const data = { keywords: F('fKw').value.trim(), name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
     details: F('fDet').value.split('\n').map(x=>x.trim()).filter(Boolean), care: F('fCare').value.trim(),
     price, mrp: Math.max(mrp, price), offerText: F('fOffer').value.trim(), badge: F('fBadge').value.trim(), status: F('fStatus').value,
     images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: launchTs, createdAt: old.createdAt || Date.now() };
@@ -397,100 +450,144 @@ window.toggleCod = async () => {
   if (!confirm(stop ? 'Stop Cash on Delivery for ALL customers right now?' : 'Resume Cash on Delivery for all customers?')) return;
   try { await update(ref(db, 'settings/site'), { codEnabled: !stop, codChangedAt: Date.now() }); toast(stop ? 'COD stopped for everyone' : 'COD resumed'); } catch(e){ toast('Failed: ' + e.message); }
 };
+/* ---------- Helpers ---------- */
+function csv(name, rows){
+  const q = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
+  const blob = new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '-' + new Date().toISOString().slice(0,10) + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+window.exportOrders = () => csv('monte-orders', [['Order','Date','Customer','Email','Address','Item','Method','Code','M Coins used','Paid ₹','Status','Payment']].concat(
+  Object.values(orders).sort((a,b)=>(b.chronologicalCreationTimestamp||0)-(a.chronologicalCreationTimestamp||0)).map(o => [o.orderId, new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN'), o.clientIdentityName, o.email, o.consignmentDeliveryAddressText, o.productTitleDescription, o.protocolMethodType, o.appliedPromoCode, o.appliedMCoins||0, o.transactionSettlementAmount, o.orderPipelineTrackingState, o.paymentStatus])));
+window.exportUsers = () => csv('monte-customers', [['Name','Email','Phone','Valid orders','M Coins','MONTÈ+','Cancels','Suspended','COD blocked']].concat(
+  Object.values(USERS).map(u => [u.name, u.email, u.phone, u.completedOrdersCount||0, u.mCoins||0, plusOf(u).on ? 'Yes' : 'No', u.totalCancelCount ?? u.cancelCount ?? 0, u.suspended ? 'Yes':'No', u.codBlocked ? 'Yes':'No'])));
+window.dupProd = id => { const p = JSON.parse(JSON.stringify(CAT[id] || {})); editId = null; p.name = (p.name||'') + ' (copy)'; p.sku = ''; p.status = 'DRAFT'; p.launchTimestamp = 0; fillForm(p); $('pTitle').textContent = 'New product (copy)'; showEdit(); };
+window.togProd = id => update(ref(db,'catalog/'+id), { status: (CAT[id]||{}).status === 'DRAFT' ? 'ACTIVE' : 'DRAFT' }).then(() => toast('Updated')).catch(e => toast('Failed: ' + e.message));
+
 /* ---------- Customers ---------- */
-let USERS = {};
-window.renderUsers = () => {
-  const q = ($('uq').value || '').toLowerCase().trim();
-  const rows = Object.entries(USERS).filter(([id,u]) => !q || [u.name,u.phone,u.email].join(' ').toLowerCase().includes(q)).slice(0, 200);
-  $('ub').innerHTML = rows.map(([id,u]) => `<tr><td><b style="font-weight:500">${esc(u.name||'—')}</b><br><span class="eb">${esc(u.phone||'')} · ${esc(u.email||'')}</span></td><td>${u.completedOrdersCount||0}</td><td><b style="font-weight:500">${u.mCoins||0}</b></td><td>${u.totalCancelCount ?? u.cancelCount ?? 0}</td>
-    <td>${u.suspended ? '<span class="tag">Suspended</span> ' : ''}${u.codBlocked ? '<span class="tag">COD blocked</span>' : ''}${!u.suspended && !u.codBlocked ? '<span class="tag">Normal</span>' : ''}</td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="uSet('${id}',{codBlocked:${!u.codBlocked}})">${u.codBlocked ? 'Allow COD' : 'Block COD'}</button>
-    <button class="btn l" onclick="uSet('${id}',{suspended:${!u.suspended}})">${u.suspended ? 'Reinstate' : 'Suspend'}</button>
-    <button class="btn l" onclick="uCoins('${id}')">M-Coins</button>
-    <button class="btn l" onclick="uSet('${id}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button></td></tr>`).join('') || '<tr><td colspan="6" class="eb">No customers found</td></tr>';
+let USERS = {}, umId = null;
+const plusOf = u => {
+  const earned = (u.completedOrdersCount||0) >= 12, granted = u.montePlus === true && (!Number(u.plusUntil) || Number(u.plusUntil) > Date.now());
+  return { on: earned || granted, earned, granted, until: Number(u.plusUntil)||0 };
 };
-window.uCoins = async id => {
-  const u = USERS[id] || {}, cur = Number(u.mCoins || 0);
-  const raw = prompt((u.name || 'Customer') + ' has ' + cur + ' M-Coins.\nType +50 to add, -20 to remove, or =200 to set exactly:', '+');
-  if (raw === null) return;
-  const m = raw.trim().match(/^([+\-=]?)\s*(\d+)$/); if (!m) return toast('Use +50, -20 or =200');
-  const op = m[1], n = parseInt(m[2]), next = op === '-' ? Math.max(0, cur - n) : op === '=' ? n : cur + n;
-  const note = (prompt('Reason (optional, customer can see it):', '') || '').trim();
-  try {
-    await runTransaction(ref(db, 'users/' + id + '/mCoins'), v => op === '=' ? n : op === '-' ? Math.max(0, (v || 0) - n) : (v || 0) + n);
-    await push(ref(db, 'users/' + id + '/coinLog'), { delta: next - cur, balance: next, by: 'admin', note, at: Date.now() }).catch(() => {});
-    toast('M-Coins updated: ' + next);
-  } catch(e){ toast('Failed: ' + e.message); }
+const plusLabel = u => { const p = plusOf(u); return p.earned ? 'Earned (12 orders)' : p.granted ? (p.until ? 'Granted until ' + new Date(p.until).toLocaleDateString('en-IN') : 'Granted (lifetime)') : 'Not a member'; };
+window.renderUsers = () => {
+  const all = Object.entries(USERS);
+  $('sC').textContent = all.length;
+  $('sCoin').textContent = all.reduce((t,[,u]) => t + Number(u.mCoins||0), 0).toLocaleString('en-IN');
+  $('sPlus').textContent = all.filter(([,u]) => plusOf(u).on).length;
+  const q = ($('uq').value || '').toLowerCase().trim();
+  const rows = all.filter(([id,u]) => !q || [u.name,u.phone,u.email,id].join(' ').toLowerCase().includes(q)).slice(0, 200);
+  $('ub').innerHTML = rows.map(([id,u]) => `<tr><td><b style="font-weight:500">${esc(u.name||'—')}</b><br><span class="eb">${esc(u.phone||'')} · ${esc(u.email||'')}</span></td><td>${u.completedOrdersCount||0}</td><td>${Number(u.mCoins||0).toLocaleString('en-IN')}</td>
+    <td>${plusOf(u).on ? '<span class="tag">MONTÈ+</span>' : '—'}</td><td>${u.totalCancelCount ?? u.cancelCount ?? 0}</td>
+    <td>${u.suspended ? '<span class="tag">Suspended</span> ' : ''}${u.codBlocked ? '<span class="tag">COD blocked</span>' : ''}${!u.suspended && !u.codBlocked ? '<span class="tag">Normal</span>' : ''}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="openUser('${esc(id)}')">Manage</button></td></tr>`).join('') || '<tr><td colspan="7" class="eb">No customers found</td></tr>';
+  if (umId) paintUser();
 };
 window.uSet = async (id, patch) => { try { await update(ref(db, 'users/' + id), patch); toast('Updated'); } catch(e){ toast('Failed: ' + e.message); } };
-
-/* ---------- Coupons ---------- */
-let COUPONS = {}, cpSel = new Set(), cpEdit = null;
-const toTs = id => { const v = $(id).value; return v ? new Date(v).getTime() : 0; };
-const fromTs = t => t ? new Date(+t - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
-const csv = id => $(id).value.split(',').map(x => x.trim()).filter(Boolean);
-const fdt = t => new Date(+t).toLocaleString('en-IN', {dateStyle:'medium', timeStyle:'short'});
-window.cpType = () => { const f = $('cType').value === 'FLAT'; $('cValL').firstChild.textContent = f ? 'Amount (₹ off)' : 'Percent (%)'; $('cCapL').classList.toggle('hide', f); };
-function fillCpProducts(){
-  const box = $('cProds'); if (!box) return;
-  box.innerHTML = Object.entries(CAT).map(([id,p]) => `<button type="button" class="pk ${cpSel.has(id)?'on':''}" onclick="cpPick('${esc(id)}',this)">${esc(p.name)}</button>`).join('') || '<span class="eb">No products yet</span>';
+window.openUser = id => { umId = id; $('um').classList.add('on'); paintUser(); };
+window.closeUser = () => { umId = null; $('um').classList.remove('on'); };
+function paintUser(){
+  const u = USERS[umId]; if (!u) return closeUser();
+  $('umName').textContent = u.name || '—'; $('umMeta').textContent = [u.email, u.phone, umId].filter(Boolean).join(' · ');
+  const bal = Number(u.mCoins||0); $('umBal').textContent = bal.toLocaleString('en-IN'); $('umVal').textContent = inr(bal);
+  const led = Object.values(u.coinLedger || {}).sort((a,b) => (b.ts||0)-(a.ts||0)).slice(0, 8);
+  $('umLedger').innerHTML = led.length ? led.map(e => { const d = Number(e.delta)||0; return `<div class="lg"><div>${esc(e.reason||'Adjustment')}<small>${new Date(e.ts||0).toLocaleString('en-IN')} · balance ${e.balance ?? ''}</small></div><b class="${d>=0?'up':'dn'}">${d>=0?'+':'−'}${Math.abs(d)}</b></div>`; }).join('') : '<p class="eb">No adjustments yet</p>';
+  $('umPlus').innerHTML = `<span class="tag">${esc(plusLabel(u))}</span>`;
+  $('umAct').innerHTML = `<button class="btn l" onclick="uSet('${esc(umId)}',{codBlocked:${!u.codBlocked}})">${u.codBlocked ? 'Allow COD' : 'Block COD'}</button>
+    <button class="btn l" onclick="uSet('${esc(umId)}',{suspended:${!u.suspended}})">${u.suspended ? 'Reinstate' : 'Suspend'}</button>
+    <button class="btn l" onclick="uSet('${esc(umId)}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button>`;
+  const mine = Object.values(orders).filter(o => o.uid === umId).sort((a,b) => (b.chronologicalCreationTimestamp||0)-(a.chronologicalCreationTimestamp||0)).slice(0, 8);
+  $('umOrders').innerHTML = mine.length ? mine.map(o => `<div class="lg"><div>${esc(o.orderId)}<small>${esc(o.productTitleDescription||'')}</small></div><span>${inr(o.transactionSettlementAmount)} · ${esc(o.orderPipelineTrackingState)}</span></div>`).join('') : '<p class="eb">No orders</p>';
 }
-window.cpPick = (id, b) => { cpSel.has(id) ? cpSel.delete(id) : cpSel.add(id); b.classList.toggle('on'); };
-window.resetCp = () => {
-  cpEdit = null; cpSel = new Set(); $('cpTitle').textContent = 'New coupon'; $('cCode').readOnly = false;
-  ['cCode','cVal','cCap','cMin','cSizes','cCols','cFrom','cTo','cHrs','cDesc'].forEach(i => $(i).value = '');
-  $('cMax').value = 0; $('cUsers').value = 0; $('cPer').value = 1; $('cType').value = 'PERCENT'; $('cCat').selectedIndex = 0; $('cAud').value = 'ALL'; $('cShow').value = '1'; cpType(); fillCpProducts();
+window.quickCoins = d => { $('umMode').value = d > 0 ? 'add' : 'remove'; $('umAmt').value = Math.abs(d); if (!$('umWhy').value.trim()) $('umWhy').value = d > 0 ? 'Goodwill gesture' : 'Balance correction'; };
+window.applyCoins = async () => {
+  const id = umId, mode = $('umMode').value, amt = Math.floor(Number($('umAmt').value));
+  if (!id) return;
+  if (!(amt >= 0) || (mode !== 'set' && amt < 1) || amt > 1000000) return toast('Enter a valid whole amount');
+  const why = $('umWhy').value.trim() || (mode === 'add' ? 'Added by MONTÈ' : mode === 'remove' ? 'Removed by MONTÈ' : 'Balance set by MONTÈ');
+  const who = (USERS[id] || {}).name || id;
+  if (!confirm(`${mode === 'add' ? 'Add' : mode === 'remove' ? 'Remove' : 'Set balance to'} ${amt} M Coins ${mode === 'add' ? 'to' : mode === 'remove' ? 'from' : 'for'} ${who}?`)) return;
+  try {
+    let before = 0;
+    const r = await runTransaction(ref(db, 'users/' + id + '/mCoins'), cur => {
+      before = Number(cur || 0);
+      return mode === 'add' ? before + amt : mode === 'remove' ? Math.max(0, before - amt) : amt;
+    });
+    if (!r.committed) throw new Error('Not saved, try again');
+    const after = Number(r.snapshot.val() || 0);
+    await push(ref(db, 'users/' + id + '/coinLedger'), { ts: Date.now(), delta: after - before, balance: after, reason: why, by: 'admin' });
+    $('umAmt').value = ''; $('umWhy').value = '';
+    toast(`Balance is now ${after} M Coins`);
+  } catch(e){ toast('Failed: ' + e.message); }
 };
-window.editCoupon = code => {
-  const v = COUPONS[code]; if (!v) return; resetCp(); cpEdit = code;
-  $('cpTitle').textContent = 'Edit coupon ' + code; $('cCode').value = code; $('cCode').readOnly = true;
-  $('cType').value = v.type === 'PERCENT' ? 'PERCENT' : 'FLAT'; cpType();
-  $('cVal').value = v.type === 'PERCENT' ? v.value : (v.value ?? v.discount ?? ''); $('cCap').value = v.maxDiscount || ''; $('cMin').value = v.minOrder || '';
-  if (v.category) $('cCat').value = v.category; $('cAud').value = v.audience || 'ALL'; $('cShow').value = v.showOnProduct ? '1' : '0'; $('cDesc').value = v.desc || '';
-  cpSel = new Set(v.products || []); fillCpProducts(); $('cSizes').value = (v.sizes || []).join(', '); $('cCols').value = (v.colors || []).join(', ');
-  $('cFrom').value = fromTs(v.startAt); $('cTo').value = fromTs(v.endAt); $('cMax').value = v.maxUses || 0; $('cUsers').value = v.maxUsers || 0; $('cPer').value = v.perUser ?? 1;
-  window.scrollTo(0, 0);
-};
-const cpState = v => { const n = Date.now(); if (v.active === false) return 'Paused'; if (+v.startAt > n) return 'Scheduled'; if (+v.endAt && +v.endAt < n) return 'Expired'; if (+v.maxUses && (v.uses||0) >= +v.maxUses) return 'Used up'; return 'Active'; };
-function renderCoupons(){
-  const rows = Object.entries(COUPONS);
-  $('cb').innerHTML = rows.map(([code,v]) => {
-    const pct = v.type === 'PERCENT', val = pct ? v.value + '% off' + (v.maxDiscount ? ' (max ' + inr(v.maxDiscount) + ')' : '') : inr(v.value ?? v.discount) + ' off';
-    const names = (v.products || []).map(id => (CAT[id] || {}).name || id).join(', ');
-    const scope = [names || 'All products', (v.sizes||[]).length ? 'Sizes: ' + v.sizes.join(', ') : '', (v.colors||[]).length ? 'Colours: ' + v.colors.join(', ') : '', v.minOrder ? 'Min ' + inr(v.minOrder) : '', v.audience === 'PLUS' ? 'MONTÈ+ only' : v.audience === 'NEW' ? 'New customers' : ''].filter(Boolean).join(' · ');
-    const when = (+v.startAt ? fdt(v.startAt) : 'Now') + ' → ' + (+v.endAt ? fdt(v.endAt) : 'No expiry');
-    const users = Object.keys(v.usedBy || {}).length;
-    const use = (v.uses || 0) + (+v.maxUses ? ' / ' + v.maxUses : '') + ' uses<br>' + users + (+v.maxUsers ? ' / ' + v.maxUsers : '') + ' customers' + (v.perUser === 0 ? '' : ' · ' + (v.perUser ?? 1) + ' each');
-    return `<tr><td><b style="font-weight:500">${esc(code)}</b><br><span class="eb">${esc(v.category||'General')}${v.showOnProduct?' · public':''}</span></td><td>${esc(val)}</td><td style="max-width:260px">${esc(scope)}</td><td>${esc(when)}</td><td>${use}</td>
-    <td><span class="tag">${cpState(v)}</span></td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editCoupon('${esc(code)}')">Edit</button> <button class="btn l" onclick="togCoupon('${esc(code)}',${v.active===false})">${v.active===false?'Activate':'Pause'}</button>
-    <button class="btn l" onclick="delCoupon('${esc(code)}')">Delete</button></td></tr>`;
-  }).join('') || '<tr><td colspan="7" style="text-align:center;color:#999;padding:40px">No coupons yet</td></tr>';
-}
-const pubOffer = (code, d) => ({ code, category: d.category || 'General', audience: d.audience || 'ALL', type: d.type, value: d.value, maxDiscount: d.maxDiscount || 0, minOrder: d.minOrder || 0, products: d.products || [], sizes: d.sizes || [], colors: d.colors || [], startAt: d.startAt || 0, endAt: d.endAt || 0, desc: d.desc || '' });
-const syncOffer = (code, d) => (d.showOnProduct && d.active !== false) ? set(ref(db, 'publicOffers/' + code), pubOffer(code, d)) : remove(ref(db, 'publicOffers/' + code));
-window.addCoupon = async () => {
-  const code = $('cCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), type = $('cType').value, val = parseFloat($('cVal').value);
-  if (!code) return toast('Enter a code');
-  if (!cpEdit && COUPONS[code]) return toast('This code already exists. Use Edit.');
-  if (!(val > 0)) return toast('Enter the discount value');
-  if (type === 'PERCENT' && val >= 100) return toast('Percent must be below 100');
-  const from = toTs('cFrom'), hrs = parseFloat($('cHrs').value) || 0; let to = toTs('cTo');
-  if (hrs > 0 && !to) to = (from || Date.now()) + hrs * 36e5;
-  if (to && from && to <= from) return toast('End must be after start');
-  if (to && to < Date.now()) return toast('End time is already in the past');
-  const old = COUPONS[code] || {}, pu = parseInt($('cPer').value);
-  const d = { category: $('cCat').value, audience: $('cAud').value, type, value: type === 'PERCENT' ? val : Math.round(val), discount: type === 'FLAT' ? Math.round(val) : 0,
-    maxDiscount: type === 'PERCENT' ? Math.max(0, parseInt($('cCap').value) || 0) : 0, minOrder: Math.max(0, parseInt($('cMin').value) || 0),
-    products: [...cpSel], sizes: csv('cSizes'), colors: csv('cCols'), startAt: from, endAt: to,
-    maxUses: Math.max(0, parseInt($('cMax').value) || 0), maxUsers: Math.max(0, parseInt($('cUsers').value) || 0), perUser: isNaN(pu) ? 1 : Math.max(0, pu),
-    showOnProduct: $('cShow').value === '1', desc: $('cDesc').value.trim(), active: old.active !== false, updatedAt: Date.now() };
-  if (!cpEdit) d.createdAt = Date.now();
-  try { await update(ref(db, 'coupons/' + code), d); await syncOffer(code, d).catch(() => toast('Saved, but public offer sync failed (check rules)')); toast(cpEdit ? 'Coupon updated' : 'Coupon added'); resetCp(); }
+window.grantPlus = async () => {
+  const id = umId, days = Math.max(0, Math.floor(Number($('umDays').value) || 0)); if (!id) return;
+  try { await update(ref(db, 'users/' + id), { montePlus: true, plusUntil: days > 0 ? Date.now() + days * 864e5 : null, plusSource: 'admin', plusGrantedAt: Date.now() }); toast(days ? `MONTÈ+ granted for ${days} days` : 'MONTÈ+ granted (lifetime)'); }
   catch(e){ toast('Failed: ' + e.message); }
 };
-window.togCoupon = async (c, a) => { try { await update(ref(db, 'coupons/' + c), { active: a }); await syncOffer(c, { ...COUPONS[c], active: a }).catch(() => {}); toast('Updated'); } catch(e){ toast('Failed: ' + e.message); } };
-window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => remove(ref(db, 'publicOffers/' + c)).catch(() => {})).then(() => toast('Deleted'));
+window.revokePlus = async () => {
+  const id = umId, u = USERS[id] || {}; if (!id) return;
+  if (!u.montePlus) return toast('No granted membership to revoke');
+  if (!confirm('Remove the granted MONTÈ+ membership? (Membership earned through 12 orders stays.)')) return;
+  try { await update(ref(db, 'users/' + id), { montePlus: false, plusUntil: null }); toast('Granted membership removed'); } catch(e){ toast('Failed: ' + e.message); }
+};
+
+/* ---------- Coupons ---------- */
+let COUP = {}, cSel = new Set();
+window.cpForm = () => { const p = $('cKind').value === 'MONTE_PLUS'; $('cpDisc').classList.toggle('hide', p); $('cpPlus').classList.toggle('hide', !p); };
+window.cpScope = () => {
+  cSel = new Set(); const sc = $('cScope').value, box = $('cpScopeBox');
+  let items = [];
+  if (sc === 'GENDER') items = ['WOMEN','MEN','KIDS','UNISEX'].map(x => [x, x[0] + x.slice(1).toLowerCase()]);
+  if (sc === 'CATEGORY') items = [...new Set(Object.values(CAT).map(p => p.category).filter(Boolean))].map(x => [x, x]);
+  if (sc === 'PRODUCT') items = Object.entries(CAT).map(([id,p]) => [id, p.name]);
+  box.innerHTML = items.map(([v,l]) => `<button type="button" data-v="${esc(v)}" onclick="cpPick(this)">${esc(l)}</button>`).join('') || (sc === 'ALL' ? '' : '<span class="eb">Nothing to pick yet</span>');
+};
+window.cpPick = b => { const v = b.dataset.v; cSel.has(v) ? cSel.delete(v) : cSel.add(v); b.classList.toggle('on'); };
+window.genCode = () => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = n => Array.from({length:n}, () => A[Math.floor(Math.random()*A.length)]).join(''); $('cCode').value = ($('cKind').value === 'MONTE_PLUS' ? 'MP-' : 'MNT-') + r(4) + '-' + r(4); };
+const scopeText = v => {
+  const nm = id => (CAT[id] || {}).name || id;
+  if (v.scope === 'GENDER') return 'Sections: ' + Object.values(v.genders || {}).join(', ');
+  if (v.scope === 'CATEGORY') return 'Categories: ' + Object.values(v.categories || {}).join(', ');
+  if (v.scope === 'PRODUCT') return 'Products: ' + Object.values(v.productIds || {}).map(nm).join(', ');
+  return 'Everything';
+};
+function renderCoupons(c){
+  COUP = c;
+  const all = Object.entries(c), plus = all.filter(([,v]) => v.kind === 'MONTE_PLUS'), dis = all.filter(([,v]) => v.kind !== 'MONTE_PLUS');
+  const exp = v => Number(v.expiresAt) > 0 ? new Date(Number(v.expiresAt)).toLocaleDateString('en-IN') + (Date.now() > Number(v.expiresAt) ? ' (expired)' : '') : '—';
+  const used = v => (v.usedCount || 0) + (Number(v.maxUses) > 0 ? ' / ' + v.maxUses : '');
+  const acts = (code, v) => `<td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="navigator.clipboard&&navigator.clipboard.writeText('${esc(code)}').then(()=>toast('Copied'))">Copy</button> <button class="btn l" onclick="togCoupon('${esc(code)}',${!v.active})">${v.active?'Pause':'Activate'}</button> <button class="btn l" onclick="delCoupon('${esc(code)}')">Delete</button></td>`;
+  const st = v => `<td><span class="tag">${v.active ? 'Active' : 'Paused'}</span></td>`;
+  $('cb').innerHTML = dis.map(([code,v]) => `<tr><td><b style="font-weight:500">${esc(code)}</b></td><td>${v.type === 'PERCENT' ? esc(v.percent) + '% off' + (Number(v.maxDiscount) > 0 ? ' (max ' + inr(v.maxDiscount) + ')' : '') : inr(v.discount) + ' off'}${Number(v.minOrder) > 0 ? '<br><span class="eb">Min order ' + inr(v.minOrder) + '</span>' : ''}</td><td>${esc(scopeText(v))}</td><td>${used(v)}</td><td>${exp(v)}</td>${st(v)}${acts(code, v)}</tr>`).join('')
+    || '<tr><td colspan="7" style="text-align:center;color:#999;padding:40px">No coupons yet</td></tr>';
+  $('pb2').innerHTML = plus.map(([code,v]) => `<tr><td><b style="font-weight:500">${esc(code)}</b></td><td>MONTÈ+ ${Number(v.plusDays) > 0 ? 'for ' + v.plusDays + ' days' : '(lifetime)'}</td><td>${used(v)}</td><td>${exp(v)}</td>${st(v)}${acts(code, v)}</tr>`).join('')
+    || '<tr><td colspan="6" style="text-align:center;color:#999;padding:30px">No private passes</td></tr>';
+}
+window.addCoupon = async () => {
+  const code = $('cCode').value.trim().toUpperCase().replace(/[^A-Z0-9_-]/g,''), kind = $('cKind').value;
+  if (!code) return toast('Enter a code');
+  const old = COUP[code] || {};
+  if (COUP[code] && !confirm(code + ' already exists. Replace it? Its usage count is kept.')) return;
+  const exp = $('cExp').value ? new Date($('cExp').value + 'T23:59:59').getTime() : 0, uses = Math.max(0, parseInt($('cUses').value) || 0);
+  let data;
+  if (kind === 'MONTE_PLUS') {
+    data = { kind, discount: 0, plusDays: Math.max(0, parseInt($('cDays').value) || 0), active: true, expiresAt: exp, maxUses: uses, usedCount: old.usedCount || 0, createdAt: old.createdAt || Date.now() };
+  } else {
+    const type = $('cType').value, val = Number($('cDisc').value), sc = $('cScope').value;
+    if (!(val > 0)) return toast('Enter the discount value');
+    if (type === 'PERCENT' && val > 90) return toast('Percent must be 90 or less');
+    if (sc !== 'ALL' && !cSel.size) return toast('Pick at least one ' + (sc === 'GENDER' ? 'section' : sc === 'CATEGORY' ? 'category' : 'product'));
+    const maxOff = Math.max(0, parseInt($('cMax').value) || 0);
+    data = { kind, type, discount: type === 'FLAT' ? Math.round(val) : maxOff, percent: type === 'PERCENT' ? val : 0, maxDiscount: type === 'PERCENT' ? maxOff : 0,
+      minOrder: Math.max(0, parseInt($('cMin').value) || 0), scope: sc, active: true, expiresAt: exp, maxUses: uses, usedCount: old.usedCount || 0, createdAt: old.createdAt || Date.now() };
+    if (sc === 'GENDER') data.genders = [...cSel]; if (sc === 'CATEGORY') data.categories = [...cSel]; if (sc === 'PRODUCT') data.productIds = [...cSel];
+  }
+  try { await set(ref(db, 'coupons/' + code), data); toast('Coupon saved'); $('cCode').value = $('cDisc').value = $('cMax').value = $('cMin').value = $('cExp').value = ''; $('cUses').value = 0; cSel = new Set(); cpScope(); }
+  catch(e){ toast('Failed: ' + e.message); }
+};
+window.togCoupon = (c, a) => update(ref(db, 'coupons/' + c), { active: a }).then(() => toast('Updated'));
+window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => toast('Deleted'));
 </script>
 </body>
 </html>
