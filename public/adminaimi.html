@@ -391,7 +391,7 @@ window.renderOrders = () => {
     const st = (o.orderPipelineTrackingState||'').toUpperCase();
     return `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN')}</span></td>
     <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
-    <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span>${o.trackingNumber ? '<br><span class="eb">' + esc(o.courierName || 'Courier') + ' · ' + esc(o.trackingNumber) + '</span>' : ''}${o.adminNote ? '<br><span class="eb" style="text-transform:none">Note: ' + esc(o.adminNote) + '</span>' : ''}</td>
+    <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span>${o.gstin ? '<br><span class="eb" style="text-transform:none">GST invoice · ' + esc(o.gstin) + ' · ' + esc(o.gstBusinessName || '') + '</span>' : ''}${o.invoiceNo ? '<br><span class="eb">Invoice ' + esc(o.invoiceNo) + '</span>' : ''}${o.trackingNumber ? '<br><span class="eb">' + esc(o.courierName || 'Courier') + ' · ' + esc(o.trackingNumber) + '</span>' : ''}${o.adminNote ? '<br><span class="eb" style="text-transform:none">Note: ' + esc(o.adminNote) + '</span>' : ''}</td>
     <td>${inr(o.transactionSettlementAmount)}<br>${payTag(o)}</td>
     <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="printLabels(['${esc(o.k)}'])">Print label</button> <button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="trackEdit('${esc(o.k)}')">Tracking / note</button> <button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="delOrder('${esc(o.k)}')">Delete</button></td></tr>`;
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
@@ -405,6 +405,13 @@ window.setStatus = async (k, v) => {
   if (online && !paid && v !== 'CANCELLED') { toast('Payment not confirmed by Cashfree yet. Tap "Check payment" first.'); return renderOrders(); }
   try {
     const patch = { orderPipelineTrackingState: v };
+    if (v === 'SHIPPED' && !o.shippedAt) {
+      patch.shippedAt = Date.now(); patch.invoiceDate = patch.shippedAt;
+      if (!o.invoiceNo) { try { const d = new Date(), y0 = d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1, fy = String(y0).slice(2) + '-' + String(y0 + 1).slice(2);
+        const r = await runTransaction(ref(db, 'counters/invoice'), c => (Number(c) || 0) + 1);
+        if (r.committed) patch.invoiceNo = 'MNT/' + fy + '/' + String(r.snapshot.val()).padStart(5, '0'); } catch(e) {} }
+    }
+    if (v === 'DELIVERED') patch.deliveredAt = Date.now();
     if (v === 'CANCELLED') {
       if (!confirm('Cancel this order?' + (online && paid ? ' It is PAID, so a refund will be marked due.' : ''))) return renderOrders();
       patch.cancelledAt = Date.now(); patch.cancelledBy = 'admin'; patch.refundStatus = (online && paid) ? 'PENDING' : 'NOT_REQUIRED';
@@ -513,8 +520,8 @@ function csv(name, rows){
   const blob = new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\n')], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '-' + new Date().toISOString().slice(0,10) + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
-window.exportOrders = () => csv('monte-orders', [['Order','Date','Customer','Email','Address','Item','Method','Code','M Coins used','Paid ₹','Status','Payment']].concat(
-  Object.values(orders).sort((a,b)=>(b.chronologicalCreationTimestamp||0)-(a.chronologicalCreationTimestamp||0)).map(o => [o.orderId, new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN'), o.clientIdentityName, o.email, o.consignmentDeliveryAddressText, o.productTitleDescription, o.protocolMethodType, o.appliedPromoCode, o.appliedMCoins||0, o.transactionSettlementAmount, o.orderPipelineTrackingState, o.paymentStatus])));
+window.exportOrders = () => csv('monte-orders', [['Order','Date','Customer','Email','Address','Item','Method','Code','M Coins used','Paid ₹','Status','Payment','GSTIN','Business name','Invoice no']].concat(
+  Object.values(orders).sort((a,b)=>(b.chronologicalCreationTimestamp||0)-(a.chronologicalCreationTimestamp||0)).map(o => [o.orderId, new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN'), o.clientIdentityName, o.email, o.consignmentDeliveryAddressText, o.productTitleDescription, o.protocolMethodType, o.appliedPromoCode, o.appliedMCoins||0, o.transactionSettlementAmount, o.orderPipelineTrackingState, o.paymentStatus, o.gstin || '', o.gstBusinessName || '', o.invoiceNo || ''])));
 window.exportUsers = () => csv('monte-customers', [['Name','Email','Phone','Valid orders','M Coins','MONTÈ+','Cancels','Suspended','COD blocked']].concat(
   Object.values(USERS).map(u => [u.name, u.email, u.phone, u.completedOrdersCount||0, u.mCoins||0, plusOf(u).on ? 'Yes' : 'No', u.totalCancelCount ?? u.cancelCount ?? 0, u.suspended ? 'Yes':'No', u.codBlocked ? 'Yes':'No'])));
 window.dupProd = id => { const p = JSON.parse(JSON.stringify(CAT[id] || {})); editId = null; p.name = (p.name||'') + ' (copy)'; p.sku = ''; p.status = 'DRAFT'; p.launchTimestamp = 0; fillForm(p); $('pTitle').textContent = 'New product (copy)'; showEdit(); };
@@ -739,12 +746,15 @@ const SHIP_CSS = `@page{size:100mm 150mm;margin:0}
   .from{font-size:7.5pt;line-height:1.35;border-top:.3mm dashed #000;padding-top:2mm;margin-top:auto}
   .ft{display:flex;justify-content:space-between;font-size:7pt;color:#333}`;
 window.printLabels = keys => {
-  const list = keys.map(k => orders[k]).filter(Boolean); if (!list.length) return toast('No orders to print');
+  const all = keys.map(k => orders[k]).filter(Boolean); if (!all.length) return toast('No orders to print');
+  const BLOCK = ['DELIVERED', 'CANCELLED', 'PENDING_PAYMENT'], list = all.filter(o => !BLOCK.includes(String(o.orderPipelineTrackingState || '').toUpperCase()));
+  if (!list.length) return toast('Label cannot be printed: the order is delivered, cancelled or unpaid');
+  if (list.length < all.length) toast((all.length - list.length) + ' delivered/cancelled/unpaid order(s) skipped');
   printDoc(SHIP_CSS, list.map(shipLabel).join(''));
 };
 window.printShown = () => {
   const q = $('q').value.toLowerCase(), f = $('fs').value;
-  const keys = Object.entries(orders).filter(([k, o]) => { const st = String(o.orderPipelineTrackingState || '').toUpperCase(); return st !== 'CANCELLED' && st !== 'PENDING_PAYMENT' && (!f || st === f) && (!q || [o.orderId, o.clientIdentityName, o.email].join(' ').toLowerCase().includes(q)); })
+  const keys = Object.entries(orders).filter(([k, o]) => { const st = String(o.orderPipelineTrackingState || '').toUpperCase(); return st !== 'CANCELLED' && st !== 'PENDING_PAYMENT' && st !== 'DELIVERED' && (!f || st === f) && (!q || [o.orderId, o.clientIdentityName, o.email].join(' ').toLowerCase().includes(q)); })
     .sort((a, b) => (a[1].chronologicalCreationTimestamp || 0) - (b[1].chronologicalCreationTimestamp || 0)).map(x => x[0]).slice(0, 100);
   if (!keys.length) return toast('No orders ready to ship in this list');
   if (!confirm(`Print ${keys.length} shipping label${keys.length > 1 ? 's' : ''}?`)) return;
