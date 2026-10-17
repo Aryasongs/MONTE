@@ -83,6 +83,7 @@ textarea:focus{border-color:#000}
       <button data-t="product">Products</button>
       <button data-t="coupons">Coupons</button>
       <button data-t="users">Customers</button>
+      <button data-t="reviews">Reviews</button>
       <button data-t="settings">Settings</button>
     </nav>
     <button class="btn l" id="codPill" onclick="toggleCod()" title="Stop or resume Cash on Delivery for everyone">COD …</button>
@@ -104,6 +105,7 @@ textarea:focus{border-color:#000}
         <input id="q" placeholder="Search order ID, name, email…" oninput="renderOrders()">
         <select id="fs" onchange="renderOrders()"><option value="">All statuses</option><option>PENDING_PAYMENT</option><option>PLACED</option><option>VERIFIED</option><option>SHIPPED</option><option>DELIVERED</option><option>CANCELLED</option></select>
         <button class="btn l" style="flex:0 0 auto" onclick="exportOrders()">Export CSV</button>
+        <button class="btn l" style="flex:0 0 auto" onclick="printShown()" title="Prints a 4 × 6 in label for every order in the list that is ready to ship">Print shipping labels</button>
       </div>
       <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Amount</th><th>Status</th></tr></thead><tbody id="ob"></tbody></table></div>
     </section>
@@ -130,6 +132,14 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Composition / material *<input id="fComp" placeholder="100% organic cotton, 280 gsm"></label><label class="eb">Made in *<input id="fOrigin" placeholder="India"></label><label class="eb">Model wears<input id="fModel" placeholder="Model is 6'1&quot;, wears size M"></label></div>
         <div class="row"><label class="eb">Details (one per line)<textarea id="fDet" placeholder="Mother-of-pearl buttons&#10;Chest 42 in, length 28 in"></textarea></label>
         <label class="eb">Care instructions *<textarea id="fCare" placeholder="Machine wash cold. Do not bleach."></textarea></label></div>
+        <p class="eb sub">More product information (all optional, shown on the product page)</p>
+        <label class="eb">About this item: key points, one per line<textarea id="fAbout" placeholder="Soft 220 gsm cotton that stays light&#10;Oversized fit, drop shoulder&#10;Pre-washed to avoid shrinking"></textarea></label>
+        <label class="eb">Product information table: one per line as Label: Value<textarea id="fSpecs" placeholder="Neck: Round neck&#10;Sleeve: Half sleeve&#10;Pattern: Solid"></textarea></label>
+        <div class="chipz" style="margin:-4px 0 12px">
+          <span class="eb" style="align-self:center">Quick add:</span>
+          <button type="button" onclick="addSpec('Neck')">Neck</button><button type="button" onclick="addSpec('Sleeve')">Sleeve</button><button type="button" onclick="addSpec('Pattern')">Pattern</button><button type="button" onclick="addSpec('Occasion')">Occasion</button><button type="button" onclick="addSpec('Closure')">Closure</button><button type="button" onclick="addSpec('Item weight')">Weight</button><button type="button" onclick="addSpec('Net quantity')">Net quantity</button><button type="button" onclick="addSpec('Included')">Included</button>
+        </div>
+        <label class="eb">Manufacturer / packer / importer (also printed on the package label)<input id="fMfr" placeholder="Name and address"></label>
         <p class="eb sub">Price &amp; offer</p>
         <div class="row"><label class="eb">Selling price ₹ *<input id="fPrice" type="number" min="1" oninput="calcOff()"></label><label class="eb">MRP ₹ *<input id="fMrp" type="number" min="1" oninput="calcOff()"></label><label class="eb">Discount<input id="fOff" disabled></label></div>
         <div class="row"><label class="eb">Offer line on product page<input id="fOffer" placeholder="Buy now and get free delivery"></label><label class="eb">Tag (shown on photo)<input id="fBadge" placeholder="NEW, BESTSELLER"></label></div>
@@ -178,6 +188,10 @@ textarea:focus{border-color:#000}
       <p class="eb" style="margin:28px 0 8px">Private MONTÈ+ passes (secret)</p>
       <div class="tw"><table style="min-width:760px"><thead><tr><th>Code</th><th>Gives</th><th>Used</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody id="pb2"></tbody></table></div>
     </section>
+  <section id="t-reviews" class="hide">
+      <div class="row" style="margin-bottom:12px"><input id="rq" placeholder="Search product, customer or text…" oninput="renderReviewsAdmin()"></div>
+      <div class="tw"><table style="min-width:760px"><thead><tr><th>Product</th><th>Customer</th><th>Rating</th><th>Review</th><th>Date</th><th></th></tr></thead><tbody id="rb"></tbody></table></div>
+    </section>
   <section id="t-users" class="hide">
       <div class="card"><div class="row" style="align-items:flex-end"><label class="eb">Search customer (name, phone or email)<input id="uq" oninput="renderUsers()" placeholder="Type to search"></label><button class="btn l" style="flex:0 0 auto" onclick="exportUsers()">Export CSV</button></div></div>
       <div class="tw"><table style="min-width:760px"><thead><tr><th>Customer</th><th>Orders</th><th>M Coins</th><th>MONTÈ+</th><th>Cancels</th><th>Status</th><th></th></tr></thead><tbody id="ub"></tbody></table></div>
@@ -188,6 +202,7 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Cash on delivery (all customers, worldwide)<select id="sCod"><option value="1">Enabled</option><option value="0">Stopped for everyone</option></select></label><label class="eb">Message shown when COD is stopped<input id="sCodMsg" placeholder="COD is paused. Please pay online."></label></div>
         <div class="row"><label class="eb">Accept orders<select id="sMaint"><option value="0">Yes, store open</option><option value="1">Paused (no orders)</option></select></label><label class="eb">Pause message<input id="sMaintMsg" placeholder="Orders are paused. Back soon."></label><label class="eb">Live chat<select id="sChat"><option value="1">On</option><option value="0">Off</option></select></label></div>
         <div class="row"><label class="eb">Express delivery fee (₹)<input id="sExp" type="number" min="0"></label><label class="eb">COD cool-off after repeat cancels (days)<input id="sCodDays" type="number" min="0"></label><label class="eb">Cancels before account suspension<input id="sMaxC" type="number" min="1"></label></div>
+        <div class="row"><label class="eb">Bag checkout<select id="sMulti"><option value="0">One item per order (works with the current worker)</option><option value="1">Many items and quantity in one order (turn on only after the worker update)</option></select></label></div>
       </div>
       <div class="card">
         <p class="eb">Website offer banner (top strip)</p>
@@ -202,6 +217,22 @@ textarea:focus{border-color:#000}
     </section>
   </main>
 </div>
+<div id="lm" class="mdl"><div class="pn" style="max-width:780px">
+  <button class="x" onclick="closeLabels()">&times;</button>
+  <p class="eb">Barcode labels</p>
+  <p id="lmName" style="font-size:18px;margin:6px 0 4px"></p>
+  <p class="eb" style="text-transform:none;letter-spacing:0">One unique Code 128 barcode per colour and size, ready to stick on the garment or its bag. Any barcode scanner reads them.</p>
+  <div class="row" style="margin-top:14px">
+    <label class="eb">Label size<select id="lmSize" onchange="lmPrev()"><option value="50x25">Small · 50 × 25 mm (label roll)</option><option value="60x40">Medium · 60 × 40 mm (label roll)</option><option value="A4">A4 sheet · 3 × 8 labels</option></select></label>
+    <label class="eb">Show MRP on label<select id="lmMrp" onchange="lmPrev()"><option value="1">Yes</option><option value="0">No</option></select></label>
+    <label class="eb">Copies for every variant<input id="lmCopies" type="number" min="1" max="200" value="1" oninput="lmAll()"></label>
+  </div>
+  <p class="eb sub">Variants to print</p>
+  <div id="lmVars"></div>
+  <p class="eb sub">Preview</p>
+  <div id="lmPrev" style="background:#f4f3f1;padding:18px;display:flex;justify-content:center"></div>
+  <div style="display:flex;gap:10px;margin-top:18px"><button class="btn" onclick="printProductLabels()">Print labels</button><button class="btn l" onclick="closeLabels()">Close</button></div>
+</div></div>
 <div id="um" class="mdl"><div class="pn">
   <button class="x" onclick="closeUser()">&times;</button>
   <p class="eb">Customer</p>
@@ -300,6 +331,8 @@ function start(){
   onValue(ref(db,'catalog'), s => { CAT = s.val() || {}; renderProducts(); });
   onValue(ref(db,'settings'), s => { if (!document.activeElement || !document.activeElement.closest('#t-settings')) fillSettings(s.val() || {}); });
   onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
+  onValue(ref(db,'reviews'), s => { REV = s.val() || {}; renderReviewsAdmin(); }, () => {});
+  onValue(ref(db,'settings/business'), s => { BIZ = s.val() || {}; }, () => {});
 }
 
 /* ---------- Orders ---------- */
@@ -334,7 +367,7 @@ window.renderOrders = () => {
     <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
     <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span></td>
     <td>${inr(o.transactionSettlementAmount)}<br>${payTag(o)}</td>
-    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}</td></tr>`;
+    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="printLabels(['${esc(o.k)}'])">Print label</button></td></tr>`;
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
 };
 window.setStatus = async (k, v) => {
@@ -370,7 +403,7 @@ function renderProducts(){
     <td><b style="font-weight:500">${esc(p.name)}</b><br><span class="eb">${esc(p.category)} ${p.sku?'· '+esc(p.sku):''}</span></td>
     <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
     <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
-    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="dupProd('${esc(id)}')">Duplicate</button> <button class="btn l" onclick="togProd('${esc(id)}')">${p.status==='DRAFT'?'Show':'Hide'}</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
+    <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="openLabels('${esc(id)}')">Barcode labels</button> <button class="btn l" onclick="dupProd('${esc(id)}')">Duplicate</button> <button class="btn l" onclick="togProd('${esc(id)}')">${p.status==='DRAFT'?'Show':'Hide'}</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
     || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
 }
 const F = id => $(id);
@@ -379,7 +412,7 @@ window.editProd = id => { editId = id; fillForm(CAT[id]); $('pTitle').textConten
 function showEdit(){ $('plist').classList.add('hide'); $('pedit').classList.remove('hide'); window.scrollTo(0,0); }
 window.closeEdit = () => { $('pedit').classList.add('hide'); $('plist').classList.remove('hide'); };
 function fillForm(p){
-  F('fKw').value = p.keywords||''; F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
+  F('fKw').value = p.keywords||''; F('fAbout').value = Object.values(p.about||{}).join('\n'); F('fSpecs').value = Object.values(p.specs||{}).map(x=>x.k+': '+x.v).join('\n'); F('fMfr').value = p.mfr||''; F('fName').value = p.name||''; F('fCat').value = p.category||''; F('fSku').value = p.sku||''; F('fDesc').value = p.description||'';
   F('fDet').value = (p.details||[]).join('\n'); F('fCare').value = p.care||''; F('fPrice').value = p.price||''; F('fMrp').value = p.mrp||'';
   F('fOffer').value = p.offerText||''; F('fBadge').value = p.badge||''; F('fStatus').value = p.status||'ACTIVE'; F('fLaunch').value = p.launchTimestamp ? new Date(+p.launchTimestamp - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
   F('fImgs').value = (p.images||[]).join('\n'); F('fGen').value=p.gender||'WOMEN'; F('fColl').value=p.collection||''; F('fFit').value=p.fit||''; F('fComp').value=p.composition||''; F('fOrigin').value=p.origin||''; F('fModel').value=p.model||''; $('colRows').innerHTML=''; (p.colors||[]).forEach(c=>addCol(c)); if(!(p.colors||[]).length)addCol(); catOpts(); if(!p.sku)F('fSku').value=genSku();
@@ -410,7 +443,7 @@ window.saveProd = async () => {
   const id = editId || slug(name) + '-' + Math.random().toString(36).slice(2,6), old = CAT[id] || {};
   const sizes = parseSizes(), colors = parseCols();
   const valid = new Set([...sizes, ...colors.map(c=>c.name)].map(x=>x.toUpperCase()));
-  const data = { keywords: F('fKw').value.trim(), name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
+  const data = { about: F('fAbout').value.split('\n').map(x=>x.trim()).filter(Boolean), specs: F('fSpecs').value.split('\n').map(x=>{const i=x.indexOf(':');return i>0?{k:x.slice(0,i).trim(),v:x.slice(i+1).trim()}:null}).filter(x=>x&&x.k&&x.v), mfr: F('fMfr').value.trim(), keywords: F('fKw').value.trim(), name, category: F('fCat').value.trim(), sku: F('fSku').value.trim()||genSku(), gender:F('fGen').value, collection:F('fColl').value.trim(), fit:F('fFit').value.trim(), composition:F('fComp').value.trim(), origin:F('fOrigin').value.trim(), model:F('fModel').value.trim(), variantSkus:Object.fromEntries(colors.flatMap(c=>sizes.map(z=>[`${c.name}|${z}`,`${F('fSku').value.trim()||'MNT'}-${c.name.replace(/[^a-z]/gi,'').slice(0,3).toUpperCase()}-${z}`]))), description: F('fDesc').value.trim(),
     details: F('fDet').value.split('\n').map(x=>x.trim()).filter(Boolean), care: F('fCare').value.trim(),
     price, mrp: Math.max(mrp, price), offerText: F('fOffer').value.trim(), badge: F('fBadge').value.trim(), status: F('fStatus').value,
     images, colors, sizes, oosVariants: [...oosSet].filter(v => valid.has(v)), launchTimestamp: launchTs, createdAt: old.createdAt || Date.now() };
@@ -431,7 +464,7 @@ function fillSettings(v){
   const s = v.site || {}, b = v.business || {};
   $('sBanner').value = s.offerText || ''; $('sBannerOn').value = s.offerActive ? '1' : '0';
   $('sCod').value = s.codEnabled === false ? '0' : '1'; $('sCodMsg').value = s.codOffText || ''; $('sMaint').value = s.maintenance ? '1' : '0'; $('sMaintMsg').value = s.maintenanceText || ''; $('sChat').value = s.chatEnabled === false ? '0' : '1';
-  $('sExp').value = s.expressFee ?? 150; $('sCodDays').value = s.codDays ?? 24; $('sMaxC').value = s.maxCancels ?? 15;
+  $('sMulti').value = s.multiItem ? '1' : '0'; $('sExp').value = s.expressFee ?? 150; $('sCodDays').value = s.codDays ?? 24; $('sMaxC').value = s.maxCancels ?? 15;
   const p = $('codPill'); if (p) { p.textContent = s.codEnabled === false ? 'COD: STOPPED ● Resume' : 'COD: ON ● Stop'; p.style.color = s.codEnabled === false ? '#b4231a' : ''; }
   $('sName').value = b.legalName||''; $('sGst').value = b.gstin||''; $('sMail').value = b.email||''; $('sPhone').value = b.phone||'';
   $('sAddr').value = b.address||''; $('sGrv').value = b.grievanceName||''; $('sGrvMail').value = b.grievanceEmail||''; $('sRet').value = b.returnDays ?? 7;
@@ -440,7 +473,7 @@ window.saveSettings = async () => {
   try {
     await update(ref(db, 'settings/site'), { offerText: $('sBanner').value.trim(), offerActive: $('sBannerOn').value === '1',
       codEnabled: $('sCod').value === '1', codOffText: $('sCodMsg').value.trim(), maintenance: $('sMaint').value === '1', maintenanceText: $('sMaintMsg').value.trim(), chatEnabled: $('sChat').value === '1',
-      expressFee: Math.max(0, parseInt($('sExp').value) || 0), codDays: Math.max(0, parseInt($('sCodDays').value) || 0), maxCancels: Math.max(1, parseInt($('sMaxC').value) || 15) });
+      multiItem: $('sMulti').value === '1', expressFee: Math.max(0, parseInt($('sExp').value) || 0), codDays: Math.max(0, parseInt($('sCodDays').value) || 0), maxCancels: Math.max(1, parseInt($('sMaxC').value) || 15) });
     await update(ref(db, 'settings/business'), { legalName: $('sName').value.trim(), gstin: $('sGst').value.trim(), email: $('sMail').value.trim(), phone: $('sPhone').value.trim(),
       address: $('sAddr').value.trim(), grievanceName: $('sGrv').value.trim(), grievanceEmail: $('sGrvMail').value.trim(), returnDays: Math.max(0, parseInt($('sRet').value) || 0) });
     toast('Settings saved'); } catch(e){ toast('Failed: ' + e.message); }
@@ -588,6 +621,121 @@ window.addCoupon = async () => {
 };
 window.togCoupon = (c, a) => update(ref(db, 'coupons/' + c), { active: a }).then(() => toast('Updated'));
 window.delCoupon = c => confirm('Delete ' + c + '?') && remove(ref(db, 'coupons/' + c)).then(() => toast('Deleted'));
+/* ---------- Code 128 barcode ---------- */
+const C128 = ['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
+function c128bits(text){
+  const v = [104];
+  for (const ch of String(text)) { let c = ch.charCodeAt(0); if (c < 32 || c > 126) c = 63; v.push(c - 32); }
+  let sum = v[0]; for (let i = 1; i < v.length; i++) sum += i * v[i];
+  v.push(sum % 103, 106);
+  let bits = ''; v.forEach(x => { const p = C128[x]; for (let i = 0; i < p.length; i++) bits += (i % 2 === 0 ? '1' : '0').repeat(+p[i]); });
+  return bits;
+}
+function bcSvg(text, h){
+  const bits = '0'.repeat(10) + c128bits(text) + '0'.repeat(10); let r = '', i = 0;
+  while (i < bits.length) { if (bits[i] === '1') { let j = i; while (bits[j] === '1') j++; r += `<rect x="${i}" y="0" width="${j - i}" height="${h}"/>`; i = j; } else i++; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${bits.length} ${h}" preserveAspectRatio="none" shape-rendering="crispEdges" style="display:block;width:100%;height:100%"><g fill="#000">${r}</g></svg>`;
+}
+function printDoc(css, body){
+  const f = document.createElement('iframe'); f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f);
+  const d = f.contentDocument; d.open(); d.write(`<!doctype html><html><head><meta charset="utf-8"><title>Print</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;color:#000}${css}</style></head><body>${body}</body></html>`); d.close();
+  setTimeout(() => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch(e) { toast('Could not open print'); } setTimeout(() => f.remove(), 60000); }, 350);
+}
+
+/* ---------- Product barcode labels ---------- */
+let REV = {}, BIZ = {}, lmId = null, lmRows = [];
+window.addSpec = k => { const t = $('fSpecs'); t.value = (t.value.trim() ? t.value.replace(/\s*$/, '\n') : '') + k + ': '; t.focus(); };
+function variantsOf(id){
+  const p = CAT[id] || {}, cols = (p.colors && p.colors.length) ? p.colors.map(c => c.name) : [''], sizes = (p.sizes && p.sizes.length) ? p.sizes : ['One Size'], base = (p.sku || id).toUpperCase().replace(/[^A-Z0-9-]/g, '');
+  return cols.flatMap(c => sizes.map(z => ({ color: c, size: z, code: ((p.variantSkus || {})[c + '|' + z] || (base + (c ? '-' + c.replace(/[^a-z]/gi, '').slice(0, 3).toUpperCase() : '') + '-' + z)).replace(/[^A-Za-z0-9-]/g, '') })));
+}
+window.openLabels = id => {
+  lmId = id; const p = CAT[id] || {}; $('lmName').textContent = p.name || '';
+  lmRows = variantsOf(id);
+  $('lmVars').innerHTML = lmRows.map((v, i) => `<div class="lg" style="align-items:center"><label style="display:flex;gap:10px;align-items:center;cursor:pointer"><input type="checkbox" id="lv${i}" checked style="width:auto" onchange="lmPrev()"><span>${esc(v.color ? v.color + ' · ' : '')}Size ${esc(v.size)}<small>${esc(v.code)}</small></span></label><input type="number" id="lq${i}" min="1" max="200" value="1" style="width:80px" aria-label="Copies"></div>`).join('');
+  $('lm').classList.add('on'); lmPrev();
+};
+window.closeLabels = () => { lmId = null; $('lm').classList.remove('on'); };
+window.lmAll = () => { const n = Math.max(1, Math.min(200, parseInt($('lmCopies').value) || 1)); lmRows.forEach((_, i) => { const e = $('lq' + i); if (e) e.value = n; }); };
+const LB = { '50x25': [50, 25], '60x40': [60, 40], 'A4': [64, 34] };
+function labelHtml(p, v, mrp, size){
+  const brand = esc(BIZ.legalName || 'MONTÈ'), big = size !== '50x25', cls = size === '50x25' ? 's' : 'm';
+  const mfr = big && p.mfr ? `<div class="mf">${esc(p.mfr)}</div>` : '';
+  return `<div class="lb ${cls}"><div class="br">${brand}${p.origin ? ' · Made in ' + esc(p.origin) : ''}</div><div class="nm">${esc(p.name)}</div><div class="vr">${esc(v.color ? v.color + ' · ' : '')}Size ${esc(v.size)}</div><div class="bc">${bcSvg(v.code, 40)}</div><div class="cd">${esc(v.code)}</div>${mrp ? `<div class="mr">MRP ₹${Number(p.mrp || p.price).toLocaleString('en-IN')} <span>(incl. of all taxes)</span></div>` : ''}${mfr}</div>`;
+}
+const LABEL_CSS = size => { const [w, h] = LB[size]; const a4 = size === 'A4'; return `${a4 ? '@page{size:A4;margin:10mm 7mm}' : `@page{size:${w}mm ${h}mm;margin:0}`}
+  .sheet{${a4 ? 'display:grid;grid-template-columns:repeat(3,64mm);grid-auto-rows:34mm;' : ''}}
+  .lb{width:${w}mm;height:${h}mm;padding:${a4 ? '2.5mm' : '1.8mm 2.2mm'};overflow:hidden;display:flex;flex-direction:column;page-break-inside:avoid;${a4 ? '' : 'page-break-after:always;'}}
+  .lb .br{font-size:${size === '50x25' ? '5.5pt' : '6.5pt'};letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lb .nm{font-size:${size === '50x25' ? '7pt' : '8.5pt'};font-weight:700;line-height:1.15;max-height:2.3em;overflow:hidden;margin-top:.4mm}
+  .lb .vr{font-size:${size === '50x25' ? '6.5pt' : '7.5pt'};margin-top:.3mm}
+  .lb .bc{flex:1;min-height:6mm;margin-top:1mm}
+  .lb .cd{font-size:${size === '50x25' ? '6pt' : '7pt'};text-align:center;letter-spacing:.08em;margin-top:.6mm;font-family:'Courier New',monospace}
+  .lb .mr{font-size:${size === '50x25' ? '7pt' : '8.5pt'};font-weight:700;margin-top:.6mm}.lb .mr span{font-weight:400;font-size:5.5pt}
+  .lb .mf{font-size:5pt;line-height:1.2;margin-top:.5mm;max-height:2.4em;overflow:hidden}`; };
+window.lmPrev = () => {
+  if (!lmId) return; const p = CAT[lmId] || {}, size = $('lmSize').value, i = lmRows.findIndex((_, k) => $('lv' + k) && $('lv' + k).checked);
+  const css = LABEL_CSS(size).replace(/@page\{[^}]*\}/, '').replace(/page-break-[a-z]+:[a-z]+;/g, '').replace(/\.sheet\{[^}]*\}/, '');
+  $('lmPrev').innerHTML = i < 0 ? '<p class="eb">Pick at least one variant</p>' : `<style>#lmPrev .lb{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);font-family:Arial,sans-serif;color:#000}${css.replace(/\.lb/g, '#lmPrev .lb')}</style>${labelHtml(p, lmRows[i], $('lmMrp').value === '1', size)}`;
+};
+window.printProductLabels = () => {
+  const p = CAT[lmId] || {}, size = $('lmSize').value, mrp = $('lmMrp').value === '1'; let out = '', n = 0;
+  lmRows.forEach((v, i) => { if (!$('lv' + i).checked) return; const c = Math.max(1, Math.min(200, parseInt($('lq' + i).value) || 1)); for (let k = 0; k < c; k++) { out += labelHtml(p, v, mrp, size); n++; } });
+  if (!n) return toast('Pick at least one variant');
+  printDoc(LABEL_CSS(size), `<div class="sheet">${out}</div>`);
+};
+
+/* ---------- Shipping / package labels ---------- */
+function parseAddr(t){
+  t = String(t || ''); const ph = (t.match(/\(PH:\s*([^)]*)\)/) || [])[1] || '', pin = (t.match(/PIN:\s*(\d+)/) || [])[1] || '';
+  return { ph, pin, addr: t.replace(/\(PH:[^)]*\)/, '').replace(/PIN:\s*\d+/, '').replace(/\s+/g, ' ').replace(/[,\s]+$/, '').trim() };
+}
+function shipLabel(o){
+  const ad = parseAddr(o.consignmentDeliveryAddressText), cod = String(o.protocolMethodType) === 'COD', amt = Number(o.transactionSettlementAmount || 0).toLocaleString('en-IN');
+  const raw = o.items ? (Array.isArray(o.items) ? o.items : Object.values(o.items)) : [];
+  const items = raw.length ? raw.map(x => ({ n: x.name || x.productTitleDescription || x.productId, c: x.color || '', z: x.size || '', q: x.qty || 1 })) : [{ n: o.productTitleDescription || '', c: o.selectedShadeColorContext || '', z: o.selectedSizeFitDimension || '', q: 1 }];
+  const from = [BIZ.legalName || 'MONTÈ', BIZ.address, BIZ.phone ? 'Ph: ' + BIZ.phone : '', BIZ.gstin ? 'GSTIN: ' + BIZ.gstin : ''].filter(Boolean).map(esc).join('<br>');
+  return `<div class="ship"><div class="top"><div class="brand">${esc(BIZ.legalName || 'MONTÈ')}</div><div class="pay ${cod ? 'cod' : ''}">${cod ? 'COD<br>Collect ₹' + amt : 'PREPAID'}</div></div>
+    <div class="to"><small>SHIP TO</small><b>${esc(o.clientIdentityName)}</b><div>${esc(ad.addr)}</div>${ad.pin ? `<div class="pin">PIN ${esc(ad.pin)}</div>` : ''}${ad.ph ? `<div>Phone: ${esc(ad.ph)}</div>` : ''}</div>
+    <div class="bcw"><div class="bcs">${bcSvg(o.orderId || '', 50)}</div><div class="oid">${esc(o.orderId)}</div></div>
+    <table class="it"><thead><tr><th>Item</th><th>Colour</th><th>Size</th><th>Qty</th></tr></thead><tbody>${items.map(x => `<tr><td>${esc(x.n)}</td><td>${esc(x.c)}</td><td>${esc(x.z)}</td><td>${esc(x.q)}</td></tr>`).join('')}</tbody></table>
+    <div class="from"><small>FROM</small><div>${from}</div></div>
+    <div class="ft"><span>Order date ${new Date(o.chronologicalCreationTimestamp || 0).toLocaleDateString('en-IN')}</span><span>Order value ₹${amt}</span></div></div>`;
+}
+const SHIP_CSS = `@page{size:100mm 150mm;margin:0}
+  .ship{width:100mm;height:150mm;padding:4mm;border:.4mm solid #000;display:flex;flex-direction:column;gap:2.4mm;page-break-after:always;overflow:hidden}
+  .ship small{display:block;font-size:6.5pt;letter-spacing:.14em;color:#444;margin-bottom:.8mm}
+  .top{display:flex;justify-content:space-between;align-items:center;border-bottom:.4mm solid #000;padding-bottom:2mm}
+  .brand{font-size:15pt;font-weight:700;letter-spacing:.12em}
+  .pay{border:.5mm solid #000;padding:1.2mm 3mm;font-size:10pt;font-weight:700;text-align:center;line-height:1.25}.pay.cod{background:#000;color:#fff}
+  .to b{font-size:13pt;display:block;margin-bottom:.8mm}.to div{font-size:9.5pt;line-height:1.35}.to .pin{font-size:13pt;font-weight:700;margin-top:1mm}
+  .bcw{height:26mm;display:flex;flex-direction:column}.bcs{flex:1;min-height:0;overflow:hidden}.oid{text-align:center;font:9pt 'Courier New',monospace;letter-spacing:.1em;margin-top:.8mm}
+  .it{width:100%;border-collapse:collapse;font-size:8pt}.it th,.it td{border:.25mm solid #000;padding:1mm 1.4mm;text-align:left;vertical-align:top}.it th{background:#eee}
+  .from{font-size:7.5pt;line-height:1.35;border-top:.3mm dashed #000;padding-top:2mm;margin-top:auto}
+  .ft{display:flex;justify-content:space-between;font-size:7pt;color:#333}`;
+window.printLabels = keys => {
+  const list = keys.map(k => orders[k]).filter(Boolean); if (!list.length) return toast('No orders to print');
+  printDoc(SHIP_CSS, list.map(shipLabel).join(''));
+};
+window.printShown = () => {
+  const q = $('q').value.toLowerCase(), f = $('fs').value;
+  const keys = Object.entries(orders).filter(([k, o]) => { const st = String(o.orderPipelineTrackingState || '').toUpperCase(); return st !== 'CANCELLED' && st !== 'PENDING_PAYMENT' && (!f || st === f) && (!q || [o.orderId, o.clientIdentityName, o.email].join(' ').toLowerCase().includes(q)); })
+    .sort((a, b) => (a[1].chronologicalCreationTimestamp || 0) - (b[1].chronologicalCreationTimestamp || 0)).map(x => x[0]).slice(0, 100);
+  if (!keys.length) return toast('No orders ready to ship in this list');
+  if (!confirm(`Print ${keys.length} shipping label${keys.length > 1 ? 's' : ''}?`)) return;
+  printLabels(keys);
+};
+
+/* ---------- Reviews moderation ---------- */
+window.renderReviewsAdmin = () => {
+  const q = ($('rq') ? $('rq').value : '').toLowerCase().trim(), rows = [];
+  Object.entries(REV).forEach(([pid, m]) => Object.entries(m || {}).forEach(([uid, r]) => { if (r && r.starRating) rows.push({ pid, uid, ...r }); }));
+  rows.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  const shown = rows.filter(r => !q || [((CAT[r.pid] || {}).name || r.pid), r.reviewerName, r.writtenReview].join(' ').toLowerCase().includes(q));
+  $('rb').innerHTML = shown.map(r => `<tr><td>${esc((CAT[r.pid] || {}).name || r.pid)}</td><td>${esc(r.reviewerName || 'Customer')}</td><td style="color:#b8860b;white-space:nowrap">${'★'.repeat(Math.round(r.starRating))}${'☆'.repeat(5 - Math.round(r.starRating))}</td><td style="max-width:360px">${esc(r.writtenReview || '—')}</td><td>${new Date(r.timestamp || 0).toLocaleDateString('en-IN')}</td><td style="text-align:right"><button class="btn l" onclick="delReview('${esc(r.pid)}','${esc(r.uid)}')">Delete</button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:#999;padding:40px">No reviews yet</td></tr>';
+};
+window.delReview = (pid, uid) => confirm('Delete this review permanently?') && remove(ref(db, `reviews/${pid}/${uid}`)).then(() => toast('Review deleted')).catch(e => toast('Failed: ' + e.message));
 </script>
 </body>
 </html>
