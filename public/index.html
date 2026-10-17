@@ -575,6 +575,15 @@ input,textarea,select{font-size:16px}
                         </div>
                     </div>
 
+                    <div class="mb-10" data-no-fx>
+                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="gstToggle" onchange="gstUi()" style="width:auto"><span class="premium-label text-black" style="margin:0">Use GST invoice (business purchase)</span></label>
+                        <div id="gstBox" class="hidden mt-5" style="display:none">
+                            <input type="text" id="gstNo" maxlength="15" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');gstUi(1)" placeholder="15-DIGIT GSTIN" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.15em] uppercase bg-transparent text-[11px]">
+                            <input type="text" id="gstName" maxlength="80" placeholder="BUSINESS / LEGAL NAME" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] uppercase bg-transparent text-[11px] mt-2">
+                            <p id="gstMsg" class="text-[10px] text-neutral-500 mt-3" style="line-height:1.7;letter-spacing:.02em">Your GSTIN and business name will appear on the tax invoice. Like on Amazon and Flipkart, GSTIN cannot be added or changed after the order is placed.</p>
+                        </div>
+                    </div>
+
                     <div id="mCoinsRedemptionBox" class="mb-12 hidden premium-border p-6 bg-[#FAFAFA] flex items-center justify-between">
                         <div>
                             <span class="font-medium uppercase tracking-[0.15em] text-black block mb-1.5 text-[10px]">Vault Balance</span>
@@ -1121,6 +1130,9 @@ input,textarea,select{font-size:16px}
 
         // OTP States
         let tempOrderDetails = null;
+        window.gstOk = function(g) { g = String(g || '').toUpperCase(); if(!/^(0[1-9]|[12][0-9]|3[0-8])[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(g)) return false; const C = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; let t = 0; for(let i = 0; i < 14; i++) { const v = C.indexOf(g[i]) * (i % 2 ? 2 : 1); t += Math.floor(v / 36) + v % 36; } return C[(36 - t % 36) % 36] === g[14]; };
+        window.gstUi = function(typing) { const on = document.getElementById('gstToggle').checked, b = document.getElementById('gstBox'); b.style.display = on ? 'block' : 'none'; b.classList.toggle('hidden', !on); if(typing) { const g = document.getElementById('gstNo').value, m = document.getElementById('gstMsg'); if(g.length === 15) { const ok = gstOk(g); m.style.color = ok ? '#14804a' : '#b4231a'; m.textContent = ok ? 'GSTIN looks valid. State code ' + g.slice(0, 2) + '.' : 'This GSTIN is not valid. Please check it.'; } } };
+        window.gstPayload = function() { const t = document.getElementById('gstToggle'); if(!t || !t.checked) return null; return { gstin: document.getElementById('gstNo').value.trim().toUpperCase(), name: document.getElementById('gstName').value.trim() }; };
         let currentOTP = null;
         let otpResendCount = 0;
         let cancelConfirmState = false; 
@@ -1992,6 +2004,7 @@ input,textarea,select{font-size:16px}
             }
 
             if(userCompletedOrdersCount === 0) {
+                { const gp = gstPayload(); if(gp) { if(!gstOk(gp.gstin)) return showToast('ENTER A VALID 15-DIGIT GSTIN, OR TURN OFF GST INVOICE.', 'error'); if(gp.name.length < 3) return showToast('ENTER YOUR BUSINESS NAME FOR THE GST INVOICE.', 'error'); } }
                 tempOrderDetails = { method: method, btnElement: btnElement, address, pin, city, state, phone, fullName };
                 otpResendCount = 0;
                 document.getElementById('otpSpamWarning').classList.add('hidden');
@@ -2071,8 +2084,10 @@ input,textarea,select{font-size:16px}
                     shipping: shippingSpeed, gift: isGiftBoxSelected, giftMessage: giftNote,
                     coupon: appliedCouponCodeString || "", useMCoins: document.getElementById('mCoinToggleInput').checked,
                     method: method === 'COD' ? 'COD' : 'ONLINE',
+                    ...(gstPayload() ? { gst: gstPayload() } : {}),
                     address: { fullName: orderData.fullName, phone: orderData.phone, address: orderData.address, pin: orderData.pin, city: orderData.city, state: orderData.state }
                 });
+                { const gp = gstPayload(); if(gp && r.orderId) { try { await update(ref(db, `orders/${r.orderId}`), { gstin: gp.gstin, gstBusinessName: gp.name, gstInvoice: true }); } catch(e) {} } }
                 if(r.needsPayment) {
                     bagMarkPay(r);
                     showToast("Opening secure payment...", "info");
@@ -2111,6 +2126,9 @@ input,textarea,select{font-size:16px}
                     throw new Error("Unauthorized access. Invalid identity.");
                 }
 
+                const stI = String(data.orderPipelineTrackingState || '').toUpperCase();
+                if(stI === 'CANCELLED') throw new Error('No invoice is issued for a cancelled order.');
+                if(stI !== 'SHIPPED' && stI !== 'DELIVERED') throw new Error('Your invoice will be available once your order is shipped.');
                 const isCod = data.protocolMethodType === 'COD', money = n => 'INR ' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 const cp = CATALOG[data.productId] || {}, vk = Object.keys(cp.variantSkus || {}).find(k => k.toUpperCase() === `${data.selectedShadeColorContext}|${String(data.selectedSizeFitDimension).toUpperCase()}`.toUpperCase());
                 const skuTxt = data.sku || (vk ? cp.variantSkus[vk] : (cp.sku || ''));
@@ -2139,12 +2157,12 @@ input,textarea,select{font-size:16px}
                             <div class="top">
                                 <div><h1 class="logo">MONTÈ</h1>
                                     <div class="meta" style="margin-top:10px">${E(BIZ.legalName || 'MONTÈ')}<br>${BIZ.address ? E(BIZ.address) + '<br>' : ''}${BIZ.gstin ? 'GSTIN: ' + E(BIZ.gstin) + '<br>' : ''}${BIZ.email ? E(BIZ.email) : ''}${BIZ.phone ? ' · ' + E(BIZ.phone) : ''}</div></div>
-                                <div class="doc"><h2>${BIZ.gstin ? 'Tax Invoice' : 'Invoice'}</h2>
-                                    <div class="l">Invoice no.</div><div>${E(data.orderId)}</div>
-                                    <div class="l" style="margin-top:10px">Date</div><div>${new Date(data.chronologicalCreationTimestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div></div>
+                                <div class="doc"><h2>${BIZ.gstin || data.gstin ? 'Tax Invoice' : 'Invoice'}</h2>
+                                    <div class="l">Invoice no.</div><div>${E(data.invoiceNo || data.orderId)}</div><div class="l" style="margin-top:10px">Order no.</div><div>${E(data.orderId)}</div><div class="l" style="margin-top:10px">Order date</div><div>${new Date(data.chronologicalCreationTimestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                                    <div class="l" style="margin-top:10px">Invoice date</div><div>${new Date(data.invoiceDate || data.shippedAt || data.chronologicalCreationTimestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div></div>
                             </div>
                             <div class="grid">
-                                <div><div class="l">Billed to</div><strong>${E(data.clientIdentityName)}</strong></div>
+                                <div><div class="l">Billed to</div><strong>${E(data.gstBusinessName || data.clientIdentityName)}</strong>${data.gstin ? '<br>GSTIN: ' + E(data.gstin) + '<br><span class="meta">Attn: ' + E(data.clientIdentityName) + '</span>' : ''}</div>
                                 <div><div class="l">Ship to</div>${E(data.consignmentDeliveryAddressText)}</div>
                                 <div><div class="l">Delivery</div>${E(data.shippingMethod || 'STANDARD')}${data.isGiftPackaged ? '<br>Gift packaged' : ''}</div>
                             </div>
@@ -2161,7 +2179,7 @@ input,textarea,select{font-size:16px}
                             </div>
                             <div class="pay"><div><div class="l">Payment</div>${isCod ? 'Cash on Delivery' : (Number(data.transactionSettlementAmount) === 0 ? 'Paid with M-Coins' : 'Paid online (' + E(String(data.protocolMethodType === 'ONLINE' ? 'Cashfree' : (data.protocolMethodType || 'UPI')).replace('_', ' ')) + ')')}</div>
                                 <div class="r"><div class="l">${isCod ? 'Amount payable on delivery' : 'Amount due'}</div><strong>${isCod ? money(data.transactionSettlementAmount) : money(0)}</strong></div></div>
-                            <div class="note">All prices are in INR and inclusive of applicable taxes. ${Number(BIZ.returnDays ?? 7) > 0 ? 'Returns are accepted within ' + Number(BIZ.returnDays ?? 7) + ' days of delivery, subject to our Returns policy.' : ''} ${BIZ.email ? 'For help with this order, write to ' + E(BIZ.email) + '.' : ''}<br>This is a computer-generated invoice and does not require a signature.</div>
+                            <div class="note">All prices are in INR and inclusive of applicable taxes. ${Number(BIZ.returnDays ?? 7) > 0 ? 'Returns are accepted within ' + Number(BIZ.returnDays ?? 7) + ' days of delivery, subject to our Returns policy.' : ''} ${BIZ.email ? 'For help with this order, write to ' + E(BIZ.email) + '.' : ''}<br>This is a computer-generated invoice and does not require a signature.${isCod ? '' : ' This invoice is not a demand for payment.'}</div>
                             <div class="foot">Thank you · MONTÈ</div>
                         </body></html>`;
                 invoiceWindow.document.write(htmlContent);
@@ -2186,6 +2204,7 @@ input,textarea,select{font-size:16px}
             try {
                 const snap = await get(ref(db, `orders/${id}`));
                 if(snap.exists()) {
+                    if(String(snap.val().orderPipelineTrackingState || '').toUpperCase() === 'DELIVERED' && !isMine(snap.val())) return showToast("This order is delivered. Tracking is closed.", "info");
                     dismissModals();
                     window.renderActiveOrderTrackingPipelineDashboard(id);
                 } else { showToast("ID not found in registry.", "error"); }
@@ -2214,7 +2233,7 @@ input,textarea,select{font-size:16px}
                 const status = String(data.orderPipelineTrackingState || '').toUpperCase();
                 updateVisualPipelineProgressBarValueIndicators(status);
                 document.getElementById('trackViewOnly').classList.toggle('hidden', owner);
-                invBtn.classList.toggle('hidden', !owner);
+                invBtn.classList.toggle('hidden', !owner || !['SHIPPED', 'DELIVERED'].includes(status));
                 const canCancel = owner && (status === "PLACED" || status === "VERIFIED");
                 cancelBtn.classList.toggle('hidden', !canCancel);
                 const rs = data.refundStatus, rr = document.getElementById('trackRefundRow');
@@ -2223,7 +2242,7 @@ input,textarea,select{font-size:16px}
                 if(status === "PLACED") msgPanel.innerText = "PAYMENT PENDING. COMPLETE THE PAYMENT TO CONFIRM YOUR ORDER.";
                 else if(status === "VERIFIED") msgPanel.innerText = "VERIFIED. GARMENT PREPARATION INITIALIZED.";
                 else if(status === "SHIPPED") msgPanel.innerText = "IN-TRANSIT. REVOCATION LOCKED.";
-                else if(status === "DELIVERED") msgPanel.innerText = "HANDOVER COMPLETED. HISTORICAL ARCHIVE SEALED.";
+                else if(status === "DELIVERED") msgPanel.innerText = ("DELIVERED" + (data.deliveredAt ? " ON " + new Date(data.deliveredAt).toLocaleDateString("en-IN") : "") + ". LIVE TRACKING IS NOW CLOSED.").toUpperCase();
                 else if(status === "CANCELLED") msgPanel.innerText = "CONSIGNMENT VOID STATUS GRANTED.";
             } catch (err) {
                 document.getElementById('trackingStatusMessagePanel').innerText = "Dashboard synced. Waiting server link...";
@@ -2363,7 +2382,7 @@ input,textarea,select{font-size:16px}
                                 </div>
                                 <div class="flex flex-wrap items-center gap-6 mt-2 sm:mt-0">
                                     <span class="text-neutral-500 text-[10px] tracking-[0.18em] uppercase">${mEsc(item.orderPipelineTrackingState)}${item.refundStatus && ['PENDING','INITIATED','COMPLETED'].includes(item.refundStatus) ? ' · REFUND ' + mEsc(item.refundStatus) : ''}</span>
-                                    <button onclick="downloadInvoice('${item.orderId}', this)" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Invoice</button>
+                                    ${['SHIPPED', 'DELIVERED'].includes(String(item.orderPipelineTrackingState).toUpperCase()) ? `<button onclick="downloadInvoice('${item.orderId}', this)" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Invoice</button>` : `<span class="text-[10px] uppercase text-neutral-400 tracking-[0.18em]" title="Available once your order ships">Invoice after dispatch</span>`}
                                     <button onclick="window.renderActiveOrderTrackingPipelineDashboard('${item.orderId}')" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Track</button>${String(item.orderPipelineTrackingState).toUpperCase() === 'DELIVERED' && item.productId ? `<button onclick="triggerReviewSubmission('${mEsc(item.productId)}')" class="text-[10px] border-b border-black uppercase text-black hover:text-neutral-500 transition pb-0.5 tracking-[0.18em]">Review</button>` : ''}
                                 </div>`;
                             wrapper.appendChild(div);
