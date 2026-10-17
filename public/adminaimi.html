@@ -224,6 +224,11 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Promise 1<textarea id="hPr1"></textarea></label><label class="eb">Promise 2<textarea id="hPr2"></textarea></label><label class="eb">Promise 3<textarea id="hPr3"></textarea></label></div>
         <label class="eb">Member band headline<input id="hMemH"></label>
         <button class="btn" style="margin-top:20px" onclick="saveHome()">Save homepage</button></div>
+      <div class="card"><p class="eb">Halloween animations (live instantly, 3D pumpkin + bats + embers + fog)</p>
+        <div class="row"><label class="eb">Halloween mode<select id="wOn"><option value="1">On</option><option value="0">Off</option></select></label><label class="eb">Style<select id="wLevel"><option value="minimal">Minimal (subtle)</option><option value="rich">Rich (more bats and embers)</option></select></label><label class="eb">Pumpkin side<select id="wSide"><option value="R">Right</option><option value="L">Left</option></select></label><label class="eb">Glow colour<input id="wAcc" type="color" value="#e8590c" style="height:42px;padding:2px"></label></div>
+        <div class="row"><label class="eb">Auto start (optional)<input id="wFrom" type="datetime-local"></label><label class="eb">Auto stop (optional)<input id="wTo" type="datetime-local"></label></div>
+        <div class="row" id="wFx"></div>
+        <button class="btn" style="margin-top:16px" onclick="saveHw()">Save Halloween</button> <button class="btn l" style="margin-top:16px" onclick="hwOff()">Turn off now</button></div>
       <div class="card"><p class="eb">Kashish AI</p>
         <div class="row"><label class="eb">Kashish AI on website<select id="kOn"><option value="1">On</option><option value="0">Off</option></select></label></div>
         <label class="eb">Extra knowledge for Kashish (offers, delivery times, FAQs, brand facts. Only true facts.)<textarea id="kNotes" style="min-height:140px"></textarea></label>
@@ -351,6 +356,7 @@ function start(){
   onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
   onValue(ref(db,'reviews'), s => { REV = s.val() || {}; renderReviewsAdmin(); }, () => {});
   onValue(ref(db,'settings/business'), s => { BIZ = s.val() || {}; }, () => {});
+  onValue(ref(db,'settings/halloween'), s => { if (!document.activeElement || !document.activeElement.closest('#t-site')) fillHw(s.val() || {}); }, () => {});
   onValue(ref(db,'settings/home'), s => { if (!document.activeElement || !document.activeElement.closest('#t-site')) fillHome(s.val() || {}); }, () => {});
   onValue(ref(db,'settings/site'), s => { if (!document.activeElement || !document.activeElement.closest('#t-site')) fillKash(s.val() || {}); }, () => {});
 }
@@ -758,6 +764,13 @@ window.backupAll = async () => { try { const o = {}; for (const k of ['catalog',
 window.trackEdit = k => { const o = orders[k] || {}; const c = prompt('Courier name', o.courierName || ''); if (c === null) return; const t = prompt('Tracking number / AWB', o.trackingNumber || ''); if (t === null) return; const n = prompt('Internal note (only you see this)', o.adminNote || ''); if (n === null) return; update(ref(db, 'orders/' + k), { courierName: c.trim(), trackingNumber: t.trim(), adminNote: n.trim() }).then(() => toast('Order updated')).catch(e => toast('Failed: ' + e.message)); };
 window.delOrder = k => confirm('Delete this order record permanently? This cannot be undone.') && remove(ref(db, 'orders/' + k)).then(() => toast('Order deleted')).catch(e => toast('Failed: ' + e.message));
 window.delUser = id => confirm('Delete this customer record (profile, coins, history)? Their login account itself stays.') && remove(ref(db, 'users/' + id)).then(() => { closeUser(); toast('Customer record deleted'); }).catch(e => toast('Failed: ' + e.message));
+
+const HFX = [['bats','Flying bats'],['embers','Floating embers'],['fog','Misty fog'],['pumpkin','3D jack-o-lantern'],['spider','Hanging spider'],['lantern','Cursor lantern glow']], HDEF = { bats: 1, embers: 1, fog: 1, pumpkin: 1, spider: 0, lantern: 0 };
+$('wFx').innerHTML = HFX.map(([k, l]) => `<label class="eb">${l}<select id="wf_${k}"><option value="1">On</option><option value="0">Off</option></select></label>`).join('');
+const toLoc = ts => ts ? new Date(+ts - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+window.fillHw = h => { $('wOn').value = h.on ? '1' : '0'; $('wLevel').value = h.level || 'minimal'; $('wSide').value = h.side || 'R'; $('wAcc').value = /^#[0-9a-f]{6}$/i.test(h.accent || '') ? h.accent : '#e8590c'; $('wFrom').value = toLoc(h.from); $('wTo').value = toLoc(h.to); HFX.forEach(([k]) => { $('wf_' + k).value = (h[k] === undefined ? HDEF[k] : h[k]) ? '1' : '0'; }); };
+window.saveHw = () => { const o = { on: $('wOn').value === '1', level: $('wLevel').value, side: $('wSide').value, accent: $('wAcc').value, from: $('wFrom').value ? new Date($('wFrom').value).getTime() : 0, to: $('wTo').value ? new Date($('wTo').value).getTime() : 0 }; HFX.forEach(([k]) => { o[k] = $('wf_' + k).value === '1'; }); set(ref(db, 'settings/halloween'), o).then(() => toast(o.on ? 'Halloween is live on the website' : 'Halloween saved (off)')).catch(e => toast('Failed: ' + e.message)); };
+window.hwOff = () => update(ref(db, 'settings/halloween'), { on: false }).then(() => toast('Halloween turned off')).catch(e => toast('Failed: ' + e.message));
 
 /* ---------- Reviews moderation ---------- */
 window.renderReviewsAdmin = () => {
