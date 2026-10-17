@@ -259,6 +259,12 @@ input,textarea,select{font-size:16px}
 
 .star{font-size:34px;line-height:1;color:#ddd;padding:6px 3px;transition:color .2s,transform .2s}
 .star.on{color:#c9971f}.star:active{transform:scale(.9)}
+.rv-sum{display:flex;gap:28px;align-items:center;padding:6px 0 18px!important}
+.rv-avg{text-align:center;flex:none}.rv-avg b{display:block;font:400 44px/1 'Playfair Display',serif}.rv-avg span{display:block;margin-top:6px;font-size:12px}.rv-avg small{display:block;color:#888;font-size:11px;margin-top:4px}
+.rv-bars{flex:1}.rv-bars div{display:flex;align-items:center;gap:10px;font-size:11px;color:#777;padding:0!important;margin:5px 0}
+.rv-bars span{width:22px}.rv-bars i{flex:1;height:5px;background:#eee;border-radius:3px;overflow:hidden;display:block}.rv-bars u{display:block;height:100%;background:#c9971f;text-decoration:none}.rv-bars em{width:22px;text-align:right;font-style:normal}
+.rv-tools{padding:0 0 8px!important}
+.spec{width:100%;font-size:12px;border-collapse:collapse}.spec td{padding:11px 0;border-top:1px solid var(--line);vertical-align:top;line-height:1.6}.spec tr:first-child td{border-top:0}.spec td:first-child{color:#888;width:42%;padding-right:16px}
 .rv-i{padding:16px 0!important;border-top:1px solid var(--line)}
 .rv-i .top{display:flex;justify-content:space-between;padding:0!important;color:#111}
 .rv-i .top span{color:#999;font-size:11px}
@@ -281,6 +287,21 @@ input,textarea,select{font-size:16px}
 .bl .acts button{font-size:10px;letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid #111;padding-bottom:2px}
 .bl .acts button.m{border-color:#ccc;color:#888}
 .bl.gone{opacity:.55}
+.bed{margin-top:14px;padding:12px 0 2px;border-top:1px dashed var(--line)}
+.bed .k{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#888;margin:12px 0 9px}
+.bed .sw{display:flex;gap:16px;flex-wrap:wrap;padding:6px}
+.bed .zs{display:flex;gap:6px;flex-wrap:wrap}
+.bed .zs button{min-width:44px;height:36px;border:1px solid var(--line);font-size:11px;border-radius:10px;padding:0 10px;transition:all .25s}
+.bed .zs button.on{background:#000;color:#fff;border-color:#000}
+.bed .zs button.off{opacity:.3;text-decoration:line-through}
+.bed .done{margin-top:16px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid #111;padding-bottom:2px}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px;margin-top:12px}
+.qty button{width:34px;height:34px;font-size:16px;line-height:1}
+.qty button:disabled{opacity:.25}
+.qty span{min-width:26px;text-align:center;font-size:12px}
+.cs-i{display:flex;gap:14px;margin-bottom:18px}
+.cs-i .im{width:64px;height:80px;background:#fff;border:1px solid var(--line);padding:3px;flex:none}
+.cs-i img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply}
 @keyframes bump{40%{transform:scale(1.25)}}
 .bump{animation:bump .5s var(--sp)}
 </style>
@@ -458,7 +479,7 @@ input,textarea,select{font-size:16px}
                     </div>
                     <p id="pdPick" class="text-center text-neutral-500 mb-3" style="font-size:11px;letter-spacing:.04em"></p>
                     <button id="masterAcquireBtn" onclick="addToBag()" class="w-full bg-black text-white py-[18px] fine btn-luxury focus:outline-none mb-3" style="font-size:10px;letter-spacing:.26em">Add to bag</button>
-                    <button id="buyNowBtn" onclick="window.__bagLine=null;initiateCheckoutProcess()" class="w-full premium-border bg-white text-black py-[17px] fine mb-3 hover:border-black transition" style="font-size:10px;letter-spacing:.26em;border-radius:14px">Buy now</button>
+                    <button id="buyNowBtn" onclick="window.__bagLine=null;window.__bagCart=null;initiateCheckoutProcess()" class="w-full premium-border bg-white text-black py-[17px] fine mb-3 hover:border-black transition" style="font-size:10px;letter-spacing:.26em;border-radius:14px">Buy now</button>
                     <p id="pdAssure" class="text-center text-neutral-400 mb-6" style="font-size:10px"></p>
                     <div class="pd-perks">
                         <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17" cy="17.5" r="1.6"/></svg>Free delivery</div>
@@ -468,11 +489,13 @@ input,textarea,select{font-size:16px}
                     <a href="#/mcoin-terms" class="pd-coin"><svg class="mc" style="width:24px;height:24px"><use href="#mcoin"/></svg><span>Earn M Coins on every order <em>· 1 M Coin = ₹1</em></span></a>
                     <a href="#/plus-terms" class="pd-plus">MONTÈ+ members shop new drops 24 hours early</a>
                     <div class="flex justify-center gap-8 mb-9"><button onclick="triggerReviewSubmission()" class="fine border-b border-black pb-0.5 hover:opacity-60 transition" style="font-size:9px">Write a review</button><button onclick="shareProduct()" class="fine border-b border-black pb-0.5 hover:opacity-60 transition" style="font-size:9px">Share</button></div>
+                    <details id="pdAboutWrap" class="acc" open style="display:none"><summary>About this item</summary><div><ul id="pdAbout" style="list-style:disc;padding-left:18px;line-height:1.9"></ul></div></details>
                     <details class="acc" open><summary>Description</summary><div id="pdDesc"></div></details>
                     <details class="acc"><summary>Details</summary><div><ul id="pdDetails" style="list-style:disc;padding-left:18px"></ul></div></details>
+                    <details id="pdSpecsWrap" class="acc" style="display:none"><summary>Product information</summary><div><table class="spec" id="pdSpecs"></table></div></details>
                     <details class="acc"><summary>Fabric &amp; care</summary><div id="pdCare"></div></details>
                     <details class="acc"><summary>Delivery &amp; returns</summary><div>See our <a href="#/shipping" class="underline">shipping</a> and <a href="#/refund" class="underline">returns &amp; refunds</a> policies. Estimated delivery for your location is shown at checkout.</div></details>
-                    <details id="pdRevWrap" class="acc"><summary>Reviews <span id="pdRevCount" class="ml-2 text-neutral-400" style="letter-spacing:0"></span></summary><div id="pdReviews"></div></details>
+                    <details id="pdRevWrap" class="acc" open><summary>Reviews <span id="pdRevCount" class="ml-2 text-neutral-400" style="letter-spacing:0"></span></summary><div id="pdReviews"></div></details>
                     <div class="acc"></div>
                 </div>
             </div>
@@ -497,7 +520,7 @@ input,textarea,select{font-size:16px}
                     <span class="premium-label mb-6 text-black">Shipping Destination</span>
                     <div class="space-y-6 text-xs mb-8">
                         <input type="text" id="chkFullName" placeholder="FULL NAME" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] uppercase bg-transparent text-xs transition">
-                        <input type="tel" id="chkPhone" placeholder="CONTACT NUMBER (e.g. 9876543210)" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] bg-transparent text-xs transition">
+                        <input type="tel" id="chkPhone" placeholder="CONTACT NUMBER" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] bg-transparent text-xs transition">
                         <textarea id="chkStreetAddress" placeholder="COMPLETE STREET ADDRESS" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] uppercase bg-transparent text-xs h-16 resize-none transition"></textarea>
                         
                         <div class="flex flex-col sm:flex-row gap-6">
@@ -609,14 +632,15 @@ input,textarea,select{font-size:16px}
                     <div class="bg-[#FAFAFA] p-8 sm:p-12 premium-border lg:sticky lg:top-28">
                         <span class="premium-label mb-8 text-black">Order Summary</span>
                         
-                        <div class="flex gap-6 mb-10">
+                        <div id="checkoutSummaryMulti" class="hidden mb-10"></div>
+                        <div id="checkoutSummarySingle" class="flex gap-6 mb-10">
                             <div class="w-20 h-28 sm:w-24 sm:h-32 bg-white premium-border flex-shrink-0 p-1">
                                 <img id="checkoutSummaryImg" src="" class="w-full h-full object-cover mix-blend-multiply">
                             </div>
                             <div class="flex flex-col justify-center text-xs">
-                                <span id="checkoutSummaryName" class="font-medium tracking-widest uppercase mb-2 text-[11px] text-black">Product</span>
-                                <span id="checkoutSummaryColor" class="text-[9px] text-neutral-500 tracking-[0.1em] uppercase mb-1.5">---</span>
-                                <span id="checkoutSummarySize" class="text-[9px] text-neutral-500 tracking-[0.1em] uppercase">---</span>
+                                <span id="checkoutSummaryName" class="font-medium tracking-widest uppercase mb-2 text-[11px] text-black"></span>
+                                <span id="checkoutSummaryColor" class="text-[9px] text-neutral-500 tracking-[0.1em] uppercase mb-1.5"></span>
+                                <span id="checkoutSummarySize" class="text-[9px] text-neutral-500 tracking-[0.1em] uppercase"></span>
                             </div>
                         </div>
 
@@ -635,7 +659,7 @@ input,textarea,select{font-size:16px}
                         <div class="mt-auto pt-8 border-t premium-border space-y-5">
                             <div class="flex justify-between text-[10px] uppercase tracking-[0.15em] text-neutral-600">
                                 <span>Subtotal</span>
-                                <span class="js-price">₹999</span>
+                                <span id="summarySubtotal"></span>
                             </div>
                             <div class="flex justify-between text-[10px] uppercase tracking-[0.15em] text-neutral-600">
                                 <span>Delivery</span>
@@ -647,7 +671,7 @@ input,textarea,select{font-size:16px}
                             </div>
                             <div class="flex justify-between text-[14px] uppercase tracking-[0.15em] font-medium text-black pt-5 premium-border-t mt-5">
                                 <span>Total Settlement</span>
-                                <span id="checkoutFinalPrice">₹999</span>
+                                <span id="checkoutFinalPrice"></span>
                             </div>
                         </div>
                     </div>
@@ -733,8 +757,8 @@ input,textarea,select{font-size:16px}
             <div class="pt-6 pb-10 flex items-start justify-between gap-6 premium-border-b">
                 <div class="min-w-0">
                     <p class="eyebrow text-neutral-400 mb-3">Portfolio</p>
-                    <h2 id="accProfileName" class="hero-t text-4xl sm:text-5xl">---</h2>
-                    <p class="mt-4 text-[12px] text-neutral-500 break-all"><span id="accProfileEmail">---</span><span class="mx-3 text-neutral-300">/</span><span id="accProfilePhone">---</span></p>
+                    <h2 id="accProfileName" class="hero-t text-4xl sm:text-5xl"></h2>
+                    <p class="mt-4 text-[12px] text-neutral-500 break-all"><span id="accProfileEmail"></span><span class="mx-3 text-neutral-300">/</span><span id="accProfilePhone"></span></p>
                 </div>
                 <button onclick="triggerSignOutSession()" class="cta flex-none mt-2">Sign out</button>
             </div>
@@ -780,71 +804,6 @@ input,textarea,select{font-size:16px}
             </section>
         </div>
 
-        <!-- ================= VIEW: REFUND POLICY ================= -->
-        <div id="refundView" class="view-section max-w-4xl mx-auto px-4">
-            <div class="bg-white p-8 sm:p-16 premium-border mt-8 shadow-sm">
-                <h2 class="text-3xl font-serif font-medium tracking-widest uppercase mb-12 premium-border-b pb-6 text-black">MONTÈ Refund & Revocation</h2>
-                
-                <div class="space-y-10 text-[11px] text-neutral-600 leading-loose uppercase tracking-[0.1em] text-justify font-light">
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 1: General Consignment Revocation</h3>
-                        <p>At the house of MONTÈ, operational efficiency, inventory control parameters, and supreme luxury alignment constitute the foundations of our standard operations. Clients retain the unencumbered prerogative to cancel any prospective transaction consignment order up to the precise chronological milestone marking the transition of order meta-attributes from "Verified" to "Shipped". Once fulfillment processing networks allocate vehicle payloads and flag order state tracking properties as "Shipped", the cancellation transaction window is definitively closed, and items are legally classified in-transit.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 2: The Montè Anti-Abuse Ledger</h3>
-                        <p>To safeguard distribution integrity and control logistical loss vectors associated with unnecessary multi-hop returns, MONTÈ deploys an automated algorithmic auditing system anchored directly within our secure ecosystem.</p>
-                        <p class="mt-4"><strong class="text-black">2.1 The 24-Day COD Restriction:</strong> If a registered user portfolio record creates and subsequently revokes/cancels an order consignment equivalent to 2 chronological frequencies sequentially, the option to transact utilizing the Cash-on-Delivery (COD) protocol pathway shall be programmatically and autonomously restricted from that client profile workspace for a strict punitive containment sequence spanning exactly 24 continuous calendar days (576 cumulative hours). The restriction calculation model operates on immutable database timestamp matrices and resets back to active state access parameter values immediately upon the conclusion of the 24-day protocol sequence.</p>
-                        <p class="mt-4 text-red-600 border border-red-100 p-5 bg-red-50/50 font-medium"><strong class="text-red-700">2.2 Permanent Suspension Protocol:</strong> Any client portfolio logging a cumulative history of 15 or more total order cancellations will be classified as a critical abuse vector. The system will permanently lock, revoke, and suspend the account. Access to the checkout engine will be definitively barred without human intervention.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 3: M-Coins Vault Reversal Protocol</h3>
-                        <p>In the event of a sanctioned pre-shipment order revocation, any M-Coins extracted from the client's vault for the purpose of subsidizing the transaction will be systematically reversed and credited back to the portfolio balance. However, M-Coins conditionally earned from the revoked transaction will be concurrently purged from the ledger to prevent artificial currency inflation.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 4: Financial Settlement Horizons</h3>
-                        <p>In instances where Instant UPI transaction protocol paths are utilized, cancellations triggered within the permissible open timeframe require verification parsing before financial asset disbursement loops execute. Refund disbursements for validated cancellation requests are evaluated against incoming transaction arrays routed through our compliance desk. Validations matching database state ledger histories will result in immediate asset restoration via the initiating payment pathway within 3 to 5 operational banking system windows.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= VIEW: PRIVACY POLICY ================= -->
-        <div id="privacyView" class="view-section max-w-4xl mx-auto px-4">
-            <div class="bg-white p-8 sm:p-16 premium-border mt-8 shadow-sm">
-                <h2 class="text-3xl font-serif font-medium tracking-widest uppercase mb-12 premium-border-b pb-6 text-black">MONTÈ Privacy Protocol</h2>
-                
-                <div class="space-y-10 text-[11px] text-neutral-600 leading-loose uppercase tracking-[0.1em] text-justify font-light">
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 1: The Cryptographic Ecosystem</h3>
-                        <p>This digital commerce node interacts directly and securely with custom-engineered infrastructure. All input metadata vectors, including consumer cryptographic password digests, email endpoints, full legal nomenclatures, and validated geolocation shipping configurations, are kept fully safe within non-volatile Realtime Database architectures and secure Identity Service infrastructure APIs. Financial instrument representations, ledger histories, and transactional state sequences are completely isolated from unindexed crawling matrix protocols or external multi-tenant telemetry vectors.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 2: Logistical Data Harvesting</h3>
-                        <p>To construct a portfolio interface cluster on MONTÈ, user records must authenticate valid contact sequences using matching phone layouts conforming to international and domestic dialing string validation logic. This profile parameters matrix is used strictly to dynamically compute fraud metrics, track cancellation behavior frequencies for the 24-day COD penalty system logic engine, and bind physical distribution payloads to authentic consumer nodes. No data parameters are traded, transferred, or syndicated to third-party marketing entities.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 3: 256-Bit Financial Encryption Layer</h3>
-                        <p>All transactional conduits routing through the MONTÈ architecture are fortified with military-grade 256-Bit SSL encryption. We do not store raw UPI handles, banking passwords, or card vectors on our localized servers. The payment intent system operates natively via deep-linking to certified banking applications resident on the client's hardware.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 4: API Integration Matrices</h3>
-                        <p>Our platform interfaces dynamically with localized postal distribution data networks to cross-examine and verify the authenticity of entered 6-digit Postal PIN codes. This mechanism reads and processes location arrays in real-time to compute destination cities, states, and estimated transit times without caching tracking markers outside the necessary transaction lifecycle sequence. Similarly, communication relays utilizing EmailJS for One-Time Password (OTP) distribution are ephemeral and strictly transactional.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="font-bold text-black text-[10px] tracking-[0.2em] mb-4">Section 5: Right to Erasure</h3>
-                        <p>Clients retain full rights to request complete removal of historical address profiles, tracking ledgers, and authentication arrays from the active data storage instances. Such requests must be coordinated directly with our encryption compliance department via authorized secure communication channels through the Global Concierge Desk.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ================= VIEW: CONTACT ================= -->
         <div id="contactView" class="view-section max-w-5xl mx-auto px-4">
             <div class="bg-white p-8 sm:p-16 premium-border mt-8 shadow-sm flex flex-col lg:flex-row gap-16 lg:gap-24">
@@ -856,19 +815,15 @@ input,textarea,select{font-size:16px}
                     <div class="space-y-10">
                         <div>
                             <span class="premium-label text-[8px]">Direct Secure Line</span>
-                            <span class="text-sm font-medium tracking-[0.15em] text-black">+91 79738 04008</span>
+                            <span id="contactPhone" class="text-sm font-medium tracking-[0.15em] text-black">+91 79738 04008</span>
                         </div>
                         <div>
                             <span class="premium-label text-[8px]">Electronic Mail Routing</span>
-                            <span class="text-sm font-medium tracking-widest text-black lowercase" style="text-transform: none;">concierge@monte-apparel.com</span>
+                            <span id="contactMail" class="text-sm font-medium tracking-widest text-black lowercase" style="text-transform: none;">concierge@monte-apparel.com</span>
                         </div>
-                        <div>
-                            <span class="premium-label text-[8px]">Corporate Headquarters</span>
-                            <span class="text-[10px] font-medium tracking-[0.15em] uppercase text-black leading-loose">
-                                MONTÈ S.p.A. Global Logistics Hub<br>
-                                Northern Distribution Sector<br>
-                                Republic of India
-                            </span>
+                        <div id="contactAddrWrap" class="hidden">
+                            <span class="premium-label text-[8px]">Registered office</span>
+                            <span id="contactAddr" class="text-[10px] font-medium tracking-[0.15em] uppercase text-black leading-loose" style="white-space:pre-line"></span>
                         </div>
                     </div>
                 </div>
@@ -906,7 +861,7 @@ input,textarea,select{font-size:16px}
         </div>
     </footer>
     <div id="ckBar">We use essential cookies and storage to run this site. <a href="#/cookies" style="text-decoration:underline">Learn more</a> <button onclick="try{localStorage.setItem('mck',1)}catch(e){};this.parentNode.style.display='none'" style="display:block;margin-top:12px;border:1px solid #fff;padding:8px 18px;font-size:10px;letter-spacing:.2em;text-transform:uppercase">Accept</button></div>
-    <div class="mbar"><button onclick="addToBag()" class="w-full bg-black text-white py-4 fine" style="font-size:10px;letter-spacing:.26em">Add to bag — <span class="js-price">₹999</span></button></div>
+    <div class="mbar"><button onclick="addToBag()" class="w-full bg-black text-white py-4 fine" style="font-size:10px;letter-spacing:.26em">Add to bag — <span class="js-price"></span></button></div>
 
     <button id="mchatBtn" onclick="toggleChat()" aria-label="Live chat"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a8 8 0 01-11.6 7.1L4 20l1-4.6A8 8 0 1121 12z"/></svg><span class="dot" id="mchatDot"></span></button>
     <div id="mchat"><header><span>Live chat</span><button onclick="toggleChat()" style="font-size:20px;line-height:1">&times;</button></header>
@@ -926,7 +881,7 @@ input,textarea,select{font-size:16px}
                 <div id="regFieldsContainer" class="hidden space-y-6">
                     <input type="text" id="authNameInput" placeholder="FULL NAME" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] uppercase bg-transparent text-[11px] transition">
                     <div>
-                        <input type="tel" id="authPhoneInput" placeholder="MOBILE (e.g. 9876543210)" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] bg-transparent text-[11px] transition">
+                        <input type="tel" id="authPhoneInput" placeholder="MOBILE NUMBER" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] bg-transparent text-[11px] transition">
                     </div>
                 </div>
                 <input type="email" id="authEmailInput" placeholder="EMAIL ADDRESS" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.1em] lowercase bg-transparent text-[11px] transition" style="text-transform: none;">
@@ -958,7 +913,7 @@ input,textarea,select{font-size:16px}
             <h2 class="text-xl font-serif font-medium tracking-widest uppercase mb-5">Track Order</h2>
             <p class="text-[9px] text-neutral-400 uppercase tracking-[0.2em] mb-10">Enter reference ID</p>
             <div class="space-y-8">
-                <input type="text" id="trackSearchIdInput" placeholder="MNT-XXXXXX" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.2em] font-medium bg-transparent uppercase text-[11px] text-center transition">
+                <input type="text" id="trackSearchIdInput" placeholder="ORDER ID" class="w-full premium-border-b py-4 outline-none focus:border-black tracking-[0.2em] font-medium bg-transparent uppercase text-[11px] text-center transition">
                 <button onclick="executeManualTrackingQueryLookup()" class="w-full bg-black text-white text-[10px] font-medium tracking-[0.2em] uppercase py-5 btn-luxury focus:outline-none">
                     Execute Lookup
                 </button>
@@ -1036,8 +991,8 @@ input,textarea,select{font-size:16px}
             '/checkout': { title: 'MONTÈ | Secure Checkout', desc: 'Finalize your acquisition through our 256-bit encrypted checkout portal.' },
             '/tracking': { title: 'MONTÈ | Consignment Tracking', desc: 'Monitor the transit status of your MONTÈ luxury acquisitions in real-time.' },
             '/account': { title: 'MONTÈ | Client Portfolio', desc: 'Access your MONTÈ+ VIP status, M-Coins vault, and historical ledger.' },
-            '/privacy': { title: 'MONTÈ | Privacy Protocol', desc: 'Comprehensive data protection, encryption, and privacy guidelines.' },
-            '/refund': { title: 'MONTÈ | Return & Revocation', desc: 'Detailed logistical policies regarding cancellations and returns.' },
+            '/privacy': { title: 'MONTÈ | Privacy Policy', desc: 'How MONTÈ handles your personal data.' },
+            '/refund': { title: 'MONTÈ | Returns & Refunds', desc: 'Cancellations, returns and refunds at MONTÈ.' },
             '/contact': { title: 'MONTÈ | VIP Concierge', desc: 'Connect directly with the MONTÈ global concierge desk for bespoke assistance.' }
         };
 
@@ -1271,6 +1226,12 @@ input,textarea,select{font-size:16px}
             $('sizeSelectorContainer').innerHTML = (p.sizes && p.sizes.length ? p.sizes : ['One Size']).map(z => `<button onclick="selectProductSize(this)" class="size-btn premium-border uppercase">${mEsc(z)}</button>`).join('');
             $('pdDesc').innerHTML = mEsc(p.description || '').replace(/\n/g, '<br>');
             $('pdDetails').innerHTML = (p.details || []).map(x => `<li>${mEsc(x)}</li>`).join('');
+            {
+                const arr = v => !v ? [] : (Array.isArray(v) ? v : Object.values(v)), ab = arr(p.about).filter(Boolean);
+                $('pdAbout').innerHTML = ab.map(x => `<li>${mEsc(x)}</li>`).join(''); $('pdAboutWrap').style.display = ab.length ? '' : 'none';
+                const rows = [['Collection', p.collection], ['Fit', p.fit], ['Material', p.composition], ['Country of origin', p.origin], ['Manufacturer', p.mfr]].concat(arr(p.specs).map(x => [x && x.k, x && x.v])).filter(r => r[0] && r[1]);
+                $('pdSpecs').innerHTML = rows.map(r => `<tr><td>${mEsc(r[0])}</td><td>${mEsc(r[1])}</td></tr>`).join(''); $('pdSpecsWrap').style.display = rows.length ? '' : 'none';
+            }
             $('pdCare').textContent = [p.composition, p.origin && 'Made in ' + p.origin, p.fit && 'Fit: ' + p.fit].filter(Boolean).join(' · ') + (p.composition || p.origin || p.fit ? '\n' : '') + (p.model ? p.model + '\n' : '') + p.care || 'Machine wash cold with similar colours. Do not bleach. Dry in shade. Iron on low heat.';
             const o = $('pdOffer'); o.textContent = p.offerText || ''; o.classList.toggle('hidden', !p.offerText);
             $('pdSku').textContent = p.sku ? 'SKU ' + p.sku : '';
@@ -1293,7 +1254,7 @@ input,textarea,select{font-size:16px}
         setInterval(tickLaunch, 1000);
         function liveUpdateProduct() {
             const p = currentProduct; if(!p) return;
-            window.liveBase = +p.price || 0; basePrice = window.liveBase;
+            window.liveBase = +p.price || 0; basePrice = window.__bagCart ? window.__bagCart.sum : window.liveBase;
             const d = mOff(p);
             { const sv = document.getElementById('pdSave'); if(sv) { const sa = (+p.mrp || 0) - (+p.price || 0); sv.textContent = sa > 0 ? 'You save ' + mInr(sa) : ''; } }
             document.querySelectorAll('.js-price').forEach(e => e.textContent = mInr(p.price));
@@ -1329,6 +1290,13 @@ input,textarea,select{font-size:16px}
             document.getElementById('mchatBtn').style.display = SITE.chatEnabled === false ? 'none' : 'flex';
             if(a && SITE.codEnabled === false && !(SITE.offerActive && SITE.offerText)) a.textContent = 'Complimentary shipping across India';
             applyCodGlobal();
+            try { paintBag(); } catch(e) {}
+            try {
+                const ca = document.getElementById('contactAddr'), cw = document.getElementById('contactAddrWrap');
+                const lines = [BIZ.legalName, BIZ.address].filter(Boolean).join('\n'); ca.textContent = lines; cw.classList.toggle('hidden', !BIZ.address);
+                if(BIZ.phone) document.getElementById('contactPhone').textContent = BIZ.phone;
+                if(BIZ.email) document.getElementById('contactMail').textContent = BIZ.email;
+            } catch(e) {}
             let mb = document.getElementById('maintBar');
             if(SITE.maintenance) { if(!mb) { mb = document.createElement('div'); mb.id = 'maintBar'; mb.className = 'fixed bottom-0 left-0 right-0 z-[80] bg-red-600 text-white text-center py-3 fine'; document.body.appendChild(mb); } mb.textContent = SITE.maintenanceText || 'Orders are temporarily paused. Please check back soon.'; }
             else if(mb) mb.remove();
@@ -1349,10 +1317,10 @@ input,textarea,select{font-size:16px}
 
         // ===== POLICIES (content reads business details saved in Admin > Settings) =====
         const bz = (k, d) => mEsc(BIZ[k] || d);
-        const BN = () => bz('legalName', 'MONTÈ'), BE = () => bz('email', '[add support email in Admin › Settings]'),
-              BP = () => bz('phone', '+91 79738 04008'), BA = () => bz('address', '[add registered address in Admin › Settings]'),
+        const BN = () => bz('legalName', 'MONTÈ'), BE = () => bz('email', 'concierge@monte-apparel.com'),
+              BP = () => bz('phone', '+91 79738 04008'), BA = () => bz('address', ''),
               RD = () => Number(BIZ.returnDays ?? 7);
-        const GO = () => `<p><b>Grievance Officer:</b> ${bz('grievanceName', '[add name in Admin › Settings]')}<br><b>Email:</b> ${bz('grievanceEmail', BIZ.email || '[add email in Admin › Settings]')}<br><b>Phone:</b> ${BP()}<br><b>Address:</b> ${BA()}<br><b>Hours:</b> Monday to Saturday, 10:00 to 18:00 IST</p>`;
+        const GO = () => `<p><b>Grievance Officer:</b> ${bz('grievanceName', BIZ.legalName || 'MONTÈ')}<br><b>Email:</b> ${bz('grievanceEmail', BIZ.email || 'concierge@monte-apparel.com')}<br><b>Phone:</b> ${BP()}${BIZ.address ? '<br><b>Address:</b> ' + BA() : ''}<br><b>Hours:</b> Monday to Saturday, 10:00 to 18:00 IST</p>`;
         const POLICIES = {
           '/terms': () => ['Terms & Conditions', [
             ['1. About these terms', `<p>These terms govern your use of this website and purchases from ${BN()} ("we", "us"). By browsing or placing an order you agree to them. If you do not agree, please do not use the site.</p>`],
@@ -1370,7 +1338,7 @@ input,textarea,select{font-size:16px}
             ['1. Who we are', `<p>${BN()} operates this website. This policy explains how we handle your personal data in line with the Information Technology Act, 2000 and the Digital Personal Data Protection Act, 2023.</p>`],
             ['2. Data we collect', `<p>Name, email, phone number, delivery address, order and payment-method details (not UPI PIN or card numbers), M-Coins and cancellation history, reviews you submit, and basic technical data such as device and browser type.</p>`],
             ['3. Why we use it', `<ul><li>To create your account, process, ship and track orders</li><li>To send order updates and one-time passwords by email</li><li>To prevent fraud and enforce our fair-use rules</li><li>To respond to support requests and improve the site</li></ul><p>We do not sell your personal data.</p>`],
-            ['4. Who we share it with', `<p>Only service providers needed to run the store: courier partners (name, phone, address), Google Firebase (secure database and sign-in), EmailJS (transactional emails and OTP) and payment apps you choose. We may disclose data when required by law.</p>`],
+            ['4. Who we share it with', `<p>Only service providers needed to run the store: courier partners (name, phone, address), Google Firebase (secure database and sign-in), EmailJS (transactional emails and OTP) and Cashfree Payments (secure payment processing). We may disclose data when required by law.</p>`],
             ['5. Retention & security', `<p>We keep order records for as long as needed for legal, tax and accounting purposes and delete other data when no longer required. We use encrypted connections and access controls, but no online system is completely secure.</p>`],
             ['6. Your rights', `<p>You may ask to access, correct or erase your data, withdraw consent, or nominate someone to exercise rights on your behalf. Write to ${BE()} and we will respond within a reasonable time. You may also complain to the Data Protection Board of India.</p>`],
             ['7. Children', `<p>The site is not directed at children under 18, and we do not knowingly collect their data without a parent or guardian's consent.</p>`],
@@ -1399,7 +1367,7 @@ input,textarea,select{font-size:16px}
             ['How we handle complaints', `<p>In line with the Consumer Protection (E-Commerce) Rules, 2020, we acknowledge complaints within 48 hours and aim to resolve them within one month. You can also approach the National Consumer Helpline (1915) or file a complaint at consumerhelpline.gov.in.</p>`]]],
           '/about': () => ['About MONTÈ', [
             ['Our story', `<p>MONTÈ makes considered essentials in premium cotton: clean silhouettes, relaxed fits and fabrics that feel good on repeat. Designed in India and delivered across the country.</p>`],
-            ['Business details', `<p>${BN()}<br>${BA()}${BIZ.gstin ? '<br>GSTIN: ' + bz('gstin', '') : ''}<br>${BE()} · ${BP()}</p>`]]],
+            ['Business details', `<p>${BN()}${BIZ.address ? '<br>' + BA() : ''}${BIZ.gstin ? '<br>GSTIN: ' + bz('gstin', '') : ''}<br>${BE()} · ${BP()}</p>`]]],
           '/size-guide': () => ['Size Guide', [
             ['How to measure', `<p><b>Chest:</b> measure around the fullest part of your chest. <b>Length:</b> from the highest point of the shoulder to the hem. Compare with the garment measurements listed in each product's details.</p>`],
             ['Fit advice', `<p>Many of our pieces have a relaxed or oversized fit. Choose your usual size for the intended look, or size down for a closer fit. Need help? Write to ${BE()}.</p>`]]],
@@ -1739,6 +1707,7 @@ input,textarea,select{font-size:16px}
         // --- MATH CENTRALIZATION ---
         window.recalculateTotal = function() {
             let subtotal = Math.max(0, basePrice - appliedCouponDiscount);
+            { const st = document.getElementById('summarySubtotal'); if(st) st.textContent = mInr(basePrice); }
             let totalBeforeCoins = subtotal + currentShippingFee;
             
             if(document.getElementById('mCoinToggleInput').checked) {
@@ -1826,7 +1795,7 @@ input,textarea,select{font-size:16px}
         };
 
         function resetCheckoutCouponState() {
-            basePrice = window.liveBase || 999;
+            basePrice = window.__bagCart ? window.__bagCart.sum : (window.liveBase || 999);
             appliedCouponDiscount = 0;
             currentShippingFee = 0;
             appliedMCoinsValue = 0;
@@ -1860,6 +1829,7 @@ input,textarea,select{font-size:16px}
             document.getElementById('checkoutSummaryColor').innerText = selectedColorProductShade;
             document.getElementById('checkoutSummarySize').innerText = `SIZE: ${selectedProductSizeValue}`;
             document.getElementById('checkoutEmailDisplay').innerText = window.sessionUserRecord.email;
+            paintCheckoutSummary(); recalculateTotal();
 
             if(window.sessionUserRecord) {
                 await syncAndEvaluateUserMatrix(window.sessionUserRecord.uid);
@@ -1918,7 +1888,7 @@ input,textarea,select{font-size:16px}
                 }
                 const why = couponWhy(cpn);
                 if(why) { showToast(why, "error"); reset(); return; }
-                let d = Number(cpn.percent) > 0 ? Math.round(basePrice * Number(cpn.percent) / 100) : parseInt(cpn.discount);
+                let d = Number(cpn.percent) > 0 ? Math.round(couponBase(cpn) * Number(cpn.percent) / 100) : parseInt(cpn.discount);
                 if(Number(cpn.percent) > 0 && Number(cpn.maxDiscount) > 0) d = Math.min(d, Number(cpn.maxDiscount));
                 appliedCouponDiscount = Math.max(0, Math.min(d, basePrice));
                 appliedCouponCodeString = code;
@@ -1936,16 +1906,23 @@ input,textarea,select{font-size:16px}
 
         // scoped coupons: which products / sections / categories a code works on
         const asArr = v => !v ? [] : (Array.isArray(v) ? v : Object.values(v));
-        function couponWhy(c) {
-            const p = currentProduct || {}, now = Date.now() + (window.__tOff || 0);
-            if(Number(c.expiresAt) > 0 && now > Number(c.expiresAt)) return "THIS CODE HAS EXPIRED.";
-            if(Number(c.minOrder) > 0 && basePrice < Number(c.minOrder)) return `VALID ON ORDERS OF ₹${Number(c.minOrder)} OR MORE.`;
+        function couponLineWhy(c, p, id) {
             const cats = asArr(c.categories).map(x => String(x).toLowerCase()), gens = asArr(c.genders).map(x => String(x).toUpperCase()), ids = asArr(c.productIds);
-            if(ids.length && !ids.includes(currentProductId)) return "THIS CODE DOES NOT APPLY TO THIS PRODUCT.";
+            if(ids.length && !ids.includes(id)) return "THIS CODE DOES NOT APPLY TO THIS PRODUCT.";
             if(cats.length && !cats.includes(String(p.category || '').toLowerCase())) return `THIS CODE IS ONLY FOR ${asArr(c.categories).join(', ').toUpperCase()}.`;
             if(gens.length) { const g = String(p.gender || 'UNISEX').toUpperCase(); const ok = gens.includes(g) || (g === 'UNISEX' && (gens.includes('MEN') || gens.includes('WOMEN'))); if(!ok) return `THIS CODE IS ONLY FOR ${gens.join(', ')}.`; }
             return '';
         }
+        const couponTargets = () => window.__bagCart ? window.__bagCart.lines.map(l => ({ p: CATALOG[l.pid] || {}, id: l.pid, amt: l.price * l.qty })) : [{ p: currentProduct || {}, id: currentProductId, amt: basePrice }];
+        function couponWhy(c) {
+            const now = Date.now() + (window.__tOff || 0);
+            if(Number(c.expiresAt) > 0 && now > Number(c.expiresAt)) return "THIS CODE HAS EXPIRED.";
+            if(Number(c.minOrder) > 0 && basePrice < Number(c.minOrder)) return `VALID ON ORDERS OF ₹${Number(c.minOrder)} OR MORE.`;
+            let msg = '';
+            for(const t of couponTargets()) { const m = couponLineWhy(c, t.p, t.id); if(!m) return ''; msg = msg || m; }
+            return msg;
+        }
+        const couponBase = c => couponTargets().filter(t => !couponLineWhy(c, t.p, t.id)).reduce((a, t) => a + t.amt, 0);
 
         // ===== MONTÈ+ state =====
         function plusState(d) {
@@ -2079,13 +2056,14 @@ input,textarea,select{font-size:16px}
             try {
                 const r = await callW(API, "/order/create", {
                     productId: currentProductId, color: selectedColorProductShade, size: selectedProductSizeValue || "",
+                    ...(window.__bagCart ? { items: window.__bagCart.lines.map(l => ({ productId: l.pid, color: l.color, size: l.size, qty: l.qty })) } : {}),
                     shipping: shippingSpeed, gift: isGiftBoxSelected, giftMessage: giftNote,
                     coupon: appliedCouponCodeString || "", useMCoins: document.getElementById('mCoinToggleInput').checked,
                     method: method === 'COD' ? 'COD' : 'ONLINE',
                     address: { fullName: orderData.fullName, phone: orderData.phone, address: orderData.address, pin: orderData.pin, city: orderData.city, state: orderData.state }
                 });
                 if(r.needsPayment) {
-                    try { localStorage.setItem('mbag_pay', JSON.stringify({ o: r.orderId, k: window.__bagLine || '' })); } catch(e) {}
+                    bagMarkPay(r);
                     showToast("Opening secure payment...", "info");
                     const p = await callW(PAY, "/pay/create", { orderId: r.orderId });
                     Cashfree({ mode: p.mode }).checkout({ paymentSessionId: p.paymentSessionId, redirectTarget: "_self" });
@@ -2093,7 +2071,7 @@ input,textarea,select{font-size:16px}
                     return;
                 }
                 window.__orderBusy = false;
-                if(window.__bagLine) { bagRemoveKey(window.__bagLine); window.__bagLine = null; }
+                bagDone(r);
                 await syncAndEvaluateUserMatrix(window.sessionUserRecord.uid);
                 setTimeout(() => {
                     window.renderActiveOrderTrackingPipelineDashboard(r.orderId);
@@ -2231,7 +2209,7 @@ input,textarea,select{font-size:16px}
                 const rs = data.refundStatus, rr = document.getElementById('trackRefundRow');
                 const RL = { PENDING: 'Refund pending review', INITIATED: 'Refund initiated' + (data.refundRef ? ' · Ref ' + data.refundRef : ''), COMPLETED: 'Refund completed' };
                 rr.classList.toggle('hidden', !(owner && RL[rs])); if(owner && RL[rs]) document.getElementById('trackRefundText').innerText = RL[rs];
-                if(status === "PLACED") msgPanel.innerText = "UPI PENDING. SEND SCREENSHOT TO +91 79738 04008 FOR BATCH ALLOCATION.";
+                if(status === "PLACED") msgPanel.innerText = "PAYMENT PENDING. COMPLETE THE PAYMENT TO CONFIRM YOUR ORDER.";
                 else if(status === "VERIFIED") msgPanel.innerText = "VERIFIED. GARMENT PREPARATION INITIALIZED.";
                 else if(status === "SHIPPED") msgPanel.innerText = "IN-TRANSIT. REVOCATION LOCKED.";
                 else if(status === "DELIVERED") msgPanel.innerText = "HANDOVER COMPLETED. HISTORICAL ARCHIVE SEALED.";
@@ -2441,15 +2419,29 @@ input,textarea,select{font-size:16px}
             btn.disabled = false; btn.innerText = orig;
         };
         const starStr = x => { const r = Math.round(x); return '★'.repeat(r) + '☆'.repeat(5 - r); };
+        let revAll = [], revSort = 'new', revShown = 6;
+        window.revSortSet = v => { revSort = v; revShown = 6; drawReviews(); };
+        window.revMore = () => { revShown += 6; drawReviews(); };
         function paintReviews(v) {
-            const list = v ? Object.values(v).filter(r => r && r.starRating).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : [];
-            const n = list.length, avg = n ? list.reduce((t, r) => t + Number(r.starRating), 0) / n : 0, lab = document.getElementById('ratingDisplayLabel');
+            revAll = v ? Object.values(v).filter(r => r && r.starRating) : [];
+            revShown = 6; drawReviews();
+        }
+        function drawReviews() {
+            const n = revAll.length, avg = n ? revAll.reduce((t, r) => t + Number(r.starRating), 0) / n : 0, lab = document.getElementById('ratingDisplayLabel');
             if(lab) {
                 if(n) { lab.className = 'mt-3 block text-[12px] text-neutral-600 cursor-pointer'; lab.innerHTML = `<span style="color:#c9971f;letter-spacing:.1em">${starStr(avg)}</span> &nbsp;${avg.toFixed(1)} · ${n} review${n > 1 ? 's' : ''}`; lab.onclick = () => { const d = document.getElementById('pdRevWrap'); d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'center' }); }; }
                 else lab.className = 'hidden';
             }
             document.getElementById('pdRevCount').textContent = n ? `(${n})` : '';
-            document.getElementById('pdReviews').innerHTML = (n ? list.slice(0, 10).map(r => `<div class="rv-i"><div class="top"><b style="font-weight:500">${mEsc(r.reviewerName || 'Customer')}</b><span>${new Date(r.timestamp || 0).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div><div class="st">${starStr(r.starRating)}</div>${r.writtenReview ? `<p>${mEsc(r.writtenReview)}</p>` : ''}</div>`).join('') : '<p>No reviews yet. Be the first to share how it wears.</p>') + '<button onclick="triggerReviewSubmission()" class="cta mt-5">Write a review</button>';
+            const sorted = [...revAll].sort((a, b) => revSort === 'high' ? (b.starRating - a.starRating) || ((b.timestamp || 0) - (a.timestamp || 0)) : revSort === 'low' ? (a.starRating - b.starRating) || ((b.timestamp || 0) - (a.timestamp || 0)) : (b.timestamp || 0) - (a.timestamp || 0));
+            let head = '';
+            if(n) {
+                const cnt = [5, 4, 3, 2, 1].map(k => revAll.filter(r => Math.round(r.starRating) === k).length);
+                head = `<div class="rv-sum"><div class="rv-avg"><b>${avg.toFixed(1)}</b><span style="color:#c9971f;letter-spacing:.12em">${starStr(avg)}</span><small>${n} review${n > 1 ? 's' : ''}</small></div><div class="rv-bars">${[5, 4, 3, 2, 1].map((k, i) => `<div><span>${k}★</span><i><u style="width:${Math.round(cnt[i] / n * 100)}%"></u></i><em>${cnt[i]}</em></div>`).join('')}</div></div>
+                    <div class="rv-tools"><select onchange="revSortSet(this.value)" class="fine" style="font-size:11px;border:0;border-bottom:1px solid #ddd;background:transparent;padding:6px 0"><option value="new" ${revSort === 'new' ? 'selected' : ''}>Newest first</option><option value="high" ${revSort === 'high' ? 'selected' : ''}>Highest rated</option><option value="low" ${revSort === 'low' ? 'selected' : ''}>Lowest rated</option></select></div>`;
+            }
+            document.getElementById('pdReviews').innerHTML = head + (n ? sorted.slice(0, revShown).map(r => `<div class="rv-i"><div class="top"><b style="font-weight:500">${mEsc(r.reviewerName || 'Customer')}</b><span>${new Date(r.timestamp || 0).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span></div><div class="st">${starStr(r.starRating)}</div>${r.writtenReview ? `<p>${mEsc(r.writtenReview)}</p>` : ''}</div>`).join('') : '<p>No reviews yet. Be the first to share how it wears.</p>')
+                + (n > revShown ? '<button onclick="revMore()" class="cta mt-4 mr-5">Show more reviews</button>' : '') + '<button onclick="triggerReviewSubmission()" class="cta mt-5">Write a review</button>';
         }
         function watchReviews() {
             if(revWatched === currentProductId) return;
@@ -2536,12 +2528,32 @@ input,textarea,select{font-size:16px}
 
 
         // ===== BAG =====
-        const BAGK = 'mbag_v1';
+        const BAGK = 'mbag_v1', MAXQ = 10;
         let BAG = []; try { BAG = JSON.parse(localStorage.getItem(BAGK) || '[]'); } catch(e) {} if(!Array.isArray(BAG)) BAG = [];
+        BAG = BAG.filter(b => b && b.pid).map(b => ({ ...b, qty: Math.max(1, Math.min(MAXQ, parseInt(b.qty) || 1)), key: [b.pid, b.color, b.size].join('|') }));
+        let bagEdit = -1;
+        const multiOn = () => SITE.multiItem === true;
         const bagSave = () => { try { localStorage.setItem(BAGK, JSON.stringify(BAG)); } catch(e) {} };
-        const bagOpenNow = () => document.getElementById('bag').classList.contains('on');
-        function bagRemoveKey(k) { const n = BAG.length; BAG = BAG.filter(b => b.key !== k); if(BAG.length !== n) { bagSave(); paintBag(); } }
-        function bagPaid(oid) { try { const x = JSON.parse(localStorage.getItem('mbag_pay') || 'null'); if(x && x.o === oid) { if(x.k) bagRemoveKey(x.k); localStorage.removeItem('mbag_pay'); } } catch(e) {} }
+        const qtyOf = b => multiOn() ? b.qty : 1;
+        function lineInfo(b) {
+            const p = CATALOG[b.pid]; if(!p || p.status === 'DRAFT') return { gone: true };
+            const oos = (p.oosVariants || []).map(v => String(v).toUpperCase()), isOos = v => oos.includes(String(v).toUpperCase());
+            return { p, isOos, sold: p.status === 'OUT_OF_STOCK' || isOos(b.size) || isOos(b.color) };
+        }
+        const liveLines = () => BAG.map((b, i) => ({ b, i, ...lineInfo(b) })).filter(x => !x.gone && !x.sold);
+        function bagRemoveKey(k) { const n = BAG.length; BAG = BAG.filter(b => b.key !== k); if(BAG.length !== n) { bagEdit = -1; bagSave(); paintBag(); } }
+        function cartKeys(r) { // which bag lines this order covered
+            const cart = window.__bagCart;
+            if(cart) return r && r.multi ? cart.lines.map(l => l.key) : [cart.lines[0].key];
+            return window.__bagLine ? [window.__bagLine] : [];
+        }
+        function bagMarkPay(r) { try { localStorage.setItem('mbag_pay', JSON.stringify({ o: r.orderId, ks: cartKeys(r), partial: !!(window.__bagCart && window.__bagCart.lines.length > 1 && !r.multi) })); } catch(e) {} }
+        function bagDone(r) {
+            const partial = !!(window.__bagCart && window.__bagCart.lines.length > 1 && !r.multi);
+            cartKeys(r).forEach(bagRemoveKey); window.__bagLine = null; window.__bagCart = null;
+            if(partial) showToast("Only the first item was ordered. The rest are still in your bag.", "info");
+        }
+        function bagPaid(oid) { try { const x = JSON.parse(localStorage.getItem('mbag_pay') || 'null'); if(x && x.o === oid) { (x.ks || []).forEach(bagRemoveKey); localStorage.removeItem('mbag_pay'); if(x.partial) showToast("Only the first item was ordered. The rest are still in your bag.", "info"); } } catch(e) {} }
         window.openBag = () => { paintBag(); document.getElementById('bag').classList.add('on'); document.getElementById('bagScrim').classList.add('on'); document.body.style.overflow = 'hidden'; };
         window.closeBag = () => { document.getElementById('bag').classList.remove('on'); document.getElementById('bagScrim').classList.remove('on'); if(!document.getElementById('srch').classList.contains('on')) document.body.style.overflow = ''; };
         document.addEventListener('keydown', e => { if(e.key === 'Escape') closeBag(); });
@@ -2551,49 +2563,87 @@ input,textarea,select{font-size:16px}
             if(btn && btn.disabled) return showToast("This item is not available to order yet.", "info");
             if(p.status === 'OUT_OF_STOCK') return showToast("This item is sold out.", "error");
             if(!selectedProductSizeValue) { showToast("Select a size first.", "info"); const z = document.getElementById('sizeSelectorContainer'); if(z) z.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
-            const key = [p.id, selectedColorProductShade, selectedProductSizeValue].join('|');
-            if(BAG.some(b => b.key === key)) showToast("Already in your bag.", "info");
-            else { BAG.push({ key, pid: p.id, color: selectedColorProductShade, size: selectedProductSizeValue, t: Date.now() }); bagSave(); }
-            paintBag(); openBag();
+            const key = [p.id, selectedColorProductShade, selectedProductSizeValue].join('|'), ex = BAG.find(b => b.key === key);
+            if(ex) { if(multiOn()) { ex.qty = Math.min(MAXQ, ex.qty + 1); bagSave(); showToast("Quantity updated.", "success"); } else showToast("Already in your bag.", "info"); }
+            else { BAG.push({ key, pid: p.id, color: selectedColorProductShade, size: selectedProductSizeValue, qty: 1, t: Date.now() }); bagSave(); }
+            bagEdit = -1; paintBag(); openBag();
             const nb = document.getElementById('navBagBtn'); nb.classList.remove('bump'); void nb.offsetWidth; nb.classList.add('bump');
         };
-        window.bagRemove = i => { BAG.splice(i, 1); bagSave(); paintBag(); };
+        window.bagRemove = i => { BAG.splice(i, 1); bagEdit = -1; bagSave(); paintBag(); };
+        window.bagEditToggle = i => { bagEdit = bagEdit === i ? -1 : i; paintBag(); };
+        window.bagQty = (i, d) => { const b = BAG[i]; if(!b) return; b.qty = Math.max(1, Math.min(MAXQ, b.qty + d)); bagSave(); paintBag(); };
+        window.bagSet = (i, what, idx) => {
+            const b = BAG[i], p = b && CATALOG[b.pid]; if(!p) return;
+            const val = what === 'size' ? (p.sizes && p.sizes.length ? p.sizes : ['One Size'])[idx] : (p.colors || [])[idx] && p.colors[idx].name;
+            if(val === undefined || val === null) return;
+            const oos = (p.oosVariants || []).map(v => String(v).toUpperCase());
+            if(oos.includes(String(val).toUpperCase())) return showToast(what === 'size' ? "That size is sold out." : "That colour is sold out.", "error");
+            if(what === 'size') b.size = val; else b.color = val;
+            const key = [b.pid, b.color, b.size].join('|'), dup = BAG.findIndex((x, k) => k !== i && x.key === key);
+            b.key = key;
+            if(dup > -1) { BAG[dup].qty = Math.min(MAXQ, BAG[dup].qty + b.qty); BAG.splice(i, 1); bagEdit = -1; showToast("Merged with the same item in your bag.", "info"); }
+            bagSave(); paintBag();
+        };
+        function startCheckoutFor(first, cart) {
+            closeBag();
+            if(!renderProduct(first.b.pid)) return showToast("This item is no longer available.", "error");
+            selectedColorProductShade = first.b.color; selectedProductSizeValue = first.b.size;
+            const c = (first.p.colors || []).find(x => x.name === first.b.color), im = colImgs(first.p, c)[0]; if(im) document.getElementById('primaryCanvas').src = im;
+            window.__bagLine = cart ? null : first.b.key; window.__bagCart = cart;
+            initiateCheckoutProcess();
+        }
         window.bagCheckout = function(i) {
             const b = BAG[i]; if(!b) return;
-            const p = CATALOG[b.pid]; if(!p || p.status === 'DRAFT') return showToast("This item is no longer available.", "error");
-            if(p.status === 'OUT_OF_STOCK') return showToast("This item is sold out.", "error");
-            closeBag();
-            if(!renderProduct(b.pid)) return showToast("This item is no longer available.", "error");
-            const oos = (p.oosVariants || []).map(v => String(v).toUpperCase());
-            if(oos.includes(String(b.size).toUpperCase()) || oos.includes(String(b.color).toUpperCase())) return showToast("That size or colour is sold out now.", "error");
-            selectedColorProductShade = b.color; selectedProductSizeValue = b.size;
-            const c = (p.colors || []).find(x => x.name === b.color), im = colImgs(p, c)[0]; if(im) document.getElementById('primaryCanvas').src = im;
-            window.__bagLine = b.key;
-            initiateCheckoutProcess();
+            const info = lineInfo(b); if(info.gone) return showToast("This item is no longer available.", "error");
+            if(info.sold) return showToast("That size or colour is sold out now.", "error");
+            startCheckoutFor({ b, ...info }, null);
         };
+        window.bagCheckoutAll = function() {
+            const ls = liveLines(); if(!ls.length) return showToast("Nothing in your bag can be ordered right now.", "error");
+            const lines = ls.map(x => ({ key: x.b.key, pid: x.b.pid, color: x.b.color, size: x.b.size, qty: x.b.qty, price: +x.p.price || 0, name: x.p.name, img: colImgs(x.p, (x.p.colors || []).find(c => c.name === x.b.color))[0] || '' }));
+            const sum = lines.reduce((a, l) => a + l.price * l.qty, 0);
+            startCheckoutFor(ls[0], { lines, sum, pieces: lines.reduce((a, l) => a + l.qty, 0) });
+        };
+        function paintCheckoutSummary() {
+            const one = document.getElementById('checkoutSummarySingle'), many = document.getElementById('checkoutSummaryMulti'), cart = window.__bagCart;
+            if(!one || !many) return;
+            if(!cart) { one.classList.remove('hidden'); many.classList.add('hidden'); return; }
+            one.classList.add('hidden'); many.classList.remove('hidden');
+            many.innerHTML = cart.lines.map(l => `<div class="cs-i"><div class="im"><img src="${mEsc(l.img)}" alt=""></div><div class="flex-1 text-xs"><div class="flex justify-between gap-3"><span class="font-medium tracking-widest uppercase text-[11px] text-black">${mEsc(l.name)}</span><span>${mInr(l.price * l.qty)}</span></div><span class="block text-[10px] text-neutral-500 mt-2">${l.color ? mEsc(l.color) + ' · ' : ''}Size ${mEsc(l.size)}</span><span class="block text-[10px] text-neutral-500 mt-1">Qty ${l.qty}${l.qty > 1 ? ' × ' + mInr(l.price) : ''}</span></div></div>`).join('');
+        }
         function paintBag() {
             const n = BAG.length, body = document.getElementById('bagBody'), foot = document.getElementById('bagFoot'); if(!body) return;
-            document.getElementById('navBagBtn').textContent = `Bag (${n})`;
-            document.getElementById('bagCount').textContent = n ? `(${n})` : '';
+            const pieces = BAG.reduce((a, b) => a + qtyOf(b), 0);
+            document.getElementById('navBagBtn').textContent = `Bag (${pieces})`;
+            document.getElementById('bagCount').textContent = n ? `(${pieces})` : '';
             if(!n) {
                 const sug = liveList().filter(p => p.status !== 'OUT_OF_STOCK').slice(0, 2);
                 body.innerHTML = `<div class="py-16 text-center"><p class="hero-t text-2xl mb-3">Your bag is empty</p><p class="text-neutral-500 mb-8" style="font-size:12px">Pieces you add will wait for you here.</p><a href="#/shop" onclick="closeBag()" class="cta">Shop now <span>→</span></a></div>` + (sug.length ? `<p class="eyebrow text-neutral-400 mb-2">New in</p>` + sug.map(p => { const im = colImgs(p, (p.colors || [])[0])[0] || ''; return `<a class="sr-row" href="#/product/${encodeURIComponent(p.id)}" onclick="closeBag()"><img src="${mEsc(im)}" alt=""><div><b>${mEsc(p.name)}</b><small>${mEsc(p.category || '')}</small></div><span class="p">${mInr(p.price)}</span></a>`; }).join('') : '');
                 foot.style.display = 'none'; return;
             }
-            let sub = 0, save = 0, live = 0;
+            if(bagEdit >= n) bagEdit = -1;
+            const multi = multiOn(); let sub = 0, save = 0, live = 0, skipped = 0;
             body.innerHTML = BAG.map((b, i) => {
-                const p = CATALOG[b.pid], gone = !p || p.status === 'DRAFT';
-                if(gone) return `<div class="bl gone"><div style="width:84px;height:105px;background:#f4f3f1" class="flex-none"></div><div class="flex-1"><b>No longer available</b><small>This item was removed from the store.</small><div class="acts"><button class="m" onclick="bagRemove(${i})">Remove</button></div></div></div>`;
-                const c = (p.colors || []).find(x => x.name === b.color), im = colImgs(p, c)[0] || '';
-                const oos = (p.oosVariants || []).map(v => String(v).toUpperCase()), sold = p.status === 'OUT_OF_STOCK' || oos.includes(String(b.size).toUpperCase()) || oos.includes(String(b.color).toUpperCase());
-                if(!sold) { sub += +p.price || 0; save += Math.max(0, (+p.mrp || 0) - (+p.price || 0)); live++; }
-                return `<div class="bl ${sold ? 'gone' : ''}"><a href="#/product/${encodeURIComponent(p.id)}" onclick="closeBag()" class="flex-none"><img src="${mEsc(im)}" alt=""></a><div class="flex-1 min-w-0"><div class="flex justify-between gap-3"><b>${mEsc(p.name)}</b><span style="font-size:13px;white-space:nowrap">${mInr(p.price)}</span></div><small>${b.color ? mEsc(b.color) + ' · ' : ''}Size ${mEsc(b.size)}</small>${+p.mrp > +p.price ? `<small><s>${mInr(p.mrp)}</s> <span style="color:#b4231a">${mOff(p)}% off</span></small>` : ''}${sold ? '<small style="color:#b4231a">Sold out</small>' : ''}<div class="acts">${sold ? '' : `<button onclick="bagCheckout(${i})">Checkout</button>`}<button class="m" onclick="bagRemove(${i})">Remove</button></div></div></div>`;
+                const info = lineInfo(b);
+                if(info.gone) { skipped++; return `<div class="bl gone"><div style="width:84px;height:105px;background:#f4f3f1" class="flex-none"></div><div class="flex-1"><b>No longer available</b><small>This item was removed from the store.</small><div class="acts"><button class="m" onclick="bagRemove(${i})">Remove</button></div></div></div>`; }
+                const p = info.p, q = qtyOf(b), c = (p.colors || []).find(x => x.name === b.color), im = colImgs(p, c)[0] || '';
+                if(!info.sold) { sub += (+p.price || 0) * q; save += Math.max(0, (+p.mrp || 0) - (+p.price || 0)) * q; live++; } else skipped++;
+                let ed = '';
+                if(bagEdit === i) {
+                    const sizes = p.sizes && p.sizes.length ? p.sizes : ['One Size'];
+                    ed = `<div class="bed">${(p.colors || []).length > 1 ? `<p class="k">Colour</p><div class="sw">${p.colors.map((x, k) => `<button class="swatch ${x.name === b.color ? 'on' : ''} ${info.isOos(x.name) ? 'variant-disabled' : ''}" style="background:${mEsc(x.hex || '#ddd')}" onclick="bagSet(${i},'color',${k})" aria-label="${mEsc(x.name)}"></button>`).join('')}</div>` : ''}<p class="k">Size</p><div class="zs">${sizes.map((z, k) => `<button class="${z === b.size ? 'on' : ''} ${info.isOos(z) ? 'off' : ''}" onclick="bagSet(${i},'size',${k})">${mEsc(z)}</button>`).join('')}</div><button class="done" onclick="bagEditToggle(-1)">Done</button></div>`;
+                }
+                return `<div class="bl ${info.sold ? 'gone' : ''}"><a href="#/product/${encodeURIComponent(p.id)}" onclick="closeBag()" class="flex-none"><img src="${mEsc(im)}" alt=""></a><div class="flex-1 min-w-0"><div class="flex justify-between gap-3"><b>${mEsc(p.name)}</b><span style="font-size:13px;white-space:nowrap">${mInr((+p.price || 0) * q)}</span></div><small>${b.color ? mEsc(b.color) + ' · ' : ''}Size ${mEsc(b.size)}</small>${q > 1 ? `<small>${mInr(p.price)} each</small>` : ''}${+p.mrp > +p.price ? `<small><s>${mInr((+p.mrp) * q)}</s> <span style="color:#b4231a">${mOff(p)}% off</span></small>` : ''}${info.sold ? '<small style="color:#b4231a">Sold out. Tap Edit to pick another size or colour.</small>' : ''}
+                    ${multi ? `<div class="qty"><button onclick="bagQty(${i},-1)" ${b.qty <= 1 ? 'disabled' : ''} aria-label="Less">−</button><span>${b.qty}</span><button onclick="bagQty(${i},1)" ${b.qty >= MAXQ ? 'disabled' : ''} aria-label="More">+</button></div>` : ''}
+                    <div class="acts"><button onclick="bagEditToggle(${i})">${bagEdit === i ? 'Close' : 'Edit'}</button>${multi || info.sold ? '' : `<button onclick="bagCheckout(${i})">Checkout</button>`}<button class="m" onclick="bagRemove(${i})">Remove</button></div>${ed}</div></div>`;
             }).join('');
             foot.style.display = '';
+            const firstLive = liveLines()[0];
             foot.innerHTML = `<div class="flex justify-between items-baseline mb-1"><span class="eyebrow text-neutral-500">Subtotal</span><span style="font-size:18px">${mInr(sub)}</span></div>
                 ${save > 0 ? `<p class="text-right mb-1" style="font-size:11px;color:#b4231a">You save ${mInr(save)}</p>` : ''}
-                <p class="text-neutral-400 mb-5" style="font-size:11px;line-height:1.7">Delivery is free. Taxes included.${live > 1 ? ' Each piece is checked out as its own order, so use Checkout on the item you want first.' : ''}</p>
-                ${live === 1 ? `<button onclick="bagCheckout(${BAG.findIndex(b => { const p = CATALOG[b.pid]; return p && p.status !== 'DRAFT' && p.status !== 'OUT_OF_STOCK'; })})" class="w-full bg-black text-white py-[18px] fine btn-luxury" style="font-size:10px;letter-spacing:.26em">Checkout</button>` : ''}
+                <p class="text-neutral-400 mb-5" style="font-size:11px;line-height:1.7">Delivery is free. Taxes included.${skipped ? ' Sold-out or removed items are left out of checkout.' : ''}${!multi && live > 1 ? ' Each piece is checked out as its own order, so use Checkout on the item you want first.' : ''}</p>
+                ${(multi && live > 0) ? `<button onclick="bagCheckoutAll()" class="w-full bg-black text-white py-[18px] fine btn-luxury" style="font-size:10px;letter-spacing:.26em">Checkout · ${mInr(sub)}</button>` : ''}
+                ${(!multi && live === 1) ? `<button onclick="bagCheckout(${firstLive.i})" class="w-full bg-black text-white py-[18px] fine btn-luxury" style="font-size:10px;letter-spacing:.26em">Checkout</button>` : ''}
                 <p class="text-center mt-4 text-neutral-400 flex items-center justify-center gap-2" style="font-size:11px"><svg class="mc" style="width:16px;height:16px"><use href="#mcoin"/></svg>Earn M Coins on every order</p>`;
         }
         paintBag();
