@@ -85,6 +85,7 @@ textarea:focus{border-color:#000}
       <button data-t="users">Customers</button>
       <button data-t="reviews">Reviews</button>
       <button data-t="settings">Settings</button>
+      <button data-t="site">Website</button>
     </nav>
     <button class="btn l" id="codPill" onclick="toggleCod()" title="Stop or resume Cash on Delivery for everyone">COD …</button>
     <button class="btn l" onclick="doOut()">Sign out</button>
@@ -117,7 +118,6 @@ textarea:focus{border-color:#000}
           <label class="eb" style="margin:0">Bulk discount % on all products<input id="bulkPct" type="number" min="1" max="90" placeholder="e.g. 20"></label>
           <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount()">Apply</button>
           <button class="btn l" style="flex:0 0 auto" onclick="bulkDiscount(true)">Remove all discounts</button>
-          <button id="impBtn" class="btn l hide" style="flex:0 0 auto" onclick="importDefault()">Import Signature Tee</button>
         </div>
         <div class="tw"><table style="min-width:640px"><thead><tr><th></th><th>Product</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="pb"></tbody></table></div>
       </div>
@@ -214,6 +214,24 @@ textarea:focus{border-color:#000}
         <div class="row"><label class="eb">Grievance officer name<input id="sGrv"></label><label class="eb">Grievance officer email<input id="sGrvMail" type="email"></label><label class="eb">Return window (days, 0 = no returns)<input id="sRet" type="number" min="0" max="60"></label></div>
         <button class="btn" style="margin-top:24px" onclick="saveSettings()">Save settings</button>
       </div>
+    </section>
+    <section id="t-site" class="hide">
+      <div class="card"><p class="eb">Homepage content (blank = default; blank images use your newest product photos)</p>
+        <div class="row"><label class="eb">Hero image 1 (URL)<input id="hHero1"></label><label class="eb">Hero image 2 (URL)<input id="hHero2"></label></div>
+        <div class="row"><label class="eb">Hero small line<input id="hHeroEy"></label><label class="eb">Hero headline (Enter = new line)<textarea id="hHeroH" style="min-height:44px"></textarea></label></div>
+        <div class="row"><label class="eb">Story small line<input id="hEdEy"></label><label class="eb">Story headline<textarea id="hEdH" style="min-height:44px"></textarea></label><label class="eb">Story image (URL)<input id="hEdImg"></label></div>
+        <label class="eb">Story paragraph<textarea id="hEdP"></textarea></label>
+        <div class="row"><label class="eb">Promise 1<textarea id="hPr1"></textarea></label><label class="eb">Promise 2<textarea id="hPr2"></textarea></label><label class="eb">Promise 3<textarea id="hPr3"></textarea></label></div>
+        <label class="eb">Member band headline<input id="hMemH"></label>
+        <button class="btn" style="margin-top:20px" onclick="saveHome()">Save homepage</button></div>
+      <div class="card"><p class="eb">Kashish AI</p>
+        <div class="row"><label class="eb">Kashish AI on website<select id="kOn"><option value="1">On</option><option value="0">Off</option></select></label></div>
+        <label class="eb">Extra knowledge for Kashish (offers, delivery times, FAQs, brand facts. Only true facts.)<textarea id="kNotes" style="min-height:140px"></textarea></label>
+        <button class="btn" style="margin-top:16px" onclick="saveKash()">Save Kashish</button></div>
+      <div class="card"><p class="eb">Database editor (advanced: any path, full control)</p>
+        <div class="row" style="align-items:flex-end"><label class="eb">Path<input id="dbPath" placeholder="settings/site"></label><button class="btn l" style="flex:0 0 auto" onclick="dbLoad()">Load</button></div>
+        <label class="eb">JSON<textarea id="dbJson" style="min-height:200px;font-family:monospace"></textarea></label>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn" onclick="dbSave()">Save</button><button class="btn l" onclick="dbDel()">Delete path</button><button class="btn l" onclick="backupAll()">Download full backup</button></div></div>
     </section>
   </main>
 </div>
@@ -322,7 +340,7 @@ onAuthStateChanged(auth, u => {
 
 document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-  ['orders','product','coupons','users','settings'].forEach(t => $('t-'+t).classList.toggle('hide', t !== b.dataset.t));
+  ['orders','product','coupons','users','reviews','settings','site'].forEach(t => $('t-'+t).classList.toggle('hide', t !== b.dataset.t));
 });
 
 function start(){
@@ -333,6 +351,8 @@ function start(){
   onValue(ref(db,'coupons'), s => renderCoupons(s.val() || {}));
   onValue(ref(db,'reviews'), s => { REV = s.val() || {}; renderReviewsAdmin(); }, () => {});
   onValue(ref(db,'settings/business'), s => { BIZ = s.val() || {}; }, () => {});
+  onValue(ref(db,'settings/home'), s => { if (!document.activeElement || !document.activeElement.closest('#t-site')) fillHome(s.val() || {}); }, () => {});
+  onValue(ref(db,'settings/site'), s => { if (!document.activeElement || !document.activeElement.closest('#t-site')) fillKash(s.val() || {}); }, () => {});
 }
 
 /* ---------- Orders ---------- */
@@ -365,9 +385,9 @@ window.renderOrders = () => {
     const st = (o.orderPipelineTrackingState||'').toUpperCase();
     return `<tr><td><b style="font-weight:500">${esc(o.orderId)}</b><br><span class="eb">${new Date(o.chronologicalCreationTimestamp||0).toLocaleString('en-IN')}</span></td>
     <td>${esc(o.clientIdentityName)}<br><span class="eb" style="text-transform:none;letter-spacing:0">${esc(o.email)}</span><br><span style="color:#777;font-size:11px">${esc(o.consignmentDeliveryAddressText)}</span></td>
-    <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span></td>
+    <td>${esc(o.productTitleDescription)}<br><span class="eb">${esc(o.protocolMethodType)} · Code: ${esc(o.appliedPromoCode)}</span>${o.trackingNumber ? '<br><span class="eb">' + esc(o.courierName || 'Courier') + ' · ' + esc(o.trackingNumber) + '</span>' : ''}${o.adminNote ? '<br><span class="eb" style="text-transform:none">Note: ' + esc(o.adminNote) + '</span>' : ''}</td>
     <td>${inr(o.transactionSettlementAmount)}<br>${payTag(o)}</td>
-    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="printLabels(['${esc(o.k)}'])">Print label</button></td></tr>`;
+    <td><select onchange="setStatus('${esc(o.k)}',this.value)">${['PENDING_PAYMENT','PLACED','VERIFIED','SHIPPED','DELIVERED','CANCELLED'].map(s=>`<option ${s===st?'selected':''}>${s}</option>`).join('')}</select>${actionBtns(o, st)}<br><button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="printLabels(['${esc(o.k)}'])">Print label</button> <button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="trackEdit('${esc(o.k)}')">Tracking / note</button> <button class="btn l" style="margin-top:8px;padding:8px 12px" onclick="delOrder('${esc(o.k)}')">Delete</button></td></tr>`;
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No orders found</td></tr>';
 };
 window.setStatus = async (k, v) => {
@@ -390,13 +410,12 @@ window.setStatus = async (k, v) => {
 };
 
 /* ---------- Products ---------- */
-const DEFAULT_PRODUCTS = {monte_signature_tee:{name:'MONTÈ Signature Tee',category:'T-Shirts',sku:'MNT-TEE-001',description:'Effortless, refined and timeless. A relaxed, oversized silhouette cut from premium cotton for all-day comfort and a clean, elevated line.',details:['Premium cotton fabric','Oversized contemporary fit','Soft-touch organic finish','Breathable and ultra-light'],care:'Machine wash cold with similar colours. Do not bleach. Dry in shade. Iron on low heat.',price:999,mrp:1499,status:'ACTIVE',badge:'',offerText:'',launchTimestamp:0,createdAt:1,images:['https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png','https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png','https://aryasongs.github.io/Pulse/9BF12F78-C4CF-4BEF-86AE-A489D8B36021.png','https://aryasongs.github.io/Pulse/B0ED3981-14B8-4A5D-83BF-D23C1DB14F2E.png'],colors:[{name:'Midnight Navy',hex:'#1A2332',image:'https://aryasongs.github.io/Pulse/91489E68-3549-48F7-9A36-7F25375A0E50.png'},{name:'Arctic Blanc',hex:'#F5F5F5',image:'https://aryasongs.github.io/Pulse/55F3C14A-0AB9-416A-891E-4B97F15829B1.png'}],sizes:['S','M','L','XL','2XL','3XL','4XL'],oosVariants:[]}};
 let CAT = {}, editId = null, oosSet = new Set();
 const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'product';
 const offPct = p => (+p.mrp > +p.price) ? Math.round((1 - p.price/p.mrp)*100) : 0;
 function renderProducts(){
   const rows = Object.entries(CAT).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
-  $('impBtn').classList.toggle('hide', rows.length > 0);
+  
   $('cats').innerHTML = [...new Set(rows.map(r=>r[1].category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
   const lab = {ACTIVE:'Available',OUT_OF_STOCK:'Sold out',DRAFT:'Hidden'};
   $('pb').innerHTML = rows.map(([id,p])=>`<tr><td><img class="th" src="${esc((p.images||[])[0]||'')}"></td>
@@ -404,7 +423,7 @@ function renderProducts(){
     <td>${inr(p.price)} ${offPct(p)?`<span style="text-decoration:line-through;color:#999">${inr(p.mrp)}</span> <span class="tag">-${offPct(p)}%</span>`:''}</td>
     <td><span class="tag">${p.status==='COMING_SOON' ? (+p.launchTimestamp > Date.now() ? 'Launches ' + new Date(+p.launchTimestamp).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : 'Live (launched)') : (lab[p.status]||p.status)}</span></td>
     <td style="text-align:right;white-space:nowrap"><button class="btn l" onclick="editProd('${esc(id)}')">Edit</button> <button class="btn l" onclick="openLabels('${esc(id)}')">Barcode labels</button> <button class="btn l" onclick="dupProd('${esc(id)}')">Duplicate</button> <button class="btn l" onclick="togProd('${esc(id)}')">${p.status==='DRAFT'?'Show':'Hide'}</button> <button class="btn l" onclick="delProd('${esc(id)}')">Delete</button></td></tr>`).join('')
-    || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Add one or import the Signature Tee.</td></tr>';
+    || '<tr><td colspan="5" style="text-align:center;color:#999;padding:40px">No products yet. Tap + New product to add your first one.</td></tr>';
 }
 const F = id => $(id);
 window.newProd = () => { editId = null; fillForm({status:'ACTIVE',price:'',mrp:''}); F('fSku').value=genSku(); $('pTitle').textContent = 'New product'; showEdit(); };
@@ -451,7 +470,6 @@ window.saveProd = async () => {
   catch(e){ toast('Failed: ' + e.message); }
 };
 window.delProd = id => confirm('Delete "' + (CAT[id]||{}).name + '" permanently?') && remove(ref(db, 'catalog/' + id)).then(() => toast('Deleted'));
-window.importDefault = async () => { const u = {}; Object.entries(DEFAULT_PRODUCTS).forEach(([k,v]) => u[k] = {...v, createdAt: Date.now()}); await update(ref(db, 'catalog'), u); toast('Imported'); };
 window.bulkDiscount = async (clear) => {
   const pct = +$('bulkPct').value; if (!clear && !(pct > 0 && pct < 90)) return toast('Enter a % between 1 and 89');
   if (!confirm(clear ? 'Set every product price equal to its MRP?' : `Apply ${pct}% off MRP to ALL products?`)) return;
@@ -528,7 +546,7 @@ function paintUser(){
   $('umPlus').innerHTML = `<span class="tag">${esc(plusLabel(u))}</span>`;
   $('umAct').innerHTML = `<button class="btn l" onclick="uSet('${esc(umId)}',{codBlocked:${!u.codBlocked}})">${u.codBlocked ? 'Allow COD' : 'Block COD'}</button>
     <button class="btn l" onclick="uSet('${esc(umId)}',{suspended:${!u.suspended}})">${u.suspended ? 'Reinstate' : 'Suspend'}</button>
-    <button class="btn l" onclick="uSet('${esc(umId)}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button>`;
+    <button class="btn l" onclick="uSet('${esc(umId)}',{cancelCount:0,totalCancelCount:0,lastCancelTimestamp:0})">Reset cancels</button> <button class="btn l" onclick="delUser('${esc(umId)}')">Delete record</button>`;
   const mine = Object.values(orders).filter(o => o.uid === umId).sort((a,b) => (b.chronologicalCreationTimestamp||0)-(a.chronologicalCreationTimestamp||0)).slice(0, 8);
   $('umOrders').innerHTML = mine.length ? mine.map(o => `<div class="lg"><div>${esc(o.orderId)}<small>${esc(o.productTitleDescription||'')}</small></div><span>${inr(o.transactionSettlementAmount)} · ${esc(o.orderPipelineTrackingState)}</span></div>`).join('') : '<p class="eb">No orders</p>';
 }
@@ -726,6 +744,20 @@ window.printShown = () => {
   if (!confirm(`Print ${keys.length} shipping label${keys.length > 1 ? 's' : ''}?`)) return;
   printLabels(keys);
 };
+
+const HK = ['Hero1','HeroEy','HeroH','Hero2','EdEy','EdH','EdImg','EdP','Pr1','Pr2','Pr3','MemH'], hk = k => k[0].toLowerCase() + k.slice(1);
+window.fillHome = h => HK.forEach(k => { $('h' + k).value = h[hk(k)] || ''; });
+window.saveHome = () => { const o = {}; HK.forEach(k => { o[hk(k)] = $('h' + k).value.trim(); }); set(ref(db, 'settings/home'), o).then(() => toast('Homepage saved, live now')).catch(e => toast('Failed: ' + e.message)); };
+window.fillKash = s => { $('kOn').value = s.kashishEnabled === false ? '0' : '1'; $('kNotes').value = s.kashishNotes || ''; };
+window.saveKash = () => update(ref(db, 'settings/site'), { kashishEnabled: $('kOn').value === '1', kashishNotes: $('kNotes').value.trim() }).then(() => toast('Kashish updated')).catch(e => toast('Failed: ' + e.message));
+const dbp = () => $('dbPath').value.trim().replace(/^\/+|\/+$/g, '');
+window.dbLoad = async () => { const p = dbp(); if (!p) return toast('Enter a path'); try { $('dbJson').value = JSON.stringify((await get(ref(db, p))).val(), null, 2); } catch(e) { toast('Failed: ' + e.message); } };
+window.dbSave = async () => { const p = dbp(); if (!p) return toast('Enter a path'); let v; try { v = JSON.parse($('dbJson').value); } catch(e) { return toast('Invalid JSON'); } if (!confirm('Overwrite "' + p + '" with this JSON?')) return; try { await set(ref(db, p), v); toast('Saved'); } catch(e) { toast('Failed: ' + e.message); } };
+window.dbDel = async () => { const p = dbp(); if (!p) return toast('Enter a path'); if (!p.includes('/') && !confirm('This is a top-level node. Delete everything under it?')) return; if (!confirm('Delete "' + p + '" permanently?')) return; try { await remove(ref(db, p)); $('dbJson').value = ''; toast('Deleted'); } catch(e) { toast('Failed: ' + e.message); } };
+window.backupAll = async () => { try { const o = {}; for (const k of ['catalog','orders','users','coupons','settings','reviews']) { try { o[k] = (await get(ref(db, k))).val(); } catch(e) { o[k] = null; } } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 1)], { type: 'application/json' })); a.download = 'monte-backup-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); toast('Backup downloaded'); } catch(e) { toast('Failed: ' + e.message); } };
+window.trackEdit = k => { const o = orders[k] || {}; const c = prompt('Courier name', o.courierName || ''); if (c === null) return; const t = prompt('Tracking number / AWB', o.trackingNumber || ''); if (t === null) return; const n = prompt('Internal note (only you see this)', o.adminNote || ''); if (n === null) return; update(ref(db, 'orders/' + k), { courierName: c.trim(), trackingNumber: t.trim(), adminNote: n.trim() }).then(() => toast('Order updated')).catch(e => toast('Failed: ' + e.message)); };
+window.delOrder = k => confirm('Delete this order record permanently? This cannot be undone.') && remove(ref(db, 'orders/' + k)).then(() => toast('Order deleted')).catch(e => toast('Failed: ' + e.message));
+window.delUser = id => confirm('Delete this customer record (profile, coins, history)? Their login account itself stays.') && remove(ref(db, 'users/' + id)).then(() => { closeUser(); toast('Customer record deleted'); }).catch(e => toast('Failed: ' + e.message));
 
 /* ---------- Reviews moderation ---------- */
 window.renderReviewsAdmin = () => {
